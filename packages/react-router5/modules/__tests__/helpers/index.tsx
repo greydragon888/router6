@@ -4,12 +4,6 @@ import { RouterProvider } from '../../'
 import { mount } from 'enzyme'
 import browserPlugin from '../../../../router5-plugin-browser'
 
-export class Child extends Component {
-    render() {
-        return <div />
-    }
-}
-
 export const FnChild: FC<Record<string, any>> = () => <div />
 
 export const createTestRouter = () => {
