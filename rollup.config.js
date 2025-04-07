@@ -82,9 +82,5 @@ module.exports = [
     makePackageConfig('router5-plugin-logger'),
     makePackageConfig('router5-plugin-listeners'),
     makePackageConfig('router5-plugin-persistent-params'),
-    makePackageConfig('rxjs-router5'),
-    makePackageConfig('xstream-router5'),
     makePackageConfig('react-router5'),
-    makePackageConfig('redux-router5'),
-    makePackageConfig('redux-router5-immutable')
 ].filter(Boolean)
