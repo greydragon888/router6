@@ -7,16 +7,9 @@
     "postbuild": "cp -f README.md ./packages/router5/README.md",
     "test": "jest",
     "lint": "eslint packages/*/modules --ext ts,tsx",
-    "format": "prettier 'packages/**/*.{js,ts,json}'",
-    "changelog": "lerna-changelog",
-    "release": "lerna publish"
+    "format": "prettier 'packages/**/*.{js,ts,json}'"
   },
-  "lint-staged": {
-    "packages/**/*.{js,ts}": [
-      "prettier --write",
-      "git add"
-    ]
-  },
+  "workspaces": ["packages/*"],
   "repository": {
     "type": "git",
     "url": "https://github.com/OlIvAl/router6.git"
@@ -51,36 +44,27 @@
     "eslint-plugin-import": "~2.19.1",
     "eslint-plugin-react": "~7.17.0",
     "eslint-plugin-react-hooks": "~2.3.0",
-    "express": "~4.17.1",
     "husky": "~3.1.0",
     "jest": "~24.9.0",
-    "lerna": "^3.19.0",
-    "lerna-changelog": "~1.0.0",
     "lint-staged": "~9.5.0",
-    "most": "~1.7.3",
     "prettier": "~1.19.1",
     "react": "~16.12.0",
-    "react-addons-test-utils": "~15.6.2",
     "react-dom": "~16.12.0",
     "rollup": "~1.27.14",
     "rollup-plugin-typescript2": "~0.25.3",
     "rollup-plugin-uglify": "~6.0.4",
     "ts-jest": "~24.2.0",
-    "typescript": "~3.7.4",
-    "webpack": "~4.41.4",
-    "webpack-dev-middleware": "~3.7.2",
-    "webpack-dev-server": "~3.10.1"
+    "typescript": "~3.7.4"
+  },
+  "lint-staged": {
+    "packages/**/*.{js,ts}": [
+      "prettier --write",
+      "git add"
+    ]
   },
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"
     }
-  },
-  "workspaces": {
-    "packages": [
-      "packages/*",
-      "examples/*",
-      "unmaintained/*"
-    ]
   }
 }
