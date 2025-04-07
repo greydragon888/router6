@@ -1,7 +1,7 @@
 {
-  "name": "router5",
+  "name": "router6",
   "private": true,
-  "description": "A simple, powerful, view-agnostic, modular and extensible router",
+  "description": "Router6 is a modern continuation of router5 — keeping its powerful API while bringing updated tooling, simplified structure, and active maintenance.",
   "scripts": {
     "build": "rollup -c rollup.config.js",
     "postbuild": "cp -f README.md ./packages/router5/README.md",
@@ -19,7 +19,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/router5/router5.git"
+    "url": "https://github.com/OlIvAl/router6.git"
   },
   "keywords": [
     "router",
@@ -33,7 +33,7 @@
   "author": "Thomas Roch",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/router5/router5/issues"
+    "url": "https://github.com/OlIvAl/router6/issues"
   },
   "homepage": "https://router5.js.org",
   "devDependencies": {
@@ -65,13 +65,11 @@
     "rollup": "~1.27.14",
     "rollup-plugin-typescript2": "~0.25.3",
     "rollup-plugin-uglify": "~6.0.4",
-    "rxjs": "~6.5.3",
     "ts-jest": "~24.2.0",
     "typescript": "~3.7.4",
     "webpack": "~4.41.4",
     "webpack-dev-middleware": "~3.7.2",
-    "webpack-dev-server": "~3.10.1",
-    "xstream": "~11.11.0"
+    "webpack-dev-server": "~3.10.1"
   },
   "husky": {
     "hooks": {
