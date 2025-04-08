@@ -58,7 +58,7 @@ const getState = () => window.history.state
 
 const getHash = () => window.location.hash
 
-let browser = {}
+let browser: Browser
 if (isBrowser) {
     browser = {
         getBase,

@@ -1,8 +1,8 @@
 import createRouter from 'router5'
-import React, { Component, FC } from 'react'
+import React, { FC } from 'react'
 import { RouterProvider } from '../../'
 import { mount } from 'enzyme'
-import browserPlugin from '../../../../router5-plugin-browser'
+import browserPlugin from 'router5-plugin-browser'
 
 export const FnChild: FC<Record<string, any>> = () => <div />
 
