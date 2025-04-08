@@ -30,9 +30,6 @@
   "dependencies": {
     "router5-transition-path": "^8.0.1"
   },
-  "devDependencies": {
-    "router5": "^8.0.1"
-  },
   "peerDependencies": {
     "react": ">=16.3.0",
     "router5": "^8.0.0"

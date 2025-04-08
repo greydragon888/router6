@@ -6,8 +6,7 @@
     "build": "rollup -c rollup.config.js",
     "postbuild": "cp -f README.md ./packages/router5/README.md",
     "test": "jest",
-    "lint": "eslint packages/*/modules --ext ts,tsx",
-    "format": "prettier 'packages/**/*.{js,ts,json}'"
+    "lint": "eslint packages/*/modules --ext ts,tsx"
   },
   "workspaces": ["packages/*"],
   "repository": {
@@ -48,23 +47,12 @@
     "jest": "~24.9.0",
     "lint-staged": "~9.5.0",
     "prettier": "~1.19.1",
-    "react": "~16.12.0",
-    "react-dom": "~16.12.0",
+    "react": "~16.14.0",
+    "react-dom": "~16.14.0",
     "rollup": "~1.27.14",
     "rollup-plugin-typescript2": "~0.25.3",
     "rollup-plugin-uglify": "~6.0.4",
     "ts-jest": "~24.2.0",
     "typescript": "~3.7.4"
-  },
-  "lint-staged": {
-    "packages/**/*.{js,ts}": [
-      "prettier --write",
-      "git add"
-    ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
   }
 }

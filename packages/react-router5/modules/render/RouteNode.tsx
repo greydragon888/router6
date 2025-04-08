@@ -1,4 +1,4 @@
-import React, { ReactNode, SFC } from 'react'
+import React, { ReactNode, FC } from 'react'
 import { shouldUpdateNode } from 'router5-transition-path'
 import { RouteContext } from '../types'
 import { routeContext } from '../context'
@@ -27,7 +27,7 @@ class RouteNodeRenderer extends React.Component<RouteNodeProps & RouteContext> {
     }
 }
 
-const RouteNode: SFC<RouteNodeProps> = props => {
+const RouteNode: FC<RouteNodeProps> = props => {
     return (
         <routeContext.Consumer>
             {routeContext => <RouteNodeRenderer {...props} {...routeContext} />}

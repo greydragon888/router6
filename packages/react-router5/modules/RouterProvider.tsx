@@ -11,7 +11,7 @@ export interface RouteProviderProps {
 class RouterProvider extends React.PureComponent<RouteProviderProps> {
     private mounted: boolean
     private routeState: RouteState
-    private unsubscribe: UnsubscribeFn
+    private readonly unsubscribe: UnsubscribeFn
 
     constructor(props) {
         super(props)

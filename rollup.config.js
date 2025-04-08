@@ -45,11 +45,13 @@ const makeConfig = ({
             : [
                   {
                       format: 'es',
-                      file: `packages/${packageName}/dist/index.es.js`
+                      file: `packages/${packageName}/dist/index.es.js`,
+                      exports: 'named'
                   },
                   {
                       format: 'cjs',
-                      file: `packages/${packageName}/dist/index.js`
+                      file: `packages/${packageName}/dist/index.js`,
+                      exports: 'named'
                   }
               ],
         plugins
@@ -68,13 +70,15 @@ module.exports = [
         packageName: 'router5',
         file: 'dist/router5.min.js',
         umd: true,
-        compress: true
+        compress: true,
+        declaration: true
     }),
     makeConfig({
         packageName: 'router5',
         file: 'dist/router5.js',
         umd: true,
-        format: 'umd'
+        format: 'umd',
+        declaration: true
     }),
     makePackageConfig('router5'),
     makePackageConfig('router5-helpers'),

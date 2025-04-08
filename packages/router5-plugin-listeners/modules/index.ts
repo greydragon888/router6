@@ -1,6 +1,5 @@
 import { PluginFactory, Router, State } from 'router5'
 import transitionPath from 'router5-transition-path'
-import { removeListener } from 'cluster'
 
 export type Listener = (toState: State, fromState: State | null) => void
 
