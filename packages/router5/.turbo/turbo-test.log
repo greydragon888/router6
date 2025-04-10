@@ -1,222 +1,19 @@
 
-
 > router5@8.0.1 test
 > jest
 
-[1G[0K[1m[2mDetermining test suites to run...[22m[22m[999D[K
+PASS modules/__tests__/routeLifecycle.ts
+PASS modules/__tests__/clone.ts
+PASS modules/__tests__/observable.ts
+PASS modules/__tests__/utils.ts
+PASS modules/__tests__/routerLifecycle.ts
+PASS modules/__tests__/plugins.ts
+PASS modules/__tests__/middleware.ts
+PASS modules/__tests__/index.ts
+PASS modules/__tests__/navigation.ts
 
-[1mTest Suites: [22m0 of 9 total
-[1mTests:       [22m0 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        0 s, estimated 3 s
-[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mplugins.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mrouteLifecycle.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mutils.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mnavigation.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mmiddleware.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mclone.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mobservable.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mrouterLifecycle.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-
-[1mTest Suites: [22m0 of 9 total
-[1mTests:       [22m0 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        0 s, estimated 3 s
-[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mplugins.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mrouteLifecycle.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mutils.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mnavigation.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mmiddleware.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mclone.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mobservable.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mrouterLifecycle.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-
-[1mTest Suites: [22m0 of 9 total
-[1mTests:       [22m0 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        1 s, estimated 3 s
-[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mplugins.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mrouteLifecycle.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mutils.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mnavigation.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mmiddleware.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mclone.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mobservable.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mrouterLifecycle.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-
-[1mTest Suites: [22m0 of 9 total
-[1mTests:       [22m0 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        2 s, estimated 3 s
-[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2mmodules/__tests__/[22m[1mutils.ts[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mplugins.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mrouteLifecycle.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mutils.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mnavigation.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mmiddleware.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mclone.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mobservable.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mrouterLifecycle.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-
-[1mTest Suites: [22m0 of 9 total
-[1mTests:       [22m0 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        2 s, estimated 3 s
-[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mplugins.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mrouteLifecycle.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mutils.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mnavigation.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mmiddleware.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mclone.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mobservable.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mrouterLifecycle.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-
-[1mTest Suites: [22m0 of 9 total
-[1mTests:       [22m0 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        2 s, estimated 3 s
-[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2mmodules/__tests__/[22m[1mrouteLifecycle.ts[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mplugins.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mrouteLifecycle.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mutils.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mnavigation.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mmiddleware.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mclone.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mobservable.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mrouterLifecycle.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-
-[1mTest Suites: [22m0 of 9 total
-[1mTests:       [22m0 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        2 s, estimated 3 s
-[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mplugins.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mrouteLifecycle.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mutils.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mnavigation.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mmiddleware.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mclone.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mobservable.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mrouterLifecycle.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-
-[1mTest Suites: [22m0 of 9 total
-[1mTests:       [22m0 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        2 s, estimated 3 s
-[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2mmodules/__tests__/[22m[1mmiddleware.ts[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mplugins.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mrouteLifecycle.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mutils.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mnavigation.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mmiddleware.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mclone.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mobservable.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mrouterLifecycle.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-
-[1mTest Suites: [22m0 of 9 total
-[1mTests:       [22m0 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        2 s, estimated 3 s
-[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2mmodules/__tests__/[22m[1mplugins.ts[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mplugins.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mrouteLifecycle.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mutils.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mnavigation.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mmiddleware.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mclone.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mobservable.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mrouterLifecycle.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-
-[1mTest Suites: [22m0 of 9 total
-[1mTests:       [22m0 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        2 s, estimated 3 s
-[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2mmodules/__tests__/[22m[1mrouterLifecycle.ts[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mplugins.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mrouteLifecycle.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mutils.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mnavigation.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mmiddleware.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mclone.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mobservable.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mrouterLifecycle.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-
-[1mTest Suites: [22m0 of 9 total
-[1mTests:       [22m0 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        2 s, estimated 3 s
-[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2mmodules/__tests__/[22m[1mobservable.ts[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mplugins.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mrouteLifecycle.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mutils.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mnavigation.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mmiddleware.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mclone.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mobservable.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mrouterLifecycle.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-
-[1mTest Suites: [22m0 of 9 total
-[1mTests:       [22m0 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        2 s, estimated 3 s
-[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mnavigation.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mclone.ts[22m
-
-[1mTest Suites: [22m[1m[32m7 passed[39m[22m, 7 of 9 total
-[1mTests:       [22m[1m[32m44 passed[39m[22m, 44 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        2 s, estimated 3 s
-[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2mmodules/__tests__/[22m[1mclone.ts[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mnavigation.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mclone.ts[22m
-
-[1mTest Suites: [22m[1m[32m7 passed[39m[22m, 7 of 9 total
-[1mTests:       [22m[1m[32m44 passed[39m[22m, 44 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        2 s, estimated 3 s
-[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2mmodules/__tests__/[22m[1mnavigation.ts[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mnavigation.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mclone.ts[22m
-
-[1mTest Suites: [22m[1m[32m7 passed[39m[22m, 7 of 9 total
-[1mTests:       [22m[1m[32m44 passed[39m[22m, 44 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        2 s, estimated 3 s
-[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-
-[1mTest Suites: [22m[1m[32m9 passed[39m[22m, 9 total
-[1mTests:       [22m[1m[32m62 passed[39m[22m, 62 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        2 s, estimated 3 s
-[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[999D[K
-[1mTest Suites: [22m[1m[32m9 passed[39m[22m, 9 total
-[1mTests:       [22m[1m[32m62 passed[39m[22m, 62 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        2.785 s, estimated 3 s
-[2mRan all test suites[22m[2m.[22m
-[1G[0K\[1G[0K
+Test Suites: 9 passed, 9 total
+Tests:       62 passed, 62 total
+Snapshots:   0 total
+Time:        2.837 s, estimated 5 s
+Ran all test suites.

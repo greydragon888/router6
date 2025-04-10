@@ -3,7 +3,9 @@ coverage
 npm-debug.log
 
 packages/*/dist
+packages/*/.turbo
 .changelog
 .DS_Store
 
 dist
+.turbo

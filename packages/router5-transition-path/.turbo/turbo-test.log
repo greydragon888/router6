@@ -1,61 +1,20 @@
 
-
 > router5-transition-path@8.0.1 test
 > jest
 
-[1G[0K[1m[2mDetermining test suites to run...[22m[22m[999D[K
-[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
+PASS modules/__tests__/index.ts
+  router5-transition-path
+    ✓ should return a transition path with from null state (2 ms)
+    ✓ should return transition path between two states (1 ms)
+    ✓ should return transition path two states with same name but different params
+    ✓ should take into action transition options
+    shouldUpdateNode
+      ✓ should tell intersection node to update
+      ✓ should tell node above intersection to not update
+      ✓ should tell node below intersection to update if not deactivated (1 ms)
 
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-[K[1A[K[1A  router5-transition-path
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-[K[1A[K[1A    [32m✓[39m [2mshould return a transition path with from null state (1 ms)[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-[K[1A[K[1A    [32m✓[39m [2mshould return transition path between two states (1 ms)[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-[K[1A[K[1A    [32m✓[39m [2mshould return transition path two states with same name but different params (2 ms)[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-[K[1A[K[1A    [32m✓[39m [2mshould take into action transition options[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-[K[1A[K[1A    shouldUpdateNode
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-[K[1A[K[1A      [32m✓[39m [2mshould tell intersection node to update (1 ms)[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-[K[1A[K[1A      [32m✓[39m [2mshould tell node above intersection to not update[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-[K[1A[K[1A      [32m✓[39m [2mshould tell node below intersection to update if not deactivated[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-[K[1A[K[1A
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-[K[1A[K[1A[999D[K[1mTest Suites: [22m[1m[32m1 passed[39m[22m, 1 total
-[1mTests:       [22m[1m[32m7 passed[39m[22m, 7 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        1.986 s, estimated 2 s
-[2mRan all test suites[22m[2m.[22m
-[1G[0K\[1G[0K
+Test Suites: 1 passed, 1 total
+Tests:       7 passed, 7 total
+Snapshots:   0 total
+Time:        2.131 s, estimated 4 s
+Ran all test suites.
