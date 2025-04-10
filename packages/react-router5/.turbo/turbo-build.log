@@ -12,23 +12,18 @@
 [34mCLI[39m tsup v8.4.0
 [34mCLI[39m Using tsup config: /Users/olegivanov/WebstormProjects/router6/packages/react-router5/tsup.config.ts
 [34mCLI[39m Target: esnext
-[34mCLI[39m Cleaning output folder
-[34mESM[39m Build start
 [34mCLI[39m Target: esnext
 [34mCLI[39m Cleaning output folder
+[34mESM[39m Build start
+[34mCLI[39m Cleaning output folder
 [34mCJS[39m Build start
-[32mESM[39m [1mdist/esm/index.mjs     [22m[32m3.08 KB[39m
-[32mESM[39m [1mdist/esm/index.mjs.map [22m[32m13.38 KB[39m
-[32mESM[39m ⚡️ Build success in 26ms
 [32mCJS[39m [1mdist/cjs/index.js     [22m[32m3.86 KB[39m
 [32mCJS[39m [1mdist/cjs/index.js.map [22m[32m13.62 KB[39m
-[32mCJS[39m ⚡️ Build success in 25ms
+[32mCJS[39m ⚡️ Build success in 16ms
+[32mESM[39m [1mdist/esm/index.mjs     [22m[32m3.08 KB[39m
+[32mESM[39m [1mdist/esm/index.mjs.map [22m[32m13.38 KB[39m
+[32mESM[39m ⚡️ Build success in 18ms
 DTS Build start
-DTS ⚡️ Build success in 882ms
+DTS ⚡️ Build success in 1886ms
 DTS dist/esm/index.d.mts 18.63 KB
-[1G[0K\[1G[0K[1mnpm[22m [96mnotice[39m
-[1mnpm[22m [96mnotice[39m New [31mmajor[39m version of npm available! [31m10.9.2[39m -> [34m11.3.0[39m
-[1mnpm[22m [96mnotice[39m Changelog: [34mhttps://github.com/npm/cli/releases/tag/v11.3.0[39m
-[1mnpm[22m [96mnotice[39m To update run: [4mnpm install -g npm@11.3.0[24m
-[1mnpm[22m [96mnotice[39m
 [1G[0K\[1G[0K

@@ -17,18 +17,13 @@
 [34mESM[39m Build start
 [34mCLI[39m Cleaning output folder
 [34mCJS[39m Build start
-[32mCJS[39m [1mdist/cjs/index.js     [22m[32m3.69 KB[39m
-[32mCJS[39m [1mdist/cjs/index.js.map [22m[32m16.19 KB[39m
-[32mCJS[39m ⚡️ Build success in 17ms
 [32mESM[39m [1mdist/esm/index.mjs     [22m[32m3.27 KB[39m
 [32mESM[39m [1mdist/esm/index.mjs.map [22m[32m16.13 KB[39m
-[32mESM[39m ⚡️ Build success in 18ms
+[32mESM[39m ⚡️ Build success in 26ms
+[32mCJS[39m [1mdist/cjs/index.js     [22m[32m3.69 KB[39m
+[32mCJS[39m [1mdist/cjs/index.js.map [22m[32m16.19 KB[39m
+[32mCJS[39m ⚡️ Build success in 25ms
 DTS Build start
-DTS ⚡️ Build success in 971ms
+DTS ⚡️ Build success in 1692ms
 DTS dist/esm/index.d.mts 1.14 KB
-[1G[0K\[1G[0K[1mnpm[22m [96mnotice[39m
-[1mnpm[22m [96mnotice[39m New [31mmajor[39m version of npm available! [31m10.9.2[39m -> [34m11.3.0[39m
-[1mnpm[22m [96mnotice[39m Changelog: [34mhttps://github.com/npm/cli/releases/tag/v11.3.0[39m
-[1mnpm[22m [96mnotice[39m To update run: [4mnpm install -g npm@11.3.0[24m
-[1mnpm[22m [96mnotice[39m
 [1G[0K\[1G[0K

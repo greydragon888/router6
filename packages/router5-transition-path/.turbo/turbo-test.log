@@ -29,10 +29,10 @@
 [K[1A[K[1A    [32m✓[39m [2mshould return a transition path with from null state (1 ms)[22m
 
 [0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-[K[1A[K[1A    [32m✓[39m [2mshould return transition path between two states[22m
+[K[1A[K[1A    [32m✓[39m [2mshould return transition path between two states (1 ms)[22m
 
 [0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-[K[1A[K[1A    [32m✓[39m [2mshould return transition path two states with same name but different params (1 ms)[22m
+[K[1A[K[1A    [32m✓[39m [2mshould return transition path two states with same name but different params (2 ms)[22m
 
 [0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
 [K[1A[K[1A    [32m✓[39m [2mshould take into action transition options[22m
@@ -41,7 +41,7 @@
 [K[1A[K[1A    shouldUpdateNode
 
 [0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-[K[1A[K[1A      [32m✓[39m [2mshould tell intersection node to update[22m
+[K[1A[K[1A      [32m✓[39m [2mshould tell intersection node to update (1 ms)[22m
 
 [0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
 [K[1A[K[1A      [32m✓[39m [2mshould tell node above intersection to not update[22m
@@ -56,6 +56,6 @@
 [K[1A[K[1A[999D[K[1mTest Suites: [22m[1m[32m1 passed[39m[22m, 1 total
 [1mTests:       [22m[1m[32m7 passed[39m[22m, 7 total
 [1mSnapshots:   [22m0 total
-[1mTime:[22m        0.873 s, estimated 1 s
+[1mTime:[22m        1.986 s, estimated 2 s
 [2mRan all test suites[22m[2m.[22m
 [1G[0K\[1G[0K
