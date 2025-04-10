@@ -2,8 +2,10 @@ node_modules
 coverage
 npm-debug.log
 
-packages/*/dist
+packages/**/dist
+packages/**/.turbo
 .changelog
 .DS_Store
 
 dist
+.turbo
