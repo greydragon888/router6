@@ -30,7 +30,7 @@
 [K[1A[K[1A      [32m✓[39m [2mshould return true if a route starts with a segment (1 ms)[22m
 
 [0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-[K[1A[K[1A      [32m✓[39m [2mshould return false if a route does not start with a segment[22m
+[K[1A[K[1A      [32m✓[39m [2mshould return false if a route does not start with a segment (1 ms)[22m
 
 [0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
 [K[1A[K[1A    .endsWithSegment()
@@ -39,7 +39,7 @@
 [K[1A[K[1A      [32m✓[39m [2mshould return true if a route ends with a segment[22m
 
 [0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
-[K[1A[K[1A      [32m✓[39m [2mshould return false if a route does not end with a segment (1 ms)[22m
+[K[1A[K[1A      [32m✓[39m [2mshould return false if a route does not end with a segment[22m
 
 [0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
 [K[1A[K[1A    .includesSegment()
@@ -57,11 +57,6 @@
 [K[1A[K[1A[999D[K[1mTest Suites: [22m[1m[32m1 passed[39m[22m, 1 total
 [1mTests:       [22m[1m[32m6 passed[39m[22m, 6 total
 [1mSnapshots:   [22m0 total
-[1mTime:[22m        0.927 s, estimated 1 s
+[1mTime:[22m        0.882 s, estimated 1 s
 [2mRan all test suites[22m[2m.[22m
-[1G[0K\[1G[0K[1mnpm[22m [96mnotice[39m
-[1mnpm[22m [96mnotice[39m New [31mmajor[39m version of npm available! [31m10.9.2[39m -> [34m11.3.0[39m
-[1mnpm[22m [96mnotice[39m Changelog: [34mhttps://github.com/npm/cli/releases/tag/v11.3.0[39m
-[1mnpm[22m [96mnotice[39m To update run: [4mnpm install -g npm@11.3.0[24m
-[1mnpm[22m [96mnotice[39m
 [1G[0K\[1G[0K
