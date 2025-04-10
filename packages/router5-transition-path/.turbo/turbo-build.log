@@ -1,0 +1,29 @@
+
+
+> router5-transition-path@8.0.1 build
+> tsup
+
+[1G[0K[34mCLI[39m Building entry: modules/index.ts
+[34mCLI[39m Using tsconfig: tsconfig.json
+[34mCLI[39m tsup v8.4.0
+[34mCLI[39m Using tsup config: /Users/olegivanov/WebstormProjects/router6/packages/router5-transition-path/tsup.config.ts
+[34mCLI[39m Building entry: modules/index.ts
+[34mCLI[39m Using tsconfig: tsconfig.json
+[34mCLI[39m tsup v8.4.0
+[34mCLI[39m Using tsup config: /Users/olegivanov/WebstormProjects/router6/packages/router5-transition-path/tsup.config.ts
+[34mCLI[39m Target: esnext
+[34mCLI[39m Target: esnext
+[34mCLI[39m Cleaning output folder
+[34mCJS[39m Build start
+[34mCLI[39m Cleaning output folder
+[34mESM[39m Build start
+[32mESM[39m [1mdist/esm/index.mjs     [22m[32m1.12 KB[39m
+[32mESM[39m [1mdist/esm/index.mjs.map [22m[32m6.77 KB[39m
+[32mESM[39m ⚡️ Build success in 27ms
+[32mCJS[39m [1mdist/cjs/index.js     [22m[32m1.60 KB[39m
+[32mCJS[39m [1mdist/cjs/index.js.map [22m[32m6.94 KB[39m
+[32mCJS[39m ⚡️ Build success in 29ms
+DTS Build start
+DTS ⚡️ Build success in 1399ms
+DTS dist/esm/index.d.mts 748.00 B
+[1G[0K\[1G[0K

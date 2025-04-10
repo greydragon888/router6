@@ -2,17 +2,21 @@
   "name": "router5-helpers",
   "version": "8.0.0",
   "description": "Router5 helpers for comparing and checking routes",
-  "main": "dist/index.js",
-  "jsnext:main": "dist/index.es.js",
-  "module": "dist/index.es.js",
-  "typings": "dist/index.d.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.mjs",
+  "types": "./dist/esm/index.d.mts",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.mjs",
+      "require": "./dist/cjs/index.js"
+    }
+  },
   "files": [
     "dist"
   ],
-  "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/router5/router5.git"
+    "url": "git+https://github.com/OlIvAl/router6.git"
   },
   "keywords": [
     "router5",
@@ -25,6 +29,9 @@
   },
   "homepage": "https://github.com/router5/router5/tree/master/packages/router5-helpers",
   "scripts": {
-    "test": "jest"
-  }
+    "test": "jest",
+    "build": "tsup",
+    "type-check": "tsc --noEmit"
+  },
+  "sideEffects": false
 }
