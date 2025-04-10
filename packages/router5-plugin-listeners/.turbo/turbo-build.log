@@ -1,27 +1,29 @@
 
+
 > router5-plugin-listeners@8.0.1 build
 > tsup
 
-CLI Building entry: modules/index.ts
-CLI Using tsconfig: tsconfig.json
-CLI tsup v8.4.0
-CLI Using tsup config: /Users/olegivanov/WebstormProjects/router6/packages/router5-plugin-listeners/tsup.config.ts
-CLI Building entry: modules/index.ts
-CLI Using tsconfig: tsconfig.json
-CLI tsup v8.4.0
-CLI Using tsup config: /Users/olegivanov/WebstormProjects/router6/packages/router5-plugin-listeners/tsup.config.ts
-CLI Target: esnext
-CLI Target: esnext
-CLI Cleaning output folder
-ESM Build start
-CLI Cleaning output folder
-CJS Build start
-ESM dist/esm/index.mjs     968.00 B
-ESM dist/esm/index.mjs.map 5.49 KB
-ESM ⚡️ Build success in 64ms
-CJS dist/cjs/index.js     1.53 KB
-CJS dist/cjs/index.js.map 5.62 KB
-CJS ⚡️ Build success in 64ms
+[1G[0K[34mCLI[39m Building entry: modules/index.ts
+[34mCLI[39m Using tsconfig: tsconfig.json
+[34mCLI[39m tsup v8.4.0
+[34mCLI[39m Using tsup config: /Users/olegivanov/WebstormProjects/router6/packages/router5-plugin-listeners/tsup.config.ts
+[34mCLI[39m Building entry: modules/index.ts
+[34mCLI[39m Using tsconfig: tsconfig.json
+[34mCLI[39m tsup v8.4.0
+[34mCLI[39m Using tsup config: /Users/olegivanov/WebstormProjects/router6/packages/router5-plugin-listeners/tsup.config.ts
+[34mCLI[39m Target: esnext
+[34mCLI[39m Target: esnext
+[34mCLI[39m Cleaning output folder
+[34mESM[39m Build start
+[34mCLI[39m Cleaning output folder
+[34mCJS[39m Build start
+[32mCJS[39m [1mdist/cjs/index.js     [22m[32m1.53 KB[39m
+[32mCJS[39m [1mdist/cjs/index.js.map [22m[32m5.62 KB[39m
+[32mCJS[39m ⚡️ Build success in 27ms
+[32mESM[39m [1mdist/esm/index.mjs     [22m[32m968.00 B[39m
+[32mESM[39m [1mdist/esm/index.mjs.map [22m[32m5.49 KB[39m
+[32mESM[39m ⚡️ Build success in 28ms
 DTS Build start
-DTS ⚡️ Build success in 1616ms
+DTS ⚡️ Build success in 1520ms
 DTS dist/esm/index.d.mts 889.00 B
+[1G[0K\[1G[0K

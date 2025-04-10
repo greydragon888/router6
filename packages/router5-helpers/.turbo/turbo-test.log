@@ -1,21 +1,62 @@
 
+
 > router5-helpers@8.0.0 test
 > jest
 
-PASS modules/__tests__/index.ts
-  router5-helpers
-    .startsWithSegment()
-      ✓ should return true if a route starts with a segment (1 ms)
-      ✓ should return false if a route does not start with a segment
-    .endsWithSegment()
-      ✓ should return true if a route ends with a segment (1 ms)
-      ✓ should return false if a route does not end with a segment
-    .includesSegment()
-      ✓ should return true if a route includes a segment
-      ✓ should return false if a route does not include a segment (1 ms)
+[1G[0K[1m[2mDetermining test suites to run...[22m[22m[999D[K
+[K[1A
+[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
+[K[1A[K[1A
+[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
+[K[1A[K[1A
+[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
+[K[1A[K[1A
+[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
+[K[1A[K[1A
+[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
+[K[1A[K[1A
+[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
+[K[1A[K[1A
+[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
+[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
 
-Test Suites: 1 passed, 1 total
-Tests:       6 passed, 6 total
-Snapshots:   0 total
-Time:        1.99 s, estimated 4 s
-Ran all test suites.
+[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
+[K[1A[K[1A  router5-helpers
+
+[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
+[K[1A[K[1A    .startsWithSegment()
+
+[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
+[K[1A[K[1A      [32m✓[39m [2mshould return true if a route starts with a segment (2 ms)[22m
+
+[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
+[K[1A[K[1A      [32m✓[39m [2mshould return false if a route does not start with a segment[22m
+
+[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
+[K[1A[K[1A    .endsWithSegment()
+
+[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
+[K[1A[K[1A      [32m✓[39m [2mshould return true if a route ends with a segment (1 ms)[22m
+
+[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
+[K[1A[K[1A      [32m✓[39m [2mshould return false if a route does not end with a segment[22m
+
+[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
+[K[1A[K[1A    .includesSegment()
+
+[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
+[K[1A[K[1A      [32m✓[39m [2mshould return true if a route includes a segment[22m
+
+[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
+[K[1A[K[1A      [32m✓[39m [2mshould return false if a route does not include a segment (1 ms)[22m
+
+[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
+[K[1A[K[1A
+
+[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2mmodules/__tests__/[22m[1mindex.ts[22m
+[K[1A[K[1A[999D[K[1mTest Suites: [22m[1m[32m1 passed[39m[22m, 1 total
+[1mTests:       [22m[1m[32m6 passed[39m[22m, 6 total
+[1mSnapshots:   [22m0 total
+[1mTime:[22m        2.146 s
+[2mRan all test suites[22m[2m.[22m
+[1G[0K\[1G[0K
