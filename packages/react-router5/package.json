@@ -2,20 +2,26 @@
   "name": "react-router5",
   "version": "8.0.1",
   "description": "router5 helpers for React",
-  "main": "dist/index.js",
-  "jsnext:main": "dist/index.es.js",
-  "module": "dist/index.es.js",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.mjs",
+  "types": "./dist/esm/index.d.mts",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.mjs",
+      "require": "./dist/cjs/index.js"
+    }
+  },
   "files": [
     "dist"
   ],
-  "typings": "dist/index.d.ts",
   "homepage": "https://router5.js.org",
   "repository": {
     "type": "git",
     "url": "https://github.com/router5/router5.git"
   },
   "scripts": {
-    "test": "jest"
+    "build": "tsup",
+    "type-check": "tsc --noEmit"
   },
   "keywords": [
     "router",
@@ -27,11 +33,12 @@
   ],
   "author": "Thomas Roch",
   "license": "MIT",
+  "sideEffects": false,
   "dependencies": {
     "router5-transition-path": "^8.0.1"
   },
   "peerDependencies": {
     "react": ">=16.3.0",
-    "router5": "^8.0.0"
+    "router5": "^8.0.1"
   }
 }

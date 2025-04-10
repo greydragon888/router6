@@ -3,7 +3,7 @@ import transitionPath from 'router5-transition-path'
 
 export type Listener = (toState: State, fromState: State | null) => void
 
-declare module 'router5/dist/types/router' {
+declare module 'router5' {
     interface Router {
         getListeners(): { [key: string]: Listener[] }
         addListener(name: string, callback: Listener): void
