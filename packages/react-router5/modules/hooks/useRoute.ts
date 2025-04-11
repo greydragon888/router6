@@ -1,7 +1,7 @@
 import { useContext } from 'react'
-import { routeContext } from '../context'
-import { RouteContext } from '../types'
+import { RouteContext } from '../context'
+import { RouteContext as RouteContextType } from '../types'
 
-export default function useRoute(): RouteContext {
-    return useContext(routeContext)
+export const useRoute = (): RouteContextType => {
+    return useContext(RouteContext)
 }

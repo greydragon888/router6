@@ -1,8 +1,8 @@
+import { RouterProvider } from '../..'
+import { render } from '@testing-library/react'
 import createRouter from 'router5'
-import React, { FC } from 'react'
-import { RouterProvider } from '../../'
-import { mount } from 'enzyme'
 import browserPlugin from 'router5-plugin-browser'
+import type { FC } from 'react'
 
 export const FnChild: FC<Record<string, any>> = () => <div />
 
@@ -30,8 +30,8 @@ export const createTestRouterWithADefaultRoute = () => {
     return router
 }
 
-export const renderWithRouter = router => BaseComponent =>
-    mount(
+export const renderWithRouter = (router) => (BaseComponent) =>
+    render(
         <RouterProvider router={router}>
             <BaseComponent />
         </RouterProvider>

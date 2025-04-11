@@ -11,10 +11,9 @@
       "router5-transition-path": ["packages/router5-transition-path/modules/index.ts"],
       "react-router5": ["packages/react-router5/modules/index.ts"]
     },
-    "target": "esnext",
+    "target": "ESNext",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "jsx": "react",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true
   }

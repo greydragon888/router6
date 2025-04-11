@@ -1,7 +1,7 @@
 import { useContext } from 'react'
-import { routerContext } from '../context'
+import { RouterContext } from '../context'
 import { Router } from 'router5'
 
-export default function useRouter(): Router {
-    return useContext(routerContext)
+export const useRouter = (): Router => {
+    return useContext(RouterContext)
 }

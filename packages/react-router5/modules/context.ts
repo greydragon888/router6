@@ -1,7 +1,6 @@
-import React from 'react'
-import { RouteContext } from './types'
-import { Router } from 'router5'
+import { createContext } from 'react'
+import type { RouteContext as RouteContextType } from './types'
+import type { Router } from 'router5'
 
-const createContext = React.createContext
-export const routeContext = createContext<RouteContext>(null)
-export const routerContext = createContext<Router>(null)
+export const RouteContext = createContext<RouteContextType>(null)
+export const RouterContext = createContext<Router>(null)

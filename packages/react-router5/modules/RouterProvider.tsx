@@ -1,63 +1,46 @@
-import React, { ReactNode } from 'react'
-import { UnsubscribeFn, RouteState } from './types'
+import { useMemo, useSyncExternalStore } from 'react'
+import { RouterContext, RouteContext } from './context'
 import { Router } from 'router5'
-import { routerContext, routeContext } from './context'
+import type { FC, ReactNode } from 'react'
+import type { RouteState, UnsubscribeFn } from './types'
 
 export interface RouteProviderProps {
-    router: Router
-    children: ReactNode
+  router: Router
+  children: ReactNode
 }
 
-class RouterProvider extends React.PureComponent<RouteProviderProps> {
-    private mounted: boolean
-    private routeState: RouteState
-    private readonly unsubscribe: UnsubscribeFn
-
-    constructor(props) {
-        super(props)
-        this.mounted = false
-        this.routeState = {
-            route: props.router.getState(),
-            previousRoute: null
-        }
-
-        if (typeof window !== 'undefined') {
-            const listener = ({ route, previousRoute }) => {
-                this.routeState = {
-                    route,
-                    previousRoute
-                }
-                if (this.mounted) {
-                    this.forceUpdate()
-                }
-            }
-            this.unsubscribe = this.props.router.subscribe(
-                listener
-            ) as UnsubscribeFn
-        }
+export const RouterProvider: FC<RouteProviderProps> = ({ router, children }) => {
+  // Local store state to hold route information
+  const store = useMemo(() => {
+    let currentState: RouteState = {
+      route: router.getState(),
+      previousRoute: null
     }
 
-    componentDidMount() {
-        this.mounted = true
+    // This will be called to return the current state snapshot
+    const getSnapshot = () => currentState
+
+    // Subscribe to router updates and notify React when state changes
+    const subscribe = (callback: () => void) => {
+      const unsubscribe = router.subscribe(({ route, previousRoute }) => {
+        currentState = { route, previousRoute }
+        callback() // Notify React to trigger re-render
+      }) as UnsubscribeFn
+
+      return unsubscribe
     }
 
-    componentWillUnmount() {
-        if (this.unsubscribe) {
-            this.unsubscribe()
-        }
-    }
+    return { getSnapshot, subscribe }
+  }, [router])
 
-    render() {
-        return (
-            <routerContext.Provider value={this.props.router}>
-                <routeContext.Provider
-                    value={{ router: this.props.router, ...this.routeState }}
-                >
-                    {this.props.children}
-                </routeContext.Provider>
-            </routerContext.Provider>
-        )
-    }
+  // Using useSyncExternalStore to manage subscription and state updates
+  const state = useSyncExternalStore(store.subscribe, store.getSnapshot)
+
+  return (
+    <RouterContext.Provider value={router}>
+      <RouteContext.Provider value={{ router, ...state }}>
+        {children}
+      </RouteContext.Provider>
+    </RouterContext.Provider>
+  )
 }
-
-export default RouterProvider
