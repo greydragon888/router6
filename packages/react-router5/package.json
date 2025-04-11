@@ -35,10 +35,18 @@
   "license": "MIT",
   "sideEffects": false,
   "dependencies": {
-    "router5-transition-path": "^8.0.1"
+    "router5": "^8.0.0",
+    "router5-transition-path": "^8.0.0",
+    "router5-plugin-browser": "^8.0.0"
+  },
+  "devDependencies": {
+    "@testing-library/react": "16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "jest-environment-jsdom": "^29.7.0",
+    "jsdom": "^26.0.0"
   },
   "peerDependencies": {
-    "react": ">=16.3.0",
-    "router5": "^8.0.1"
+    "@types/react": ">=18.0.0",
+    "react": ">=18.0.0"
   }
 }

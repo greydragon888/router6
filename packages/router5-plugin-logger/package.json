@@ -28,8 +28,8 @@
     "url": "https://github.com/router5/router5/issues"
   },
   "sideEffects": false,
-  "peerDependencies": {
-    "router5": "^8.0.1"
+  "dependencies": {
+    "router5": "^8.0.0"
   },
   "homepage": "https://github.com/router5/router5/tree/master/packages/router5-plugin-logger",
   "scripts": {
