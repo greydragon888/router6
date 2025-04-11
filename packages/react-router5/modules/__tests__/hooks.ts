@@ -5,10 +5,11 @@ import {
     renderWithRouter
 } from './helpers'
 import { useRoute, useRouter, useRouteNode } from '..'
+import type { Router } from 'router5'
+
+let router: Router
 
 describe('useRoute hook', () => {
-    let router
-
     beforeAll(() => {
         router = createTestRouter()
     })
@@ -28,8 +29,6 @@ describe('useRoute hook', () => {
 })
 
 describe('useRouter hook', () => {
-    let router
-
     beforeAll(() => {
         router = createTestRouter()
     })
@@ -49,8 +48,7 @@ describe('useRouter hook', () => {
 })
 
 describe('useRouteNode hook', () => {
-    let router
-    let routerWithADefaultRoute
+    let routerWithADefaultRoute: Router
 
     beforeAll(() => {
         router = createTestRouter()
