@@ -26,9 +26,9 @@ const listenersPluginFactory = (
     options: ListenersPluginOptions = defaultOptions
 ): PluginFactory => {
     return function listenersPlugin(router: Router) {
-        let listeners = {}
+        let listeners: Record<string, Listener[]> = {}
 
-        function removeListener(name, cb?) {
+        function removeListener(name: string, cb?: Listener) {
             if (cb) {
                 if (listeners[name])
                     listeners[name] = listeners[name].filter(
@@ -40,7 +40,7 @@ const listenersPluginFactory = (
             return router
         }
 
-        function addListener(name, cb, replace?) {
+        function addListener(name: string, cb: Listener, replace?: boolean) {
             const normalizedName = name.replace(/^(\*|\^|=)/, '')
 
             if (normalizedName && !/^\$/.test(name)) {
@@ -62,8 +62,8 @@ const listenersPluginFactory = (
 
         router.getListeners = () => listeners
 
-        router.addListener = cb => addListener('*', cb)
-        router.removeListener = cb => removeListener('*', cb)
+        router.addListener = (name, cb) => addListener(name || '*', cb)
+        router.removeListener = (name, cb) => removeListener(name || '*', cb)
 
         router.addNodeListener = (name, cb) => addListener('^' + name, cb, true)
         router.removeNodeListener = (name, cb) => removeListener('^' + name, cb)
@@ -72,7 +72,7 @@ const listenersPluginFactory = (
         router.removeRouteListener = (name, cb) =>
             removeListener('=' + name, cb)
 
-        function invokeListeners(name, toState, fromState) {
+        function invokeListeners(name: string, toState: State, fromState: State | null) {
             ;(listeners[name] || []).forEach(cb => {
                 if (listeners[name].indexOf(cb) !== -1) {
                     cb(toState, fromState)

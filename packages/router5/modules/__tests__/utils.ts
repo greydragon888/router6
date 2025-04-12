@@ -1,18 +1,23 @@
 import { createTestRouter, omitMeta } from './helpers'
-import createRouter from '../'
+import createRouter from '..'
+import type { Router } from '..'
+
+let router: Router
 
 describe('core/utils', () => {
-    let router
-
     describe('with strictQueryParams', () => {
-        beforeAll(() => (router = createTestRouter().start()))
-        afterAll(() => router.stop())
+        beforeEach(() => {
+          router = createTestRouter().start()
+        })
+        afterEach(() => {
+          router.stop()
+        })
 
-        it('should expose RouteNode path building function', function() {
+        it('should expose RouteNode path building function', () => {
             expect(router.buildPath('users.list')).toBe('/users/list')
         })
 
-        it('should tell if a route is active or not', function() {
+        it('should tell if a route is active or not', () => {
             router.navigate('users.view', { id: 1 })
             expect(router.isActive('users.view', { id: 1 })).toBe(true)
             expect(router.isActive('users.view', { id: 2 })).toBe(false)
@@ -55,7 +60,7 @@ describe('core/utils', () => {
             })
         })
 
-        it('should match deep `/` routes', function() {
+        it('should match deep `/` routes', () => {
             router.setOption('trailingSlashMode', 'never')
             expect(omitMeta(router.matchPath('/profile'))).toEqual({
                 name: 'profile.me',
@@ -73,13 +78,14 @@ describe('core/utils', () => {
     })
 
     describe('without strict query params mode', () => {
-        beforeAll(
-            () =>
-                (router = createTestRouter({
-                    queryParamsMode: 'loose'
-                }).start())
-        )
-        afterAll(() => router.stop())
+        beforeEach(() => {
+          router = createTestRouter({
+            queryParamsMode: 'loose'
+          }).start()
+        })
+        afterEach(() => {
+          router.stop()
+        })
 
         it('should build paths with extra parameters', () => {
             expect(

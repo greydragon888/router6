@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
+    "types": ["vitest/globals"],
     "paths": {
       "router5": ["packages/router5/modules/index.ts"],
       "router5-helpers": ["packages/router5-helpers/modules/index.ts"],
@@ -16,5 +17,10 @@
     "moduleResolution": "NodeNext",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "packages/*/dist",
+  ]
 }

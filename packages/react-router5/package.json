@@ -21,6 +21,7 @@
   },
   "scripts": {
     "build": "tsup",
+    "test": "vitest",
     "type-check": "tsc --noEmit"
   },
   "keywords": [
@@ -40,10 +41,10 @@
     "router5-plugin-browser": "^8.0.0"
   },
   "devDependencies": {
+    "@testing-library/dom": "10.4.0",
+    "@testing-library/jest-dom": "6.6.3",
     "@testing-library/react": "16.3.0",
-    "@testing-library/user-event": "^14.6.1",
-    "jest-environment-jsdom": "^29.7.0",
-    "jsdom": "^26.0.0"
+    "@testing-library/user-event": "^14.6.1"
   },
   "peerDependencies": {
     "@types/react": ">=18.0.0",

@@ -4,8 +4,10 @@ npm-debug.log
 
 packages/**/dist
 packages/**/.turbo
+packages/**/.vitest
 .changelog
 .DS_Store
 
 dist
 .turbo
+.vitest

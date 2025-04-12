@@ -29,7 +29,7 @@
   },
   "homepage": "https://github.com/router5/router5/tree/master/packages/router5-helpers",
   "scripts": {
-    "test": "jest",
+    "test": "vitest",
     "build": "tsup",
     "type-check": "tsc --noEmit"
   },
