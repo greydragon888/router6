@@ -58,27 +58,22 @@ const getState = () => window.history.state
 
 const getHash = () => window.location.hash
 
-let browser: Browser
-if (isBrowser) {
-    browser = {
-        getBase,
-        pushState,
-        replaceState,
-        addPopstateListener,
-        getLocation,
-        getState,
-        getHash
-    }
-} else {
-    browser = {
-        getBase: value(''),
-        pushState: noop,
-        replaceState: noop,
-        addPopstateListener: noop,
-        getLocation: value(''),
-        getState: value(null),
-        getHash: value('')
-    }
+const browser: Browser = isBrowser ? {
+  getBase,
+  pushState,
+  replaceState,
+  addPopstateListener,
+  getLocation,
+  getState,
+  getHash
+} : {
+  getBase: value(''),
+  pushState: noop,
+  replaceState: noop,
+  addPopstateListener: noop,
+  getLocation: value(''),
+  getState: value(null),
+  getHash: value('')
 }
 
 export default browser as Browser

@@ -5,6 +5,7 @@ npm-debug.log
 packages/**/dist
 packages/**/.turbo
 packages/**/.vitest
+packages/**/coverage
 .changelog
 .DS_Store
 

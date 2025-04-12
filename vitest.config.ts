@@ -11,5 +11,30 @@ export default defineConfig({
     reporters: ["dot"],
     watch: false,
     include: ["**/__tests__/*.ts?(x)"],
+    coverage: {
+      provider: 'v8',
+      clean: true,
+      include: ["modules/*"],
+      exclude: [
+        "**/types/**",
+        "**/__mocks__/**",
+        "**/__fixtures__/**",
+        "**/assets",
+        "**/contexts.ts",
+        "**/enums.ts",
+        "**/interfaces.ts",
+      ],
+      extension: ["ts", "tsx"],
+      thresholds: {
+        global: {
+          statements: 10,
+          branches: 10,
+          functions: 10,
+          lines: 10,
+        },
+      },
+      reporter: ["lcovonly", ["text", { skipFull: true }]],
+      reportsDirectory: './coverage',
+    },
   },
 })
