@@ -1,52 +1,56 @@
-import { createRouter } from 'router5'
-import listenersPlugin from '../'
+import createRouter from 'router5'
+import listenersPlugin from '..'
+import type { Router } from 'router5'
+
+let router: Router
+const routes = [
+  {
+    name: 'home',
+    path: '/home'
+  },
+  {
+    name: 'users',
+    path: '/users',
+    children: [
+      {
+        name: 'view',
+        path: '/view/:id'
+      },
+      {
+        name: 'list',
+        path: '/list'
+      }
+    ]
+  },
+  {
+    name: 'orders',
+    path: '/orders',
+    children: [
+      { name: 'view', path: '/view/:id' },
+      { name: 'pending', path: '/pending' },
+      { name: 'completed', path: '/completed' }
+    ]
+  }
+]
 
 describe('listenersPlugin', () => {
-    let router
-    beforeAll(() => {
-        router = createRouter([
-            {
-                name: 'home',
-                path: '/home'
-            },
-            {
-                name: 'users',
-                path: '/users',
-                children: [
-                    {
-                        name: 'view',
-                        path: '/view/:id'
-                    },
-                    {
-                        name: 'list',
-                        path: '/list'
-                    }
-                ]
-            },
-            {
-                name: 'orders',
-                path: '/orders',
-                children: [
-                    { name: 'view', path: '/view/:id' },
-                    { name: 'pending', path: '/pending' },
-                    { name: 'completed', path: '/completed' }
-                ]
-            }
-        ])
+    beforeEach(() => {
+        router = createRouter(routes)
         router.usePlugin(listenersPlugin())
     })
 
-    afterAll(() => {
+    afterEach(() => {
         router.stop()
     })
 
-    it('should call root node listener on first transition', function(done) {
-        router.stop()
+    it('should call root node listener on first transition', () => new Promise((done) => {
         router.setOption('defaultRoute', 'home')
-        const nodeListener = jest.fn()
+
+        const nodeListener = vi.fn()
+
         router.addNodeListener('', nodeListener)
 
-        router.start(function(err, state) {
+        router.start((_err, state) => {
             expect(state).toEqual({
                 meta: {
                     id: 1,
@@ -57,112 +61,144 @@ describe('listenersPlugin', () => {
                 path: '/home',
                 params: {}
             })
+
             expect(nodeListener).toHaveBeenCalled()
-            done()
-        })
-    })
 
-    it('should invoke listeners on navigation', function(done) {
+            done(null)
+        })
+    }))
+
+    it('should invoke listeners on navigation', () => new Promise((done) => {
+      router.start(() => {
         router.navigate('home', {}, {}, () => {
-            const previousState = router.getState()
-            const listener = jest.fn()
-            router.addListener(listener)
+          const previousState = router.getState()
+          const listener = vi.fn()
 
-            router.navigate('orders.pending', {}, {}, () => {
-                expect(listener).toHaveBeenCalledWith(
-                    router.getState(),
-                    previousState
-                )
-                router.removeListener(listener)
-                done()
-            })
+          router.addListener('*', listener)
+
+          router.navigate('orders.pending', {}, {}, () => {
+            expect(listener).toHaveBeenCalledWith(
+              router.getState(),
+              previousState
+            )
+
+            done(null)
+          })
         })
-    })
+      })
+    }))
 
-    it('should not invoke listeners if trying to navigate to the current route', function(done) {
-        router.navigate('orders.view', { id: 123 }, {}, () => {
-            const listener = jest.fn()
-            router.addListener(listener)
+    it('should not invoke listeners if trying to navigate to the current route', () => new Promise((done) => {
+        router.start(() => {
+          router.navigate('orders.view', { id: 123 }, {}, () => {
+            const listener = vi.fn()
+
+            router.addListener('*', listener)
 
             router.navigate('orders.view', { id: 123 }, {}, () => {
-                expect(listener).not.toHaveBeenCalled()
-                done()
-            })
-        })
-    })
+              expect(listener).not.toHaveBeenCalled()
 
-    it('should invoke node listeners', function(done) {
+              done(null)
+            })
+          })
+        })
+    }))
+
+    it('should invoke node listeners', () => new Promise((done) => {
+      router.start(() => {
         router.navigate('users.list', {}, {}, () => {
-            const nodeListener = jest.fn()
-            router.addNodeListener('users', nodeListener)
+          const nodeListener = vi.fn()
+
+          router.addNodeListener('users', nodeListener)
+
+          router.navigate('users.view', { id: 1 }, {}, () => {
+            expect(nodeListener).toHaveBeenCalled()
+
             router.navigate('users.view', { id: 1 }, {}, () => {
-                expect(nodeListener).toHaveBeenCalled()
-                router.navigate('users.view', { id: 1 }, {}, () => {
-                    router.navigate('users.view', { id: 2 }, {}, function() {
-                        expect(nodeListener).toHaveBeenCalledTimes(2)
-                        router.removeNodeListener('users', nodeListener)
-                        done()
-                    })
-                })
-            })
-        })
-    })
+              router.navigate('users.view', { id: 2 }, {}, function() {
+                expect(nodeListener).toHaveBeenCalledTimes(2)
 
-    it('should invoke node listeners on root', function(done) {
+                done(null)
+              })
+            })
+          })
+        })
+      })
+    }))
+
+    it('should invoke node listeners on root', () => new Promise((done) => {
+      router.start(() => {
         router.navigate('orders', {}, {}, () => {
-            const nodeListener = jest.fn()
-            router.addNodeListener('', nodeListener)
-            router.navigate('users', {}, {}, () => {
-                expect(nodeListener).toHaveBeenCalled()
-                router.removeNodeListener('', nodeListener)
-                done()
-            })
-        })
-    })
+          const nodeListener = vi.fn()
 
-    it('should invoke route listeners', function(done) {
+          router.addNodeListener('', nodeListener)
+
+          router.navigate('users', {}, {}, () => {
+            expect(nodeListener).toHaveBeenCalled()
+
+            done(null)
+          })
+        })
+      })
+    }))
+
+    it('should invoke route listeners', () => new Promise((done) => {
+      router.start(() => {
         router.navigate('users.list', {}, {}, () => {
-            const nodeListener = jest.fn()
-            router.addRouteListener('users', nodeListener)
-            router.navigate('users', {}, {}, () => {
-                expect(nodeListener).toHaveBeenCalled()
-                router.removeRouteListener('users', nodeListener)
-                done()
-            })
-        })
-    })
+          const nodeListener = vi.fn()
 
-    it('should automatically remove node listeners if autoCleanUp', function(done) {
-        router.navigate('orders.completed', {}, {}, function() {
-            router.addNodeListener('orders', () => {})
-            router.navigate('users', {}, {}, function() {
-                setTimeout(() => {
-                    expect(router.getListeners()['^orders']).toEqual([])
-                    done()
-                })
-            })
+          router.addRouteListener('users', nodeListener)
+
+          router.navigate('users', {}, {}, () => {
+            expect(nodeListener).toHaveBeenCalled()
+
+            done(null)
+          })
         })
-    })
+      })
+    }))
+
+    it('should automatically remove node listeners if autoCleanUp', () => new Promise((done) => {
+      router.start(() => {
+        router.navigate('orders.completed', {}, {}, function() {
+          router.addNodeListener('orders', () => {})
+
+          router.navigate('users', {}, {}, () => {
+            setTimeout(() => {
+              expect(router.getListeners()['^orders']).toEqual([])
+
+              done(null)
+            })
+          })
+        })
+      })
+    }))
 
     it('should warn if trying to register a listener on an unknown route', () => {
-        jest.spyOn(console, 'warn').mockImplementation(() => {})
+        vi.spyOn(console, 'warn').mockImplementation(() => {})
+
         router.addRouteListener('fake.route', () => {})
+
         expect(console.warn).toHaveBeenCalled()
-        jest.resetAllMocks()
+
+        vi.resetAllMocks()
     })
 
-    it('should not invoke listeners removed by previously called listeners', function(done) {
+    it('should not invoke listeners removed by previously called listeners', () => new Promise((done) => {
+      router.start(() => {
         router.navigate('home', {}, {}, () => {
-            const listener2 = jest.fn()
-            const listener1 = jest.fn(() => router.removeListener(listener2))
-            router.addListener(listener1)
-            router.addListener(listener2)
+          const listener2 = vi.fn()
+          const listener1 = vi.fn(() => router.removeListener('*', listener2))
 
-            router.navigate('orders.pending', {}, {}, () => {
-                expect(listener2).not.toHaveBeenCalled()
-                router.removeListener(listener1)
-                done()
-            })
+          router.addListener('*', listener1)
+          router.addListener('*', listener2)
+
+          router.navigate('orders.pending', {}, {}, () => {
+            expect(listener2).not.toHaveBeenCalled()
+
+            done(null)
+          })
         })
-    })
+      })
+    }))
 })

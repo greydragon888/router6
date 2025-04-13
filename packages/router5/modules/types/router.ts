@@ -48,7 +48,7 @@ export type ActivationFn = (
     toState: State,
     fromState: State,
     done: DoneFn
-) => boolean | Promise<boolean> | void
+) => boolean | Promise<boolean | Error | void> | void
 
 export type ActivationFnFactory<
     Dependencies extends DefaultDependencies = DefaultDependencies

@@ -31,9 +31,13 @@
   "dependencies": {
     "router5": "^8.0.0"
   },
+  "devDependencies": {
+    "jest-environment-jsdom": "^29.7.0",
+    "jsdom": "^26.0.0"
+  },
   "homepage": "https://github.com/router5/router5/tree/master/packages/router5-plugin-browser",
   "scripts": {
-    "test": "jest",
+    "test": "vitest",
     "build": "tsup",
     "type-check": "tsc --noEmit"
   }

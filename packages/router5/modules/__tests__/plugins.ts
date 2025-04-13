@@ -1,42 +1,47 @@
 import { createTestRouter } from './helpers'
 import createRouter from '..'
+import type { Router, PluginFactory, Plugin } from '..'
+
+let router: Router
+let myPlugin: PluginFactory, myPluginMethods: Plugin
 
 describe('core/plugins', () => {
-    let router
-    let myPlugin, myPluginMethods
-
-    beforeAll(() => {
+    beforeEach(() => {
         router = createTestRouter().start()
         myPluginMethods = {
-            onTransitionStart: jest.fn(),
-            onTransitionSuccess: jest.fn(),
-            onTransitionError: function onTransitionError() {}
+            onTransitionStart: vi.fn(),
+            onTransitionSuccess: vi.fn(),
+            onTransitionError: () => {}
         }
-        myPlugin = router => {
-            router.myCustomMethod = function() {}
+        myPlugin = (router: Router) => {
+          // @ts-ignore
+          router.myCustomMethod = () => undefined
 
-            return myPluginMethods
+          return myPluginMethods
         }
     })
-    afterAll(() => router.stop())
+    afterEach(() => {
+      router.stop()
+    })
 
-    it('should register plugins', done => {
+    it('should register plugins', () => new Promise(done => {
         router.stop()
         router.usePlugin(myPlugin)
         router.start('', () => {
+            // @ts-ignore
             expect(router.myCustomMethod).not.toBe(undefined)
 
-            router.navigate('orders', function() {
+            router.navigate('orders', () => {
                 expect(myPluginMethods.onTransitionStart).toHaveBeenCalled()
                 expect(myPluginMethods.onTransitionSuccess).toHaveBeenCalled()
-                done()
+                done(null)
             })
         })
-    })
+    }))
 
     it('should return an deregister function and call teardown', () => {
         const router = createRouter()
-        const teardown = jest.fn()
+        const teardown = vi.fn()
         const unsubscribe = router.usePlugin(() => ({
             teardown
         }))

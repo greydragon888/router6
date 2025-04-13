@@ -1,17 +1,18 @@
 import { errorCodes } from '../'
 import { createTestRouter, omitMeta } from './helpers'
+import type { Router } from '..'
 
-describe('core/route-lifecycle', function() {
-    let router
+let router: Router
 
-    beforeAll(() => (router = createTestRouter().start()))
-    afterAll(() => router.stop())
+describe('core/route-lifecycle', () => {
+    beforeEach(() => (router = createTestRouter().start()))
+    afterEach(() => router.stop())
 
-    it('should block navigation if a component refuses deactivation', done => {
-        router.navigate('users.list', function() {
+    it('should block navigation if a component refuses deactivation', () => new Promise((done) => {
+        router.navigate('users.list', () => {
             // Cannot deactivate
             router.canDeactivate('users.list', () => () => Promise.reject())
-            router.navigate('users', function(err) {
+            router.navigate('users', (err) => {
                 expect(err.code).toBe(errorCodes.CANNOT_DEACTIVATE)
                 expect(err.segment).toBe('users.list')
                 expect(omitMeta(router.getState())).toEqual({
@@ -22,7 +23,7 @@ describe('core/route-lifecycle', function() {
 
                 // Can deactivate
                 router.canDeactivate('users.list', true)
-                router.navigate('users', function() {
+                router.navigate('users', () => {
                     expect(omitMeta(router.getState())).toEqual({
                         name: 'users',
                         params: {},
@@ -32,39 +33,42 @@ describe('core/route-lifecycle', function() {
                     expect(
                         router.getLifecycleFunctions()[0]['users.list']
                     ).toBe(undefined)
-                    done()
+
+                    done(null)
                 })
             })
         })
-    })
+    }))
 
-    it('should register can deactivate status', done => {
-        router.navigate('users.list', function() {
+    it('should register can deactivate status', () => new Promise((done) => {
+        router.navigate('users.list', () => {
             router.canDeactivate('users.list', false)
-            router.navigate('users', function(err) {
+            router.navigate('users', (err) => {
                 expect(err.code).toBe(errorCodes.CANNOT_DEACTIVATE)
                 expect(err.segment).toBe('users.list')
                 router.canDeactivate('users.list', true)
-                router.navigate('users', function(err) {
+                router.navigate('users', (err) => {
                     expect(err).toBe(null)
-                    done()
+
+                    done(null)
                 })
             })
         })
-    })
+    }))
 
-    it('should block navigation if a route cannot be activated', done => {
-        router.navigate('home', function() {
-            router.navigate('admin', function(err) {
+    it('should block navigation if a route cannot be activated', () => new Promise((done) => {
+        router.navigate('home', () => {
+            router.navigate('admin', (err) => {
                 expect(err.code).toBe(errorCodes.CANNOT_ACTIVATE)
                 expect(err.segment).toBe('admin')
                 expect(router.isActive('home')).toBe(true)
-                done()
+
+                done(null)
             })
         })
-    })
+    }))
 
-    it('should force deactivation if specified as a transition option', done => {
+    it('should force deactivation if specified as a transition option', () => new Promise((done) => {
         router.navigate('orders.view', { id: '1' }, {}, () => {
             router.canDeactivate('orders.view', false)
             router.navigate('home', err => {
@@ -73,12 +77,13 @@ describe('core/route-lifecycle', function() {
                     'home',
                     {},
                     { forceDeactivate: true },
-                    (err, state) => {
+                    (_err, state) => {
                         expect(state.name).toBe('home')
-                        done()
+
+                        done(null)
                     }
                 )
             })
         })
-    })
+    }))
 })

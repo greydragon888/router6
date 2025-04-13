@@ -1,58 +1,61 @@
-import { constants, errorCodes, createRouter } from '../'
+import { constants, errorCodes, createRouter } from '..'
 import { createTestRouter, omitMeta } from './helpers'
+import type { Router } from '..'
 
+let router: Router
 const noop = () => {}
 
-describe('core/navigation', function() {
-    let router
-
-    beforeAll(() => {
+describe('core/navigation', () => {
+    beforeEach(() => {
         router = createTestRouter().start()
     })
-    afterAll(() => router.stop())
 
-    afterEach(() => jest.clearAllMocks())
+    afterEach(() => {
+      router.stop()
 
-    it('should be able to navigate to routes', done => {
-        router.navigate('users.view', { id: 123 }, {}, function(err, state) {
+      vi.clearAllMocks()
+    })
+
+    it('should be able to navigate to routes', () => new Promise(done => {
+        router.navigate('users.view', { id: 123 }, {}, (_err, state) => {
             expect(omitMeta(state)).toEqual({
                 name: 'users.view',
                 params: { id: 123 },
                 path: '/users/view/123'
             })
-            done()
+            done(null)
         })
-    })
+    }))
 
-    it('should navigate to same state if reload is set to true', done => {
-        router.navigate('orders.pending', function() {
-            router.navigate('orders.pending', function(err) {
+    it('should navigate to same state if reload is set to true', () => new Promise(done => {
+        router.navigate('orders.pending', () => {
+            router.navigate('orders.pending', (err) => {
                 expect(err.code).toBe(errorCodes.SAME_STATES)
 
                 router.navigate(
                     'orders.pending',
                     {},
                     { reload: true },
-                    function(err) {
+                    (err) => {
                         expect(err).toBe(null)
-                        done()
+                        done(null)
                     }
                 )
             })
         })
-    })
+    }))
 
-    it('should be able to cancel a transition', done => {
+    it('should be able to cancel a transition', () => new Promise(done => {
         router.canActivate('admin', () => () => Promise.resolve())
-        const cancel = router.navigate('admin', function(err) {
+        const cancel = router.navigate('admin', (err) => {
             expect(err.code).toBe(errorCodes.TRANSITION_CANCELLED)
-            done()
+            done(null)
         })
         cancel()
-    })
+    }))
 
-    it('should be able to handle multiple cancellations', done => {
-        router.useMiddleware(() => (toState, fromState, done) => {
+    it('should be able to handle multiple cancellations', () => new Promise(done => {
+        router.useMiddleware(() => (_toState, _fromState, done) => {
             setTimeout(done, 20)
         })
         router.navigate('users', err => {
@@ -66,46 +69,46 @@ describe('core/navigation', function() {
         })
         router.navigate('users', () => {
             router.clearMiddleware()
-            done()
+            done(null)
         })
-    })
+    }))
 
-    it('should redirect if specified by transition error, and call back', done => {
+    it('should redirect if specified by transition error, and call back', () => new Promise(done => {
         router.stop()
-        router.start('/auth-protected', (err, state) => {
+        router.start('/auth-protected', (_err, state) => {
             expect(omitMeta(state)).toEqual({
                 name: 'sign-in',
                 params: {},
                 path: '/sign-in'
             })
-            router.navigate('auth-protected', (err, state) => {
+            router.navigate('auth-protected', (_err, state) => {
                 expect(omitMeta(state)).toEqual({
                     name: 'sign-in',
                     params: {},
                     path: '/sign-in'
                 })
-                done()
+                done(null)
             })
         })
-    })
+    }))
 
-    it('should pass along handled errors in promises', done => {
+    it('should pass along handled errors in promises', () => new Promise(done => {
         router.clearMiddleware()
         router.stop()
         router.canActivate('admin', () => () =>
             Promise.resolve(new Error('error message'))
         )
         router.start('', () => {
-            router.navigate('admin', function(err) {
+            router.navigate('admin', (err) => {
                 expect(err.code).toBe(errorCodes.CANNOT_ACTIVATE)
                 expect(err.error.message).toBe('error message')
-                done()
+                done(null)
             })
         })
-    })
+    }))
 
-    it('should pass along handled errors in promises', done => {
-        jest.spyOn(console, 'error').mockImplementation(noop)
+    it('should pass along handled errors in promises', () => new Promise(done => {
+        vi.spyOn(console, 'error').mockImplementation(noop)
         router.stop()
         router.canActivate('admin', () => () =>
             new Promise(() => {
@@ -113,51 +116,51 @@ describe('core/navigation', function() {
             })
         )
         router.start('', () => {
-            router.navigate('admin', function(err) {
+            router.navigate('admin', (err) => {
                 expect(err.code).toBe(errorCodes.CANNOT_ACTIVATE)
                 expect(console.error).toHaveBeenCalled()
-                done()
+                done(null)
             })
         })
-    })
+    }))
 
-    it('should prioritise cancellation errors', done => {
+    it('should prioritise cancellation errors', () => new Promise(done => {
         router.stop()
         router.canActivate('admin', () => () =>
-            new Promise((resolve, reject) => {
+            new Promise((_resolve, reject) => {
                 setTimeout(() => reject(), 20)
             })
         )
         router.start('', () => {
-            const cancel = router.navigate('admin', function(err) {
+            const cancel = router.navigate('admin', (err) => {
                 expect(err.code).toBe(errorCodes.TRANSITION_CANCELLED)
-                done()
+                done(null)
             })
             setTimeout(cancel, 10)
         })
-    })
+    }))
 
-    it('should let users navigate to unkown URLs if allowNotFound is set to true', done => {
+    it('should let users navigate to unkown URLs if allowNotFound is set to true', () => new Promise(done => {
         router.setOption('allowNotFound', true)
         router.setOption('defaultRoute', undefined)
         router.stop()
-        router.start('/unkown-url', (err, state) => {
+        router.start('/unkown-url', (_err, state) => {
             expect(state.name).toBe(constants.UNKNOWN_ROUTE)
-            done()
+            done(null)
         })
-    })
+    }))
 
-    it('should forward a route to another route', done => {
+    it('should forward a route to another route', () => new Promise(done => {
         router.forward('profile', 'profile.me')
 
-        router.navigate('profile', (err, state) => {
+        router.navigate('profile', (_err, state) => {
             expect(state.name).toBe('profile.me')
             router.forward('profile', undefined)
-            done()
+            done(null)
         })
-    })
+    }))
 
-    it('should forward a route to another with default params', done => {
+    it('should forward a route to another with default params', () => new Promise(done => {
         const routerTest = createRouter([
             {
                 name: 'app',
@@ -174,29 +177,29 @@ describe('core/navigation', function() {
             }
         ])
 
-        routerTest.start('/app', (err, state) => {
+        routerTest.start('/app', (_err, state) => {
             expect(state.name).toBe('app.version')
             expect(state.params).toEqual({
                 version: 'v1',
                 lang: 'en'
             })
-            done()
+            done(null)
         })
-    })
+    }))
 
-    it('should encode params to path', done => {
+    it('should encode params to path', () => new Promise(done => {
         router.navigate(
             'withEncoder',
             { one: 'un', two: 'deux' },
-            (err, state) => {
+            (_err, state) => {
                 expect(state.path).toEqual('/encoded/un/deux')
-                done()
+                done(null)
             }
         )
-    })
+    }))
 
     it('should extend default params', () => {
-        router.navigate('withDefaultParam', (err, state) => {
+        router.navigate('withDefaultParam', (_err, state) => {
             expect(state.params).toEqual({
                 param: 'hello'
             })
@@ -205,7 +208,7 @@ describe('core/navigation', function() {
 
     it('should add navitation options to meta', () => {
         const options = { reload: true, replace: true, customOption: 'abc' }
-        router.navigate('profile', {}, options, (err, state) => {
+        router.navigate('profile', {}, options, (_err, state) => {
             expect(state.meta.options).toEqual(options)
         })
     })

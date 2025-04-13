@@ -1,10 +1,15 @@
 import { createTestRouter } from './helpers'
+import type { Router, Subscription } from '..'
+
+let router: Router
 
 describe('core/observable', function() {
-    let router
-
-    beforeAll(() => (router = createTestRouter().start()))
-    afterAll(() => router.stop())
+    beforeEach(() => {
+      router = createTestRouter().start()
+    })
+    afterEach(() => {
+      router.stop()
+    })
 
     it('should accept a listener function', () => {
         const unsubscribe = router.subscribe(() => {})
@@ -14,8 +19,8 @@ describe('core/observable', function() {
 
     it('should accept a listener object', () => {
         const subscription = router.subscribe({
-            next: () => {}
-        })
+            next: () => undefined
+        }) as Subscription
 
         expect(typeof subscription.unsubscribe).toBe('function')
     })

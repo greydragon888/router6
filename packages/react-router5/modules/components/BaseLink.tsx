@@ -91,9 +91,12 @@ export const BaseLink: FC<BaseLinkProps> = ({
     return [active ? activeClassName : '', className].join(' ').trim()
   }, [active, activeClassName, className])
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { previousRoute, ...restProps } = linkProps;
+
   return (
     <a
-      {...linkProps}
+      {...restProps}
       href={buildUrl}
       className={linkClassName}
       onClick={clickHandler}

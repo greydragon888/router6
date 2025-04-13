@@ -1,6 +1,8 @@
 import { createRouter } from 'router5'
-import persistentParamsPlugin from '../'
+import persistentParamsPlugin from '..'
+import type { Router } from 'router5'
 
+let router: Router
 const createTestRouter = () =>
     createRouter([
         { name: 'route1', path: '/route1/:id' },
@@ -8,20 +10,19 @@ const createTestRouter = () =>
     ])
 
 describe('Persistent params plugin', () => {
-    let router
-
     describe('with an array', () => {
-        beforeAll(() => {
-            router = createTestRouter()
-        })
+      beforeEach(() => {
+        router = createTestRouter()
 
-        it('should be registered with params', () => {
-            router.usePlugin(persistentParamsPlugin(['mode']))
-        })
+        router.usePlugin(persistentParamsPlugin(['mode']))
+      })
+      afterEach(() => {
+        router.stop()
+      })
 
-        it('should persist specified parameters', done => {
+        it('should persist specified parameters', () => new Promise(done => {
             router.start('route1')
-            router.navigate('route2', { id: '2' }, {}, (err, state) => {
+            router.navigate('route2', { id: '2' }, {}, (_err, state) => {
                 expect(state.path).toBe('/route2/2')
                 router.navigate(
                     'route1',
@@ -34,27 +35,27 @@ describe('Persistent params plugin', () => {
                             'route2',
                             { id: '2' },
                             {},
-                            (err, state) => {
+                            (_err, state) => {
                                 expect(state.path).toBe('/route2/2?mode=dev')
-                                done()
+                                done(null)
                             }
                         )
                     }
                 )
             })
-        })
+        }))
 
-        it('should save value on start', done => {
+        it('should save value on start', () => new Promise(done => {
             router.stop()
-            router.start('/route2/1?mode=dev', (err, state) => {
+            router.start('/route2/1?mode=dev', (_err, state) => {
                 expect(state.params).toEqual({ mode: 'dev', id: '1' })
 
-                router.navigate('route2', { id: '2' }, {}, (err, state) => {
+                router.navigate('route2', { id: '2' }, {}, (_err, state) => {
                     expect(state.path).toBe('/route2/2?mode=dev')
-                    done()
+                    done(null)
                 })
             })
-        })
+        }))
     })
 
     describe('with an object', () => {
@@ -67,12 +68,12 @@ describe('Persistent params plugin', () => {
             router.usePlugin(persistentParamsPlugin({ mode: 'dev' }))
         })
 
-        it('should persist specified parameters', done => {
+        it('should persist specified parameters', () => new Promise(done => {
             router.start()
-            router.navigate('route1', { id: '1' }, {}, (err, state) => {
+            router.navigate('route1', { id: '1' }, {}, (_err, state) => {
                 expect(state.path).toBe('/route1/1?mode=dev')
-                done()
+                done(null)
             })
-        })
+        }))
     })
 })
