@@ -7,7 +7,7 @@ const homeState: State = {
     name: 'home',
     params: {},
     path: '/home',
-    meta: { id: 1, params: { home: {} }, redirected: false, options: {} }
+    meta: { id: 5, params: { home: {} }, redirected: false, options: {} }
 }
 
 describe('core/router-lifecycle', () => {
@@ -161,14 +161,19 @@ describe('core/router-lifecycle', () => {
         })
     }))
 
-    it.skip('should not reuse id when starting with provided state', () => new Promise((done) => {
+    it('should not reuse id when starting with provided state', () => new Promise((done) => {
         router.start(homeState as State, (_err, state) => {
           expect(state.meta.id).toEqual(homeState.meta.id)
 
           router.navigate('users', (_err, state: State) => {
-              expect(state.meta.id).not.toEqual(1)
+              expect(state.meta.id).toEqual(1)
 
-              done(null)
+              router.navigate('profile', (_err, state: State) => {
+                expect(state.meta.id).not.toEqual(1)
+                expect(state.meta.id).not.toEqual(homeState.meta.id)
+
+                done(null)
+              })
           })
         })
     }))
