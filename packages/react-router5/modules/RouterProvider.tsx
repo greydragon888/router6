@@ -1,40 +1,43 @@
-import { useMemo, useSyncExternalStore } from 'react'
-import { RouterContext, RouteContext } from './context'
-import { Router } from 'router5'
-import type { FC, ReactNode } from 'react'
-import type { RouteState, UnsubscribeFn } from './types'
+import { useMemo, useSyncExternalStore } from "react";
+import { RouterContext, RouteContext } from "./context";
+import { Router } from "router5";
+import type { FC, ReactNode } from "react";
+import type { RouteState, UnsubscribeFn } from "./types";
 
 export interface RouteProviderProps {
-  router: Router
-  children: ReactNode
+  router: Router;
+  children: ReactNode;
 }
 
-export const RouterProvider: FC<RouteProviderProps> = ({ router, children }) => {
+export const RouterProvider: FC<RouteProviderProps> = ({
+  router,
+  children,
+}) => {
   // Local store state to hold route information
   const store = useMemo(() => {
     let currentState: RouteState = {
       route: router.getState(),
-      previousRoute: null
-    }
+      previousRoute: null,
+    };
 
     // This will be called to return the current state snapshot
-    const getSnapshot = () => currentState
+    const getSnapshot = () => currentState;
 
     // Subscribe to router updates and notify React when state changes
     const subscribe = (callback: () => void) => {
       const unsubscribe = router.subscribe(({ route, previousRoute }) => {
-        currentState = { route, previousRoute }
-        callback() // Notify React to trigger re-render
-      }) as UnsubscribeFn
+        currentState = { route, previousRoute };
+        callback(); // Notify React to trigger re-render
+      }) as UnsubscribeFn;
 
-      return unsubscribe
-    }
+      return unsubscribe;
+    };
 
-    return { getSnapshot, subscribe }
-  }, [router])
+    return { getSnapshot, subscribe };
+  }, [router]);
 
   // Using useSyncExternalStore to manage subscription and state updates
-  const state = useSyncExternalStore(store.subscribe, store.getSnapshot)
+  const state = useSyncExternalStore(store.subscribe, store.getSnapshot);
 
   return (
     <RouterContext.Provider value={router}>
@@ -42,5 +45,5 @@ export const RouterProvider: FC<RouteProviderProps> = ({ router, children }) => 
         {children}
       </RouteContext.Provider>
     </RouterContext.Provider>
-  )
-}
+  );
+};

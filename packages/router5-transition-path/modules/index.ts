@@ -1,6 +1,6 @@
-import transitionPath, { nameToIDs } from './transitionPath'
-import shouldUpdateNode from './shouldUpdateNode'
+import transitionPath, { nameToIDs } from "./transitionPath";
+import shouldUpdateNode from "./shouldUpdateNode";
 
-export { shouldUpdateNode, nameToIDs }
+export { shouldUpdateNode, nameToIDs };
 
-export default transitionPath
+export default transitionPath;

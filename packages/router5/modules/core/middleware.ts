@@ -1,43 +1,41 @@
-import { Router } from '../types/router'
+import { Router } from "../types/router";
 
 export default function withMiddleware<Dependencies>(
-    router: Router<Dependencies>
+  router: Router<Dependencies>,
 ): Router<Dependencies> {
-    let middlewareFactories = []
-    let middlewareFunctions = []
+  let middlewareFactories = [];
+  let middlewareFunctions = [];
 
-    router.useMiddleware = (...middlewares) => {
-        const removePluginFns: Array<() => void> = middlewares.map(
-            middleware => {
-                const middlewareFunction = router.executeFactory(middleware)
+  router.useMiddleware = (...middlewares) => {
+    const removePluginFns: Array<() => void> = middlewares.map((middleware) => {
+      const middlewareFunction = router.executeFactory(middleware);
 
-                middlewareFactories.push(middleware)
-                middlewareFunctions.push(middlewareFunction)
+      middlewareFactories.push(middleware);
+      middlewareFunctions.push(middlewareFunction);
 
-                return () => {
-                    middlewareFactories = middlewareFactories.filter(
-                        m => m !== middleware
-                    )
-                    middlewareFunctions = middlewareFunctions.filter(
-                        m => m !== middlewareFunction
-                    )
-                }
-            }
-        )
+      return () => {
+        middlewareFactories = middlewareFactories.filter(
+          (m) => m !== middleware,
+        );
+        middlewareFunctions = middlewareFunctions.filter(
+          (m) => m !== middlewareFunction,
+        );
+      };
+    });
 
-        return () => removePluginFns.forEach(fn => fn())
-    }
+    return () => removePluginFns.forEach((fn) => fn());
+  };
 
-    router.clearMiddleware = () => {
-        middlewareFactories = []
-        middlewareFunctions = []
+  router.clearMiddleware = () => {
+    middlewareFactories = [];
+    middlewareFunctions = [];
 
-        return router
-    }
+    return router;
+  };
 
-    router.getMiddlewareFactories = () => middlewareFactories
+  router.getMiddlewareFactories = () => middlewareFactories;
 
-    router.getMiddlewareFunctions = () => middlewareFunctions
+  router.getMiddlewareFunctions = () => middlewareFunctions;
 
-    return router
+  return router;
 }

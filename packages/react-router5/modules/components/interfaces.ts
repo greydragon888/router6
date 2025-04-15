@@ -1,5 +1,5 @@
-import type { HTMLAttributes, MouseEventHandler } from 'react'
-import type { NavigationOptions, Router, State } from 'router5'
+import type { HTMLAttributes, MouseEventHandler } from "react";
+import type { NavigationOptions, Router, State } from "router5";
 
 export interface BaseLinkProps extends HTMLAttributes<HTMLAnchorElement> {
   router: Router;

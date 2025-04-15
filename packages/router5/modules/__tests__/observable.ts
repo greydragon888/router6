@@ -1,27 +1,27 @@
-import { createTestRouter } from './helpers'
-import type { Router, Subscription } from '..'
+import { createTestRouter } from "./helpers";
+import type { Router, Subscription } from "..";
 
-let router: Router
+let router: Router;
 
-describe('core/observable', function() {
-    beforeEach(() => {
-      router = createTestRouter().start()
-    })
-    afterEach(() => {
-      router.stop()
-    })
+describe("core/observable", function () {
+  beforeEach(() => {
+    router = createTestRouter().start();
+  });
+  afterEach(() => {
+    router.stop();
+  });
 
-    it('should accept a listener function', () => {
-        const unsubscribe = router.subscribe(() => {})
+  it("should accept a listener function", () => {
+    const unsubscribe = router.subscribe(() => {});
 
-        expect(typeof unsubscribe).toBe('function')
-    })
+    expect(typeof unsubscribe).toBe("function");
+  });
 
-    it('should accept a listener object', () => {
-        const subscription = router.subscribe({
-            next: () => undefined
-        }) as Subscription
+  it("should accept a listener object", () => {
+    const subscription = router.subscribe({
+      next: () => undefined,
+    }) as Subscription;
 
-        expect(typeof subscription.unsubscribe).toBe('function')
-    })
-})
+    expect(typeof subscription.unsubscribe).toBe("function");
+  });
+});
