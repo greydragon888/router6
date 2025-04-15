@@ -1,19 +1,14 @@
-import {
-  useCallback,
-  useEffect,
-  useState,
-  useMemo
-} from 'react'
-import type { FC, MouseEvent } from 'react'
-import type { BaseLinkProps } from './interfaces'
-import type { State } from 'router5'
+import { useCallback, useEffect, useState, useMemo } from "react";
+import type { FC, MouseEvent } from "react";
+import type { BaseLinkProps } from "./interfaces";
+import type { State } from "router5";
 
 export const BaseLink: FC<BaseLinkProps> = ({
   routeName,
   routeParams = {},
   routeOptions = {},
   className,
-  activeClassName = 'active',
+  activeClassName = "active",
   activeStrict = false,
   ignoreQueryParams = true,
   onClick,
@@ -24,72 +19,68 @@ export const BaseLink: FC<BaseLinkProps> = ({
   children,
   ...linkProps
 }) => {
-  const getActiveState = () => router.isActive(
-    routeName,
-    routeParams,
-    activeStrict,
-    ignoreQueryParams
-  )
+  const getActiveState = () =>
+    router.isActive(routeName, routeParams, activeStrict, ignoreQueryParams);
 
   // State to track if the link is active or not
-  const [active, setActive] = useState<boolean>(getActiveState())
+  const [active, setActive] = useState<boolean>(getActiveState());
 
   // Callback to handle successful or erroneous navigation
-  const callback: ((err?: any, state?: State) => void) = useCallback(
+  const callback: (err?: any, state?: State) => void = useCallback(
     (err, state) => {
       if (!err && successCallback) {
-        successCallback(state)
+        successCallback(state);
       }
 
       if (err && errorCallback) {
-        errorCallback(err)
+        errorCallback(err);
       }
     },
-    [successCallback, errorCallback]
-  )
+    [successCallback, errorCallback],
+  );
 
   // Build URL using router's buildUrl or buildPath methods
   const buildUrl = useMemo(() => {
     if (router.buildUrl) {
-      return router.buildUrl(routeName, routeParams)
+      return router.buildUrl(routeName, routeParams);
     }
 
-    return router.buildPath(routeName, routeParams)
-  }, [routeName, routeParams])
+    return router.buildPath(routeName, routeParams);
+  }, [routeName, routeParams]);
 
   // Update the active state based on the isActive result
   useEffect(() => {
-    setActive(getActiveState())
-  }, [routeName, routeParams, activeStrict, ignoreQueryParams])
+    setActive(getActiveState());
+  }, [routeName, routeParams, activeStrict, ignoreQueryParams]);
 
   // Handler for click events, handles navigation
   const clickHandler = useCallback(
     (evt: MouseEvent<HTMLAnchorElement>) => {
       if (onClick) {
-        onClick(evt)
+        onClick(evt);
 
         // Prevent default behavior if the callback calls preventDefault
         if (evt.defaultPrevented) {
-          return
+          return;
         }
       }
 
       // Check if a modifier key is pressed (e.g., meta, ctrl, shift, alt)
-      const comboKey = evt.metaKey || evt.altKey || evt.ctrlKey || evt.shiftKey
+      const comboKey = evt.metaKey || evt.altKey || evt.ctrlKey || evt.shiftKey;
 
       // Only navigate if left mouse button is clicked and no modifier keys
-      if (evt.button === 0 && !comboKey && target !== '_blank') {
-        evt.preventDefault() // Prevent default link behavior
-        router.navigate(routeName, routeParams, routeOptions, callback)
+      if (evt.button === 0 && !comboKey && target !== "_blank") {
+        evt.preventDefault(); // Prevent default link behavior
+        router.navigate(routeName, routeParams, routeOptions, callback);
       }
     },
-    [onClick, routeName, routeParams, routeOptions, callback, target]
-  )
+    [onClick, routeName, routeParams, routeOptions, callback, target],
+  );
 
   // Build the class name string for the link
   const linkClassName = useMemo(() => {
-    return [active ? activeClassName : '', className].join(' ').trim()
-  }, [active, activeClassName, className])
+    return [active ? activeClassName : "", className].join(" ").trim();
+  }, [active, activeClassName, className]);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { previousRoute, ...restProps } = linkProps;
@@ -103,5 +94,5 @@ export const BaseLink: FC<BaseLinkProps> = ({
     >
       {children}
     </a>
-  )
-}
+  );
+};

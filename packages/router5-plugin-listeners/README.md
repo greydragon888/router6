@@ -7,11 +7,11 @@
 ## Usage
 
 ```javascript
-import listenersPlugin from 'router5-plugin-listeners'
+import listenersPlugin from "router5-plugin-listeners";
 
-const router = createRouter()
+const router = createRouter();
 
-router.usePlugin(listenersPlugin())
+router.usePlugin(listenersPlugin());
 ```
 
 ## Types of listeners

@@ -1,40 +1,45 @@
-import { createTestRouter, createTestRouterWithADefaultRoute, FnChild, renderWithRouter } from './helpers'
-import { useRouteNode } from 'react-router5'
-import type { Router } from 'router5'
+import {
+  createTestRouter,
+  createTestRouterWithADefaultRoute,
+  FnChild,
+  renderWithRouter,
+} from "./helpers";
+import { useRouteNode } from "react-router5";
+import type { Router } from "router5";
 
-let router: Router
+let router: Router;
 
-describe('useRouteNode hook', () => {
-  let routerWithADefaultRoute: Router
+describe("useRouteNode hook", () => {
+  let routerWithADefaultRoute: Router;
 
   beforeEach(() => {
-    router = createTestRouter()
-    routerWithADefaultRoute = createTestRouterWithADefaultRoute()
-  })
+    router = createTestRouter();
+    routerWithADefaultRoute = createTestRouterWithADefaultRoute();
+  });
   afterEach(() => {
-    router.stop()
-  })
+    router.stop();
+  });
 
-  it('should return the router', () => {
-    const ChildSpy = vi.fn(FnChild)
+  it("should return the router", () => {
+    const ChildSpy = vi.fn(FnChild);
 
-    renderWithRouter(router)(() => ChildSpy(useRouteNode('')))
+    renderWithRouter(router)(() => ChildSpy(useRouteNode("")));
     expect(ChildSpy).toHaveBeenCalledWith({
       router,
       route: null,
-      previousRoute: null
-    })
-  })
+      previousRoute: null,
+    });
+  });
 
-  it('should not return a null route with a default route and the router started', () => {
-    const ChildSpy = vi.fn(FnChild)
+  it("should not return a null route with a default route and the router started", () => {
+    const ChildSpy = vi.fn(FnChild);
 
-    const BaseComponent = () => ChildSpy(useRouteNode(''))
+    const BaseComponent = () => ChildSpy(useRouteNode(""));
 
     routerWithADefaultRoute.start(() => {
-      renderWithRouter(routerWithADefaultRoute)(BaseComponent)
+      renderWithRouter(routerWithADefaultRoute)(BaseComponent);
       /* first call, first argument */
-      expect(ChildSpy.mock.calls[0][0].route.name).toBe('test')
-    })
-  })
-})
+      expect(ChildSpy.mock.calls[0][0].route.name).toBe("test");
+    });
+  });
+});

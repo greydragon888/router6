@@ -25,7 +25,7 @@ const AppWithRouter = (
   <RouterProvider router={router}>
     <App />
   </RouterProvider>
-)
+);
 ```
 
 ## Connecting components
@@ -49,8 +49,8 @@ You can connect your components using three different methods:
 - **ConnectedLink**: same as `Link`, except it re-renders on a route changes.
 
 ```javascript
-import React from 'react'
-import { Link } from 'react-router5'
+import React from "react";
+import { Link } from "react-router5";
 
 function Menu(props) {
   return (
@@ -59,8 +59,8 @@ function Menu(props) {
 
       <Link routeName="about">About</Link>
     </nav>
-  )
+  );
 }
 
-export default Menu
+export default Menu;
 ```

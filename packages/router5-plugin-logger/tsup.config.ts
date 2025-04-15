@@ -1,3 +1,3 @@
-import { createConfig } from '../../tsup.base';
+import { createConfig } from "../../tsup.base";
 
 export default createConfig();

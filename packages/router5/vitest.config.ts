@@ -1,3 +1,3 @@
-import sharedConfig from '../../vitest.config';
+import sharedConfig from "../../vitest.config";
 
-export default sharedConfig
+export default sharedConfig;

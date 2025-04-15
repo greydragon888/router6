@@ -14,41 +14,41 @@ router5 is a **framework and view library agnostic router**.
 - **flexible**: you have control over transitions and what happens on transitions
 
 ```javascript
-import createRouter from 'router5'
-import browserPlugin from 'router5-plugin-browser'
+import createRouter from "router5";
+import browserPlugin from "router5-plugin-browser";
 
 const routes = [
-  { name: 'home', path: '/' },
-  { name: 'profile', path: '/profile' }
-]
+  { name: "home", path: "/" },
+  { name: "profile", path: "/profile" },
+];
 
-const router = createRouter(routes)
+const router = createRouter(routes);
 
-router.usePlugin(browserPlugin())
+router.usePlugin(browserPlugin());
 
-router.start()
+router.start();
 ```
 
 **With React \(hooks\)**
 
 ```javascript
-import React from 'react'
-import ReactDOM from 'react-dom'
-import { RouterProvider, useRoute } from 'react-router5'
+import React from "react";
+import ReactDOM from "react-dom";
+import { RouterProvider, useRoute } from "react-router5";
 
 function App() {
-  const { route } = useRoute()
+  const { route } = useRoute();
 
   if (!route) {
-    return null
+    return null;
   }
 
-  if (route.name === 'home') {
-    return <h1>Home</h1>
+  if (route.name === "home") {
+    return <h1>Home</h1>;
   }
 
-  if (route.name === 'profile') {
-    return <h1>Profile</h1>
+  if (route.name === "profile") {
+    return <h1>Profile</h1>;
   }
 }
 
@@ -56,8 +56,8 @@ ReactDOM.render(
   <RouterProvider router={router}>
     <App />
   </RouterProvider>,
-  document.getElementById('root')
-)
+  document.getElementById("root"),
+);
 ```
 
 **With observables**
@@ -65,11 +65,11 @@ ReactDOM.render(
 Your router instance is compatible with most observable libraries.
 
 ```javascript
-import { from } from 'rxjs/observable/from'
+import { from } from "rxjs/observable/from";
 
 from(router).map(({ route }) => {
   /* happy routing */
-})
+});
 ```
 
 ### Examples
