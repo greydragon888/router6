@@ -1,9 +1,10 @@
-import { createTestRouter } from "./helpers";
 import createRouter from "..";
+import { createTestRouter } from "./helpers";
 import type { Router, PluginFactory, Plugin } from "..";
 
 let router: Router;
-let myPlugin: PluginFactory, myPluginMethods: Plugin;
+let myPlugin: PluginFactory;
+let myPluginMethods: Plugin;
 
 describe("core/plugins", () => {
   beforeEach(() => {
@@ -13,9 +14,8 @@ describe("core/plugins", () => {
       onTransitionSuccess: vi.fn(),
       onTransitionError: () => {},
     };
-    myPlugin = (router: Router) => {
-      // @ts-ignore
-      router.myCustomMethod = () => undefined;
+    myPlugin = (router?: Router & { myCustomMethod?: Function }) => {
+      router!.myCustomMethod = () => {};
 
       return myPluginMethods;
     };
@@ -24,21 +24,20 @@ describe("core/plugins", () => {
     router.stop();
   });
 
-  it("should register plugins", () =>
-    new Promise((done) => {
-      router.stop();
-      router.usePlugin(myPlugin);
-      router.start("", () => {
-        // @ts-ignore
-        expect(router.myCustomMethod).not.toBe(undefined);
+  it("should register plugins", () => {
+    router.stop();
+    router.usePlugin(myPlugin);
+    router.start("", () => {
+      expect(
+        (router as Router & { myCustomMethod?: Function }).myCustomMethod,
+      ).not.toBe(undefined);
 
-        router.navigate("orders", () => {
-          expect(myPluginMethods.onTransitionStart).toHaveBeenCalled();
-          expect(myPluginMethods.onTransitionSuccess).toHaveBeenCalled();
-          done(null);
-        });
+      router.navigate("orders", () => {
+        expect(myPluginMethods.onTransitionStart).toHaveBeenCalled();
+        expect(myPluginMethods.onTransitionSuccess).toHaveBeenCalled();
       });
-    }));
+    });
+  });
 
   it("should return an deregister function and call teardown", () => {
     const router = createRouter();

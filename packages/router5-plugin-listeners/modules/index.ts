@@ -1,5 +1,5 @@
-import { PluginFactory, Router, State } from "router5";
 import transitionPath from "router5-transition-path";
+import type { NavigationOptions, PluginFactory, Router, State } from "router5";
 
 export type Listener = (toState: State, fromState: State | null) => void;
 
@@ -81,18 +81,25 @@ const listenersPluginFactory = (
       });
     }
 
-    function onTransitionSuccess(toState, fromState, opts) {
-      const { intersection, toDeactivate } = transitionPath(toState, fromState);
-      const intersectionNode = opts.reload ? "" : intersection;
+    function onTransitionSuccess(
+      toState: State,
+      fromState?: State,
+      opts?: NavigationOptions,
+    ) {
+      const { intersection, toDeactivate } = transitionPath(
+        toState,
+        fromState ?? null,
+      );
+      const intersectionNode = opts?.reload ? "" : intersection;
       const { name } = toState;
 
       if (options.autoCleanUp) {
         toDeactivate.forEach((name) => removeListener("^" + name));
       }
 
-      invokeListeners("^" + intersectionNode, toState, fromState);
-      invokeListeners("=" + name, toState, fromState);
-      invokeListeners("*", toState, fromState);
+      invokeListeners("^" + intersectionNode, toState, fromState ?? null);
+      invokeListeners("=" + name, toState, fromState ?? null);
+      invokeListeners("*", toState, fromState ?? null);
     }
 
     return {

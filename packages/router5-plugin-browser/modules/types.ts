@@ -1,4 +1,4 @@
-import { State } from "router5";
+import type { State } from "router5";
 
 export interface BrowserPluginOptions {
   forceDeactivate?: boolean;
@@ -13,7 +13,15 @@ export interface Browser {
   getBase(): string;
   pushState(state: HistoryState, title: string | null, path: string): void;
   replaceState(state: HistoryState, title: string | null, path: string): void;
-  addPopstateListener(fn, opts): any;
+
+  addPopstateListener(
+    fn: (evt: PopStateEvent) => void,
+    opts: BrowserPluginOptions,
+  ): () => void;
+  addPopstateListener(
+    fn: (evt: HashChangeEvent) => void,
+    opts: BrowserPluginOptions,
+  ): () => void;
   getLocation(opts: BrowserPluginOptions): string;
   getState(): HistoryState;
   getHash(): string;

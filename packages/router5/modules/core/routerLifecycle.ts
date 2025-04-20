@@ -1,35 +1,57 @@
 import { constants, errorCodes } from "../constants";
-import { Router } from "../types/router";
+import type { DefaultDependencies, Router } from "../types/router";
+import type { DoneFn, DoneFnError, State } from "../types/base";
 
-const noop = function () {};
+const noop = () => {};
 
-export default function withRouterLifecycle<Dependencies>(
-  router: Router<Dependencies>,
-): Router<Dependencies> {
+type StartRouterArguments =
+  | []
+  | [done?: DoneFn]
+  | [startPathOrState: string | State]
+  | [startPathOrState: string | State, done?: DoneFn];
+
+const getStartRouterArguments = (
+  args: StartRouterArguments,
+): [startPathOrState: string | State | undefined, done: DoneFn] => {
+  switch (args.length) {
+    case 0:
+      return [undefined, noop];
+    case 1:
+      if (typeof args[0] === "function") {
+        return [undefined, (args as [done?: DoneFn])[0] || noop];
+      }
+      return [args[0], noop];
+    case 2:
+      return [args[0], args[1] || noop];
+    default:
+      throw new Error("Invalid number of arguments");
+  }
+};
+
+export default function withRouterLifecycle<
+  Dependencies extends DefaultDependencies,
+>(router: Router<Dependencies>): Router<Dependencies> {
   let started = false;
 
-  router.isStarted = () => started;
+  router.isStarted = (): boolean => started;
 
-  //@ts-ignore
-  router.start = (...args) => {
+  router.start = (...args: StartRouterArguments): Router<Dependencies> => {
     const options = router.getOptions();
-    const lastArg = args[args.length - 1];
-    const done = typeof lastArg === "function" ? lastArg : noop;
-    const startPathOrState =
-      typeof args[0] !== "function" ? args[0] : undefined;
+    const [startPathOrState, done] = getStartRouterArguments(args);
 
     if (started) {
       done({ code: errorCodes.ROUTER_ALREADY_STARTED });
       return router;
     }
 
-    let startPath, startState;
+    let startPath = "",
+      startState;
 
     started = true;
     router.invokeEventListeners(constants.ROUTER_START);
 
     // callback
-    const cb = (err, state?, invokeErrCb = true) => {
+    const cb = (err: DoneFnError, state?: State, invokeErrCb = true) => {
       if (!err)
         router.invokeEventListeners(constants.TRANSITION_SUCCESS, state, null, {
           replace: true,
@@ -45,7 +67,8 @@ export default function withRouterLifecycle<Dependencies>(
     };
 
     if (startPathOrState === undefined && !options.defaultRoute) {
-      return cb({ code: errorCodes.NO_START_PATH_OR_STATE });
+      cb({ code: errorCodes.NO_START_PATH_OR_STATE });
+      return router;
     }
     if (typeof startPathOrState === "string") {
       startPath = startPathOrState;
@@ -60,20 +83,30 @@ export default function withRouterLifecycle<Dependencies>(
       // Navigate to default function
       const navigateToDefault = () =>
         router.navigateToDefault({ replace: true }, done);
-      const redirect = (route) =>
+
+      const redirect = (state: State) =>
         router.navigate(
-          route.name,
-          route.params,
+          state.name,
+          state?.params ?? {},
           { replace: true, reload: true, redirected: true },
           done,
         );
 
-      const transitionToState = (state) => {
+      const transitionToState = (state: State) => {
         router.transitionToState(state, router.getState(), {}, (err, state) => {
-          if (!err) cb(null, state);
-          else if (err.redirect) redirect(err.redirect);
-          else if (options.defaultRoute) navigateToDefault();
-          else cb(err, null, false);
+          if (!err) {
+            cb(null, state);
+          } else if (
+            typeof err === "object" &&
+            "redirect" in err &&
+            err.redirect
+          ) {
+            redirect(err.redirect);
+          } else if (options.defaultRoute) {
+            navigateToDefault();
+          } else {
+            cb(err, undefined, false);
+          }
         });
       };
       // If matched start path
@@ -88,7 +121,7 @@ export default function withRouterLifecycle<Dependencies>(
         );
       } else {
         // No start match, no default => do nothing
-        cb({ code: errorCodes.ROUTE_NOT_FOUND, path: startPath }, null);
+        cb({ code: errorCodes.ROUTE_NOT_FOUND, path: startPath });
       }
     } else {
       // Initialise router with provided start state
@@ -99,7 +132,7 @@ export default function withRouterLifecycle<Dependencies>(
     return router;
   };
 
-  router.stop = () => {
+  router.stop = (): Router<Dependencies> => {
     if (started) {
       router.setState(null);
       started = false;

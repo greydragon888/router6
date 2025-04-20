@@ -4,7 +4,7 @@ export interface SegementParams {
 
 export interface State {
   name: string;
-  params?: {
+  params: {
     [key: string]: any;
   };
   meta?: {
@@ -12,7 +12,7 @@ export interface State {
       [key: string]: boolean;
     };
     params?: {
-      [key: string]: SegementParams;
+      [key: string]: SegementParams | unknown;
     };
   };
   [key: string]: any;
@@ -33,17 +33,23 @@ export const nameToIDs = (name: string): string[] =>
       [],
     );
 
-const exists = (val) => val !== undefined && val !== null;
+const exists = (val: unknown) => val !== undefined && val !== null;
 
-const hasMetaParams = (state) => state && state.meta && state.meta.params;
+const hasMetaParams = (state: State) =>
+  state && state.meta && state.meta.params;
 
 const extractSegmentParams = (name: string, state: State): SegementParams => {
-  if (!hasMetaParams(state) || !exists(state.meta.params[name])) return {};
+  if (!hasMetaParams(state) || !exists(state.meta?.params?.[name])) return {};
 
-  return Object.keys(state.meta.params[name]).reduce((params, p) => {
-    params[p] = state.params[p];
-    return params;
-  }, {});
+  return Object.keys(state?.meta?.params?.[name] ?? {}).reduce(
+    (params, param) => {
+      return {
+        ...params,
+        [param]: state.params?.[param],
+      };
+    },
+    {},
+  );
 };
 
 export default function transitionPath(
@@ -65,7 +71,9 @@ export default function transitionPath(
       if (left !== right) return i;
 
       const leftParams = extractSegmentParams(left, toState);
-      const rightParams = extractSegmentParams(right, fromState);
+      const rightParams = fromState
+        ? extractSegmentParams(right, fromState)
+        : {};
 
       if (Object.keys(leftParams).length !== Object.keys(rightParams).length)
         return i;

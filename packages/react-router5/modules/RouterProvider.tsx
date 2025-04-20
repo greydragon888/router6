@@ -1,7 +1,7 @@
-import { useMemo, useSyncExternalStore } from "react";
-import { RouterContext, RouteContext } from "./context";
-import { Router } from "router5";
 import type { FC, ReactNode } from "react";
+import { useMemo, useSyncExternalStore } from "react";
+import { RouteContext, RouterContext } from "./context";
+import { Router } from "router5";
 import type { RouteState, UnsubscribeFn } from "./types";
 
 export interface RouteProviderProps {
@@ -25,12 +25,10 @@ export const RouterProvider: FC<RouteProviderProps> = ({
 
     // Subscribe to router updates and notify React when state changes
     const subscribe = (callback: () => void) => {
-      const unsubscribe = router.subscribe(({ route, previousRoute }) => {
+      return router.subscribe(({ route, previousRoute }) => {
         currentState = { route, previousRoute };
         callback(); // Notify React to trigger re-render
       }) as UnsubscribeFn;
-
-      return unsubscribe;
     };
 
     return { getSnapshot, subscribe };

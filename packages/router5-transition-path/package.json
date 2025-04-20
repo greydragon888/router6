@@ -28,13 +28,14 @@
     "url": "https://github.com/router5/router5/issues"
   },
   "homepage": "https://github.com/router5/router5/tree/master/packages/router5-transition-path",
-  "sideEffects": false,
-  "peerDependencies": {
-    "router5": "^8.0.0"
-  },
   "scripts": {
     "test": "vitest",
     "build": "tsup",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "type-check:watch": "tsc --watch --noEmit"
+  },
+  "sideEffects": false,
+  "peerDependencies": {
+    "router5": "^8.0.0"
   }
 }

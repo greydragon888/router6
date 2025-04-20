@@ -11,6 +11,10 @@ export const useRouteNode = (nodeName: string): RouteContext => {
   // Access the router instance from context
   const router = useContext(RouterContext);
 
+  if (!router) {
+    throw new Error("useRouteNode must be used within a RouterProvider");
+  }
+
   // Memoize the shouldUpdate function to avoid re-creating it on every render
   const shouldUpdate = useMemo(() => shouldUpdateNode(nodeName), [nodeName]);
 

@@ -21,16 +21,14 @@ const normaliseSegment = (name: string): string => {
   return name.replace(".", "\\.");
 };
 
-const testRouteWithSegment = (start, end) => {
-  return (...args) => {
-    const route = args[0];
-
-    const applySegment = (segment) => {
+const testRouteWithSegment = (start: string, end: string) => {
+  return (route: State | string, segment?: string) => {
+    const applySegment = (segment: string) => {
       return test(route, new RegExp(start + normaliseSegment(segment) + end));
     };
 
-    if (args.length === 2) {
-      return applySegment(args[1]);
+    if (segment) {
+      return applySegment(segment);
     }
 
     return applySegment;

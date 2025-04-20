@@ -3,5 +3,11 @@ import { RouteContext } from "../context";
 import { RouteContext as RouteContextType } from "../types";
 
 export const useRoute = (): RouteContextType => {
-  return useContext(RouteContext);
+  const routeContext = useContext(RouteContext);
+
+  if (!routeContext) {
+    throw new Error("useRoute must be used within a RouteProvider");
+  }
+
+  return routeContext;
 };

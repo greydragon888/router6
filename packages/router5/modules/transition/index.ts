@@ -1,16 +1,26 @@
 import transitionPath, { nameToIDs } from "router5-transition-path";
-import resolve from "./resolve";
+import { resolve } from "./resolve";
 import { constants, errorCodes } from "../constants";
-import { Router } from "../types/router";
-import { State, NavigationOptions, DoneFn } from "../types/base";
+import type {
+  ActivationFn,
+  DefaultDependencies,
+  Router,
+} from "../types/router";
+import type {
+  State,
+  NavigationOptions,
+  DoneFn,
+  CancelFn,
+  DoneFnError,
+} from "../types/base";
 
-export default function transition(
-  router: Router,
+export function transition(
+  router: Router<DefaultDependencies>,
   toState: State,
   fromState: State | null,
   opts: NavigationOptions,
   callback: DoneFn,
-) {
+): CancelFn {
   let cancelled = false;
   let completed = false;
   const options = router.getOptions();
@@ -21,10 +31,10 @@ export default function transition(
   const cancel = () => {
     if (!cancelled && !completed) {
       cancelled = true;
-      callback({ code: errorCodes.TRANSITION_CANCELLED }, null);
+      callback({ code: errorCodes.TRANSITION_CANCELLED });
     }
   };
-  const done = (err, state) => {
+  const done: DoneFn = (err, state) => {
     completed = true;
 
     if (isCancelled()) {
@@ -39,11 +49,14 @@ export default function transition(
       });
     }
 
-    callback(err, state || toState);
+    callback(err, state ?? toState);
   };
-  const makeError = (base, err) => ({
+  const makeError = (
+    base: { code: string },
+    err?: Record<string, unknown> | Error | string | null,
+  ) => ({
     ...base,
-    ...(err instanceof Object ? err : { error: err }),
+    ...(err && Object.keys(err).length ? (err as Object) : { error: err }),
   });
 
   const isUnknownRoute = toState.name === constants.UNKNOWN_ROUTE;
@@ -52,8 +65,8 @@ export default function transition(
 
   const canDeactivate =
     !fromState || opts.forceDeactivate
-      ? []
-      : (toState, fromState, cb) => {
+      ? undefined
+      : (_toState: State, _fromState: State, cb: DoneFn) => {
           const canDeactivateFunctionMap = toDeactivate
             .filter((name) => canDeactivateFunctions[name])
             .reduce(
@@ -77,8 +90,8 @@ export default function transition(
         };
 
   const canActivate = isUnknownRoute
-    ? []
-    : (toState, fromState, cb) => {
+    ? undefined
+    : (_toState: State, _fromState: State, cb: DoneFn) => {
         const canActivateFunctionMap = toActivate
           .filter((name) => canActivateFunctions[name])
           .reduce(
@@ -92,27 +105,28 @@ export default function transition(
         resolve(
           canActivateFunctionMap,
           { ...asyncBase, errorKey: "segment" },
-          (err) =>
+          (err?: DoneFnError) => {
             cb(
               err ? makeError({ code: errorCodes.CANNOT_ACTIVATE }, err) : null,
-            ),
+            );
+          },
         );
       };
 
   const middleware = !middlewareFunctions.length
-    ? []
-    : (toState, fromState, cb) =>
-        resolve(middlewareFunctions, { ...asyncBase }, (err, state) =>
+    ? undefined
+    : (toState: State, _fromState: State, cb: DoneFn) => {
+        resolve(middlewareFunctions, { ...asyncBase }, (err, state?: State) => {
           cb(
             err ? makeError({ code: errorCodes.TRANSITION_ERR }, err) : null,
-            state || toState,
-          ),
-        );
+            state ?? toState,
+          );
+        });
+      };
 
-  const pipeline = []
-    .concat(canDeactivate)
-    .concat(canActivate)
-    .concat(middleware);
+  const pipeline = [canDeactivate, canActivate, middleware].filter(
+    Boolean,
+  ) as ActivationFn[];
 
   resolve(pipeline, asyncBase, done);
 

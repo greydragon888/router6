@@ -1,10 +1,11 @@
-import { RouteNode } from "route-node";
 import { constants } from "../constants";
-import { Router, Route } from "../types/router";
+import { RouteNode } from "route-node";
+import type { Params } from "../types/base";
+import type { Router, Route, DefaultDependencies } from "../types/router";
 
-export default function withRoutes<Dependencies>(
+export default function withRoutes<Dependencies extends DefaultDependencies>(
   routes: Array<Route<Dependencies>> | RouteNode,
-) {
+): (router: Router<Dependencies>) => Router<Dependencies> {
   return (router: Router<Dependencies>): Router<Dependencies> => {
     router.forward = (fromRoute, toRoute) => {
       router.config.forwardMap[fromRoute] = toRoute;
@@ -17,7 +18,7 @@ export default function withRoutes<Dependencies>(
         ? routes
         : new RouteNode("", "", routes, { onAdd: onRouteAdded });
 
-    function onRouteAdded(route) {
+    function onRouteAdded(route: Route<Dependencies>) {
       if (route.canActivate) router.canActivate(route.name, route.canActivate);
 
       if (route.forwardTo) router.forward(route.name, route.forwardTo);
@@ -49,11 +50,11 @@ export default function withRoutes<Dependencies>(
     };
 
     router.isActive = (
-      name,
-      params = {},
-      strictEquality = false,
-      ignoreQueryParams = true,
-    ) => {
+      name: string,
+      params: Params = {},
+      strictEquality: boolean = false,
+      ignoreQueryParams: boolean = true,
+    ): boolean => {
       const activeState = router.getState();
 
       if (!activeState) return false;
@@ -72,9 +73,9 @@ export default function withRoutes<Dependencies>(
       );
     };
 
-    router.buildPath = (route, params) => {
+    router.buildPath = (route: string, params: Params): string => {
       if (route === constants.UNKNOWN_ROUTE) {
-        return params.path;
+        return params.path as string;
       }
 
       const paramsWithDefault = {
@@ -109,10 +110,9 @@ export default function withRoutes<Dependencies>(
           name,
           decodedParams,
         );
-        const builtPath =
-          options.rewritePathOnMatch === false
-            ? path
-            : router.buildPath(routeName, routeParams);
+        const builtPath = !options.rewritePathOnMatch
+          ? path
+          : router.buildPath(routeName, routeParams);
 
         return router.makeState(routeName, routeParams, builtPath, {
           params: meta,

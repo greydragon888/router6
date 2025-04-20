@@ -1,14 +1,21 @@
-import { PluginFactory } from "router5";
+import type { Plugin, PluginFactory } from "router5";
+import type { Params } from "router5";
 
-const getDefinedParams = (params) =>
+const getDefinedParams = (params: Params) =>
   Object.keys(params)
     .filter((param) => params[param] !== undefined)
     .reduce((acc, param) => ({ ...acc, [param]: params[param] }), {});
 
-function persistentParamsPluginFactory(params = {}): PluginFactory {
-  return function persistentParamsPlugin(router) {
+function persistentParamsPluginFactory(
+  params: Params | string[] = {},
+): PluginFactory {
+  return function persistentParamsPlugin(router): Plugin {
+    if (!router) {
+      throw new Error("Router instance is required");
+    }
+
     // Persistent parameters
-    const persistentParams = Array.isArray(params)
+    const persistentParams: Params = Array.isArray(params)
       ? params.reduce((acc, param) => ({ ...acc, [param]: undefined }), {})
       : params;
 
@@ -44,9 +51,15 @@ function persistentParamsPluginFactory(params = {}): PluginFactory {
 
     return {
       onTransitionSuccess(toState) {
+        if (!toState) {
+          throw new Error("State is required");
+        }
+
         Object.keys(toState.params)
-          .filter((p) => paramNames.indexOf(p) !== -1)
-          .forEach((p) => (persistentParams[p] = toState.params[p]));
+          .filter((param) => paramNames.indexOf(param) !== -1)
+          .forEach(
+            (param) => (persistentParams[param] = toState.params[param]),
+          );
       },
     };
   };

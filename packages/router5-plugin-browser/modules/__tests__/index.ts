@@ -4,7 +4,7 @@ import { createRouter, constants } from "router5";
 import type { Browser } from "../types";
 import type { Router, State } from "router5";
 
-let router: Router, currentHistoryState: State;
+let router: Router, currentHistoryState: State | undefined;
 const base = window.location.pathname;
 const hashPrefix = "!";
 const mockedBrowser: Browser = {
@@ -13,7 +13,7 @@ const mockedBrowser: Browser = {
   pushState: (state) => (currentHistoryState = state),
   replaceState: (state) => (currentHistoryState = state),
   addPopstateListener: vi.fn(),
-  getState: () => currentHistoryState,
+  getState: () => currentHistoryState as State,
 };
 const routerConfig = [
   {
@@ -37,7 +37,7 @@ const routerConfig = [
 ];
 
 const withoutMeta = (state: State) => {
-  if (!state.meta.id) {
+  if (!state.meta?.id) {
     throw new Error("No state id");
   }
   return {
@@ -101,12 +101,12 @@ describe("browserPlugin", () => {
       }));
 
     it("should match an URL", () => {
-      expect(withoutMeta(router.matchUrl(makeUrl("/home")))).toEqual({
+      expect(withoutMeta(router.matchUrl(makeUrl("/home"))!)).toEqual({
         name: "home",
         params: {},
         path: "/home",
       });
-      expect(withoutMeta(router.matchUrl(makeUrl("/users/view/1")))).toEqual({
+      expect(withoutMeta(router.matchUrl(makeUrl("/users/view/1"))!)).toEqual({
         name: "users.view",
         params: { id: "1" },
         path: "/users/view/1",
@@ -164,7 +164,7 @@ describe("browserPlugin", () => {
     it("should update on route change", () =>
       new Promise((done) => {
         router.start(() => {
-          router.navigate("users", (_err, state: State) => {
+          router.navigate("users", (_err, state) => {
             expect(mockedBrowser.pushState).toHaveBeenCalledWith(
               state,
               "",
@@ -176,12 +176,12 @@ describe("browserPlugin", () => {
       }));
 
     it("should match an URL", () => {
-      expect(withoutMeta(router.matchUrl(makeUrl("/home")))).toEqual({
+      expect(withoutMeta(router.matchUrl(makeUrl("/home"))!)).toEqual({
         name: "home",
         params: {},
         path: "/home",
       });
-      expect(withoutMeta(router.matchUrl(makeUrl("/users/view/1")))).toEqual({
+      expect(withoutMeta(router.matchUrl(makeUrl("/users/view/1"))!)).toEqual({
         name: "users.view",
         params: { id: "1" },
         path: "/users/view/1",

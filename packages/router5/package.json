@@ -41,7 +41,8 @@
   "scripts": {
     "test": "vitest",
     "build": "tsup",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "type-check:watch": "tsc --watch --noEmit"
   },
   "sideEffects": false
 }

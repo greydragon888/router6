@@ -23,9 +23,9 @@ describe("BaseLink component", () => {
       </BaseLink>,
     );
 
-    expect(screen.queryByText(TEST_TEXT).getAttribute("href")).toBe("/home");
-    expect(screen.queryByText(TEST_TEXT).getAttribute("class")).not.toContain(
-      "active",
-    );
+    const linkElement = screen.queryByText(TEST_TEXT)!;
+
+    expect(linkElement.getAttribute("href")).toBe("/home");
+    expect(linkElement.getAttribute("class")).not.toContain("active");
   });
 });

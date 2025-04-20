@@ -1,7 +1,9 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "paths": {}
+    "paths": {
+      "router5-transition-path": ["packages/router5-transition-path/modules/index.ts"]
+    }
   },
   "include": ["modules"]
 }

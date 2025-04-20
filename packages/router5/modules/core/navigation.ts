@@ -1,53 +1,115 @@
 import { constants, errorCodes } from "../constants";
-import { Router } from "../types/router";
-import transition from "../transition";
+import { transition } from "../transition";
+import type { DefaultDependencies, Router } from "../types/router";
+import type {
+  CancelFn,
+  DoneFn,
+  NavigationOptions,
+  Params,
+  State,
+} from "../types/base";
 
 const noop = () => {};
 
-export default function withNavigation<Dependencies>(
-  router: Router<Dependencies>,
-): Router<Dependencies> {
-  let cancelCurrentTransition;
+type NavigationArguments =
+  | [name: string]
+  | [name: string, done?: DoneFn]
+  | [name: string, params?: Params, done?: DoneFn]
+  | [name: string, params?: Params, opts?: NavigationOptions, done?: DoneFn];
 
-  router.navigate = navigate;
-  router.navigate = navigate;
+type NavigationFn = {
+  (routeName: string): CancelFn;
+  (routeName: string, done?: DoneFn): CancelFn;
+  (routeName: string, routeParams: Params, done?: DoneFn): CancelFn;
+  (
+    routeName: string,
+    routeParams: Params,
+    options: NavigationOptions,
+    done?: DoneFn,
+  ): CancelFn;
+};
 
-  router.navigateToDefault = (...args) => {
-    const opts = typeof args[0] === "object" ? args[0] : {};
-    const done =
-      args.length === 2
-        ? args[1]
-        : typeof args[0] === "function"
-          ? args[0]
-          : noop;
-    const options = router.getOptions();
+const getNavigationArguments = (
+  args: NavigationArguments,
+): [name: string, params: Params, opts: NavigationOptions, done: DoneFn] => {
+  switch (args.length) {
+    case 1:
+      return [args[0], {}, {}, noop];
+    case 2:
+      if (typeof args[1] === "function") {
+        return [
+          args[0],
+          {},
+          {},
+          (args as [name: string, done?: DoneFn])[1] ?? noop,
+        ];
+      }
 
-    if (options.defaultRoute) {
-      return navigate(options.defaultRoute, options.defaultParams, opts, done);
-    }
+      return [
+        args[0],
+        (args as [name: string, params?: Params])[1] ?? {},
+        {},
+        noop,
+      ];
+    case 3:
+      if (typeof args[2] === "function") {
+        return [
+          args[0],
+          (args as [name: string, params?: Params])[1] ?? {},
+          {},
+          (args as [name: string, params?: Params, done?: DoneFn])[2] ?? noop,
+        ];
+      }
+      return [
+        args[0],
+        (
+          args as [name: string, params?: Params, opts?: NavigationOptions]
+        )[1] ?? {},
+        (
+          args as [name: string, params?: Params, opts?: NavigationOptions]
+        )[2] ?? {},
+        noop,
+      ];
+    case 4:
+      return [args[0], args[1] ?? {}, args[2] ?? {}, args[3] ?? noop];
+    default:
+      throw new Error("Invalid number of arguments");
+  }
+};
 
-    return () => {};
-  };
+type NavigationToDefaultArguments =
+  | []
+  | [done?: DoneFn]
+  | [opts: NavigationOptions, done?: DoneFn];
 
-  router.cancel = () => {
-    if (cancelCurrentTransition) {
-      cancelCurrentTransition("navigate");
-      cancelCurrentTransition = null;
-    }
+const getNavigationToDefaultArguments = (
+  args: NavigationToDefaultArguments,
+): [opts: NavigationOptions, done?: DoneFn] => {
+  switch (args.length) {
+    case 0:
+      return [{}, noop];
+    case 1:
+      if (typeof args[0] === "function") {
+        return [{}, (args as [done?: DoneFn])[0]];
+      }
+      return [args[0] || {}, noop];
+    case 2:
+      return [args[0], args[1]];
+    default:
+      throw new Error("Invalid number of arguments");
+  }
+};
 
-    return router;
-  };
-
-  function navigate(...args) {
-    const name = args[0];
-    const lastArg = args[args.length - 1];
-    const done = typeof lastArg === "function" ? lastArg : noop;
-    const params = typeof args[1] === "object" ? args[1] : {};
-    const opts = typeof args[2] === "object" ? args[2] : {};
+export default function withNavigation<
+  Dependencies extends DefaultDependencies,
+>(router: Router<Dependencies>): Router<Dependencies> {
+  const navigate: NavigationFn = (...args: NavigationArguments): CancelFn => {
+    const [name, params = {}, opts = {}, done = noop] =
+      getNavigationArguments(args);
 
     if (!router.isStarted()) {
       done({ code: errorCodes.ROUTER_NOT_STARTED });
-      return;
+      return noop;
     }
 
     const route = router.buildState(name, params);
@@ -61,7 +123,7 @@ export default function withNavigation<Dependencies>(
         router.getState(),
         err,
       );
-      return;
+      return noop;
     }
 
     const toState = router.makeState(
@@ -70,8 +132,9 @@ export default function withNavigation<Dependencies>(
       router.buildPath(route.name, route.params),
       { params: route.meta, options: opts },
     );
+
     const sameStates = router.getState()
-      ? router.areStatesEqual(router.getState(), toState, false)
+      ? router.areStatesEqual(router.getState() as State, toState, false)
       : false;
 
     // Do not proceed further if states are the same and no reload
@@ -85,7 +148,7 @@ export default function withNavigation<Dependencies>(
         router.getState(),
         err,
       );
-      return;
+      return noop;
     }
 
     const fromState = router.getState();
@@ -98,7 +161,7 @@ export default function withNavigation<Dependencies>(
     // Transition
     return router.transitionToState(toState, fromState, opts, (err, state) => {
       if (err) {
-        if (err.redirect) {
+        if (typeof err === "object" && "redirect" in err && err.redirect) {
           const { name, params } = err.redirect;
 
           navigate(
@@ -120,47 +183,85 @@ export default function withNavigation<Dependencies>(
         done(null, state);
       }
     });
-  }
+  };
+
+  let cancelCurrentTransition: CancelFn | null = null;
+
+  router.navigate = navigate;
+
+  router.navigateToDefault = (
+    ...args: NavigationToDefaultArguments
+  ): CancelFn => {
+    const [opts, done] = getNavigationToDefaultArguments(args);
+
+    const options = router.getOptions();
+
+    if (options.defaultRoute) {
+      return navigate(
+        options.defaultRoute,
+        options.defaultParams || {},
+        opts,
+        done,
+      );
+    }
+
+    return noop;
+  };
+
+  router.cancel = (): Router<Dependencies> => {
+    if (cancelCurrentTransition) {
+      cancelCurrentTransition();
+      cancelCurrentTransition = null;
+    }
+
+    return router;
+  };
 
   router.transitionToState = (
-    toState,
-    fromState,
-    options = {},
-    done = noop,
-  ) => {
+    toState: State,
+    fromState: State,
+    options: NavigationOptions = {},
+    done: DoneFn = noop,
+  ): CancelFn => {
     router.cancel();
     router.invokeEventListeners(constants.TRANSITION_START, toState, fromState);
 
+    const callback: DoneFn = (err, state) => {
+      cancelCurrentTransition = null;
+      state = state || toState;
+
+      if (err) {
+        if (
+          typeof err === "object" &&
+          "redirect" in err &&
+          err.code === errorCodes.TRANSITION_CANCELLED
+        ) {
+          router.invokeEventListeners(
+            constants.TRANSITION_CANCEL,
+            toState,
+            fromState,
+          );
+        } else {
+          router.invokeEventListeners(
+            constants.TRANSITION_ERROR,
+            toState,
+            fromState,
+            err,
+          );
+        }
+        done(err);
+      } else {
+        router.setState(state);
+        done(null, state);
+      }
+    };
+
     cancelCurrentTransition = transition(
-      router,
+      router as Router,
       toState,
       fromState,
       options,
-      (err, state) => {
-        cancelCurrentTransition = null;
-        state = state || toState;
-
-        if (err) {
-          if (err.code === errorCodes.TRANSITION_CANCELLED) {
-            router.invokeEventListeners(
-              constants.TRANSITION_CANCEL,
-              toState,
-              fromState,
-            );
-          } else {
-            router.invokeEventListeners(
-              constants.TRANSITION_ERROR,
-              toState,
-              fromState,
-              err,
-            );
-          }
-          done(err);
-        } else {
-          router.setState(state);
-          done(null, state);
-        }
-      },
+      callback,
     );
 
     return cancelCurrentTransition;
