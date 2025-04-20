@@ -4,6 +4,7 @@ import createRouter from "router5";
 import browserPlugin from "router5-plugin-browser";
 import type { FC } from "react";
 import type { Router } from "router5";
+import { JSX } from "react/jsx-runtime";
 
 export const FnChild: FC<Record<string, any>> = () => <div />;
 
@@ -33,9 +34,10 @@ export const createTestRouterWithADefaultRoute = (): Router => {
   return router;
 };
 
-export const renderWithRouter = (router: Router) => (BaseComponent) =>
-  render(
-    <RouterProvider router={router}>
-      <BaseComponent />
-    </RouterProvider>,
-  );
+export const renderWithRouter =
+  (router: Router) => (BaseComponent: React.ComponentType) =>
+    render(
+      <RouterProvider router={router}>
+        <BaseComponent />
+      </RouterProvider>,
+    );

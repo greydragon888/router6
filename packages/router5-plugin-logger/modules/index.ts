@@ -6,10 +6,10 @@ const loggerPlugin: PluginFactory = () => {
   let startGroup, endGroup;
 
   if (console.groupCollapsed) {
-    startGroup = (label) => console.groupCollapsed(label);
+    startGroup = (label: string) => console.groupCollapsed(label);
     endGroup = () => console.groupEnd();
   } else if (console.group) {
-    startGroup = (label) => console.group(label);
+    startGroup = (label: string) => console.group(label);
     endGroup = () => console.groupEnd();
   } else {
     startGroup = noop;

@@ -28,7 +28,7 @@ describe("ConnectedLink component", () => {
         </ConnectedLink>
       </RouterProvider>,
     );
-    const a = screen.queryByText(TEST_TEXT);
+    const a = screen.queryByText(TEST_TEXT)!;
     const navSpy = vi.spyOn(router, "navigate");
 
     await userEvent.click(a);
@@ -46,7 +46,7 @@ describe("ConnectedLink component", () => {
       </RouterProvider>,
     );
 
-    const a = screen.queryByText(TEST_TEXT);
+    const a = screen.queryByText(TEST_TEXT)!;
 
     expect(a.getAttribute("title")).toBe("Hello");
     expect(a.getAttribute("data-testid")).toBe("Link");

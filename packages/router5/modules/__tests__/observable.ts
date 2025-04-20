@@ -19,7 +19,7 @@ describe("core/observable", function () {
 
   it("should accept a listener object", () => {
     const subscription = router.subscribe({
-      next: () => undefined,
+      next: async () => undefined,
     }) as Subscription;
 
     expect(typeof subscription.unsubscribe).toBe("function");

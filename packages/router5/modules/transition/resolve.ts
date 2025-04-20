@@ -1,35 +1,61 @@
-export default function resolve(
-  functions,
-  { isCancelled, toState, fromState, errorKey = undefined },
-  callback,
+import type { DoneFn, State } from "../types/base";
+import type { ActivationFn } from "../types/router";
+
+export function resolve(
+  functions: ActivationFn[] | Record<string, ActivationFn>,
+  {
+    isCancelled,
+    toState,
+    fromState,
+    errorKey = undefined,
+  }: {
+    isCancelled: () => boolean;
+    toState: State;
+    fromState: State | null;
+    errorKey?: string;
+  },
+  callback: DoneFn,
 ) {
   let remainingFunctions = Array.isArray(functions)
     ? functions
     : Object.keys(functions);
 
-  const isState = (obj) =>
+  const isState = (obj?: State) =>
     typeof obj === "object" &&
     obj.name !== undefined &&
     obj.params !== undefined &&
     obj.path !== undefined;
-  const hasStateChanged = (toState, fromState) =>
-    fromState.name !== toState.name ||
+
+  const hasStateChanged = (toState: State, fromState?: State) =>
+    fromState?.name !== toState.name ||
     fromState.params !== toState.params ||
     fromState.path !== toState.path;
 
-  const mergeStates = (toState, fromState) => ({
-    ...fromState,
-    ...toState,
-    meta: {
-      ...fromState.meta,
-      ...toState.meta,
-    },
-  });
+  const mergeStates = (toState: State, fromState?: State): State =>
+    fromState
+      ? {
+          ...fromState,
+          ...toState,
+          meta: {
+            id: fromState.meta?.id ?? toState.meta?.id ?? 1,
+            ...toState.meta,
+            params: fromState.params ?? toState.params,
+            options: fromState.params ?? toState.params,
+            redirected:
+              fromState.meta?.redirected ?? toState.meta?.redirected ?? false,
+          },
+        }
+      : toState;
 
-  const processFn = (stepFn, errBase, state, _done) => {
-    const done = (err, newState?) => {
+  const processFn = (
+    stepFn: Function,
+    errBase: Record<string, unknown>,
+    state: State | undefined,
+    doneCb: DoneFn,
+  ) => {
+    const done: DoneFn = (err, newState) => {
       if (err) {
-        _done(err);
+        doneCb(err);
       } else if (newState && newState !== state && isState(newState)) {
         if (hasStateChanged(newState, state)) {
           console.error(
@@ -37,12 +63,14 @@ export default function resolve(
           );
         }
 
-        _done(null, mergeStates(newState, state));
+        doneCb(null, mergeStates(newState, state));
       } else {
-        _done(null, state);
+        doneCb(null, state);
       }
     };
+
     const res = stepFn.call(null, state, fromState, done);
+
     if (isCancelled()) {
       done(null);
     } else if (typeof res === "boolean") {
@@ -51,19 +79,17 @@ export default function resolve(
       done(null, res);
     } else if (res && typeof res.then === "function") {
       res.then(
-        (resVal) => {
-          if (resVal instanceof Error) done({ error: resVal }, null);
+        (resVal?: State | Error) => {
+          if (resVal instanceof Error) done({ error: resVal });
           else done(null, resVal);
         },
-        (err) => {
+        (err: Error | object) => {
           if (err instanceof Error) {
             console.error(err.stack || err);
-            done({ ...errBase, promiseError: err }, null);
+
+            done({ ...errBase, promiseError: err });
           } else {
-            done(
-              typeof err === "object" ? { ...errBase, ...err } : errBase,
-              null,
-            );
+            done(typeof err === "object" ? { ...errBase, ...err } : errBase);
           }
         },
       );
@@ -71,7 +97,7 @@ export default function resolve(
     // else: wait for done to be called
   };
 
-  const next = (err, state) => {
+  const next: DoneFn = (err, state) => {
     if (isCancelled()) {
       callback();
     } else if (err) {
@@ -84,8 +110,10 @@ export default function resolve(
         const errBase =
           errorKey && isMapped ? { [errorKey]: remainingFunctions[0] } : {};
         const stepFn = isMapped
-          ? functions[remainingFunctions[0]]
-          : remainingFunctions[0];
+          ? (functions as Record<string, Function>)[
+              remainingFunctions[0] as string
+            ]
+          : (remainingFunctions[0] as Function);
 
         remainingFunctions = remainingFunctions.slice(1);
 

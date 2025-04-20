@@ -1,5 +1,11 @@
 import { constants } from "../constants";
-import { Router, PluginFactory } from "../types/router";
+import type {
+  Router,
+  Plugin,
+  PluginFactory,
+  DefaultDependencies,
+} from "../types/router";
+import type { Unsubscribe } from "../types/base";
 
 const eventsMap = {
   onStart: constants.ROUTER_START,
@@ -10,14 +16,16 @@ const eventsMap = {
   onTransitionCancel: constants.TRANSITION_CANCEL,
 };
 
-export default function withPlugins<Dependencies>(
-  router: Router<Dependencies>,
-): Router<Dependencies> {
-  let routerPlugins: PluginFactory[] = [];
+export default function withPlugins<
+  Dependencies extends DefaultDependencies = DefaultDependencies,
+>(router: Router<Dependencies>): Router<Dependencies> {
+  let routerPlugins: PluginFactory<Dependencies>[] = [];
 
-  router.getPlugins = () => routerPlugins;
+  router.getPlugins = (): PluginFactory<Dependencies>[] => routerPlugins;
 
-  router.usePlugin = (...plugins) => {
+  router.usePlugin = (
+    ...plugins: PluginFactory<Dependencies>[]
+  ): Unsubscribe => {
     const removePluginFns = plugins.map((plugin) => {
       routerPlugins.push(plugin);
       return startPlugin(plugin);
@@ -27,14 +35,19 @@ export default function withPlugins<Dependencies>(
       routerPlugins = routerPlugins.filter(
         (plugin) => plugins.indexOf(plugin) === -1,
       );
+
       removePluginFns.forEach((removePlugin) => removePlugin());
     };
   };
 
-  function startPlugin(plugin) {
-    const appliedPlugin = router.executeFactory(plugin);
+  function startPlugin(
+    pluginFactory: PluginFactory<Dependencies>,
+  ): Unsubscribe {
+    const appliedPlugin = router.executeFactory<Plugin>(pluginFactory);
 
-    const removeEventListeners = Object.keys(eventsMap)
+    const removeEventListeners = (
+      Object.keys(eventsMap) as (keyof typeof eventsMap)[]
+    )
       .map((methodName) => {
         if (appliedPlugin[methodName]) {
           return router.addEventListener(
@@ -43,10 +56,11 @@ export default function withPlugins<Dependencies>(
           );
         }
       })
-      .filter(Boolean);
+      .filter(Boolean) as Unsubscribe[];
 
     return () => {
       removeEventListeners.forEach((removeListener) => removeListener());
+
       if (appliedPlugin.teardown) {
         appliedPlugin.teardown();
       }

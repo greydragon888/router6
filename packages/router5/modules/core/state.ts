@@ -1,8 +1,16 @@
-import { Router } from "../types/router";
-import { State } from "../types/base";
 import { constants } from "../constants";
+import type {
+  NavigationOptions,
+  Params,
+  SimpleState,
+  State,
+  StateMeta,
+} from "../types/base";
+import type { DefaultDependencies, Router } from "../types/router";
+import type { RouteNode, RouteNodeState } from "route-node";
+import type { Path } from "path-parser";
 
-export default function withState<Dependencies>(
+export default function withState<Dependencies extends DefaultDependencies>(
   router: Router<Dependencies>,
 ): Router<Dependencies> {
   let stateId = 0;
@@ -10,54 +18,88 @@ export default function withState<Dependencies>(
 
   router.getState = () => routerState;
 
-  router.setState = (state) => {
+  router.setState = (state: State) => {
     routerState = state;
   };
 
-  router.makeState = (name, params, path, meta, forceId) => ({
+  router.makeState = (
+    name: string,
+    params?: Params,
+    path?: string,
+    meta?: Partial<StateMeta>,
+    forceId?: number,
+  ): State => ({
     name,
     params: {
       ...router.config.defaultParams[name],
       ...params,
     },
-    path,
+    path: path || router.buildPath(name, params ?? {}),
     meta: meta
       ? {
           ...meta,
           id: forceId === undefined ? ++stateId : forceId,
+          params: meta.params || {},
+          options: meta.options || {},
+          redirected: meta.redirected || false,
         }
       : undefined,
   });
 
-  router.makeNotFoundState = (path, options) =>
-    router.makeState(constants.UNKNOWN_ROUTE, { path }, path, {
-      options,
-    });
+  router.makeNotFoundState = (
+    path: string,
+    options?: NavigationOptions,
+  ): State =>
+    router.makeState(
+      constants.UNKNOWN_ROUTE,
+      { path },
+      path,
+      options
+        ? {
+            options: options,
+          }
+        : undefined,
+    );
 
-  router.areStatesEqual = (state1, state2, ignoreQueryParams = true) => {
+  router.areStatesEqual = (
+    state1: State,
+    state2: State,
+    ignoreQueryParams: boolean = true,
+  ): boolean => {
     if (state1.name !== state2.name) return false;
 
-    const getUrlParams = (name) =>
+    const getUrlParams = (name: string): string[] =>
       router.rootNode
-        //@ts-ignore
+        // @ts-expect-error use private method
         .getSegmentsByName(name)
-        .map((segment) => segment.parser["urlParams"])
-        .reduce((params, p) => params.concat(p), []);
+        .map(
+          (segment: RouteNode) =>
+            (segment.parser as Path)["urlParams"] as string[],
+        )
+        .reduce(
+          (params: string[], param: string[]) => params.concat(param),
+          [],
+        );
 
-    const state1Params = ignoreQueryParams
+    const state1Params: string[] = ignoreQueryParams
       ? getUrlParams(state1.name)
       : Object.keys(state1.params);
-    const state2Params = ignoreQueryParams
+    const state2Params: string[] = ignoreQueryParams
       ? getUrlParams(state2.name)
       : Object.keys(state2.params);
 
     return (
       state1Params.length === state2Params.length &&
-      state1Params.every((p) => state1.params[p] === state2.params[p])
+      state1Params.every(
+        (param) => state1.params[param] === state2.params[param],
+      )
     );
   };
 
-  router.areStatesDescendants = (parentState, childState) => {
+  router.areStatesDescendants = (
+    parentState: State,
+    childState: State,
+  ): boolean => {
     const regex = new RegExp("^" + parentState.name + "\\.(.*)$");
     if (!regex.test(childState.name)) return false;
     // If child state name extends parent state name, and all parent state params
@@ -67,7 +109,10 @@ export default function withState<Dependencies>(
     );
   };
 
-  router.forwardState = (routeName, routeParams) => {
+  router.forwardState = (
+    routeName: string,
+    routeParams: Params,
+  ): SimpleState => {
     const name = router.config.forwardMap[routeName] || routeName;
     const params = {
       ...router.config.defaultParams[routeName],
@@ -81,7 +126,10 @@ export default function withState<Dependencies>(
     };
   };
 
-  router.buildState = (routeName, routeParams) => {
+  router.buildState = (
+    routeName: string,
+    routeParams: Params,
+  ): RouteNodeState | null => {
     const { name, params } = router.forwardState(routeName, routeParams);
 
     return router.rootNode.buildState(name, params);

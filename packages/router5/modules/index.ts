@@ -1,11 +1,12 @@
 import createRouter from "./createRouter";
-import { RouteNode } from "route-node";
 import transitionPath from "router5-transition-path";
-import { constants, errorCodes, ErrorCodes, Constants } from "./constants";
+import { constants, errorCodes } from "./constants";
 import cloneRouter from "./clone";
+import type { RouteNode } from "route-node";
+import type { ErrorCodes, Constants } from "./constants";
 
 // Types
-export {
+export type {
   Route,
   Options,
   ActivationFn,
@@ -19,17 +20,16 @@ export {
   Listener,
   Subscription,
 } from "./types/router";
-export { State, StateMeta, NavigationOptions } from "./types/base";
+export type {
+  Params,
+  State,
+  StateMeta,
+  NavigationOptions,
+  DoneFn,
+} from "./types/base";
 
-export {
-  createRouter,
-  cloneRouter,
-  RouteNode,
-  transitionPath,
-  constants,
-  errorCodes,
-  ErrorCodes,
-  Constants,
-};
+export { createRouter, cloneRouter, transitionPath, constants, errorCodes };
+
+export type { ErrorCodes, Constants, RouteNode };
 
 export default createRouter;

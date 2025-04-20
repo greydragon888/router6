@@ -19,9 +19,10 @@ describe("core/utils", () => {
 
     it("should tell if a route is active or not", () => {
       router.navigate("users.view", { id: 1 });
+
       expect(router.isActive("users.view", { id: 1 })).toBe(true);
       expect(router.isActive("users.view", { id: 2 })).toBe(false);
-      expect(router.isActive("users.view")).toBe(false);
+      expect(() => router.isActive("users.view")).toThrow(Error);
       expect(router.isActive("users")).toBe(true);
       expect(router.isActive("users", {}, true)).toBe(false);
 
@@ -48,7 +49,7 @@ describe("core/utils", () => {
     });
 
     it("should decode path params on match", () => {
-      expect(omitMeta(router.matchPath("/encoded/hello/123"))).toEqual({
+      expect(omitMeta(router.matchPath("/encoded/hello/123")!)).toEqual({
         name: "withEncoder",
         params: {
           one: "hello",
@@ -60,14 +61,14 @@ describe("core/utils", () => {
 
     it("should match deep `/` routes", () => {
       router.setOption("trailingSlashMode", "never");
-      expect(omitMeta(router.matchPath("/profile"))).toEqual({
+      expect(omitMeta(router.matchPath("/profile")!)).toEqual({
         name: "profile.me",
         params: {},
         path: "/profile",
       });
 
       router.setOption("trailingSlashMode", "always");
-      expect(omitMeta(router.matchPath("/profile"))).toEqual({
+      expect(omitMeta(router.matchPath("/profile")!)).toEqual({
         name: "profile.me",
         params: {},
         path: "/profile/",
@@ -126,7 +127,7 @@ describe("core/utils", () => {
     it("should match paths", () => {
       const match = router.matchPath("/query?param1=✓&param2=✗");
 
-      expect(match.params).toEqual({
+      expect(match?.params).toEqual({
         param1: true,
         param2: false,
       });
@@ -134,7 +135,7 @@ describe("core/utils", () => {
 
     it("should match on start", () => {
       router.start("/query?param1=✓&param2=✗", (err, state) => {
-        expect(state.params).toEqual({
+        expect(state?.params).toEqual({
           param1: true,
           param2: false,
         });

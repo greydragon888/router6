@@ -1,4 +1,4 @@
-import { Options, Router } from "../types/router";
+import type { DefaultDependencies, Options, Router } from "../types/router";
 
 const defaultOptions: Options = {
   trailingSlashMode: "default",
@@ -12,7 +12,9 @@ const defaultOptions: Options = {
   urlParamsEncoding: "default",
 };
 
-export default function withOptions<Dependencies>(options: Partial<Options>) {
+export default function withOptions<Dependencies extends DefaultDependencies>(
+  options: Partial<Options>,
+): (router: Router<Dependencies>) => Router<Dependencies> {
   return (router: Router<Dependencies>): Router<Dependencies> => {
     const routerOptions = {
       ...defaultOptions,
@@ -21,8 +23,12 @@ export default function withOptions<Dependencies>(options: Partial<Options>) {
 
     router.getOptions = () => routerOptions;
 
-    router.setOption = (option, value) => {
-      routerOptions[option] = value;
+    router.setOption = (
+      option: keyof Options,
+      value: Options[keyof Options],
+    ): Router<Dependencies> => {
+      (routerOptions as Record<keyof Options, Options[keyof Options]>)[option] =
+        value;
 
       return router;
     };

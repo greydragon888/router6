@@ -1,16 +1,19 @@
-import { Router, DefaultDependencies } from "./types/router";
 import createRouter from "./createRouter";
+import type { DefaultDependencies, Router } from "./types/router";
 
-export default function cloneRouter<
-  Dependencies extends DefaultDependencies = DefaultDependencies,
->(router: Router, dependencies?: Dependencies): Router<Dependencies> {
+export default function cloneRouter<Dependencies extends DefaultDependencies>(
+  router: Router<Dependencies>,
+  dependencies?: Dependencies,
+): Router<Dependencies> {
+  const middlewareFactories = router.getMiddlewareFactories();
+
   const clonedRouter = createRouter<Dependencies>(
     router.rootNode,
     router.getOptions(),
     dependencies,
   );
 
-  clonedRouter.useMiddleware(...router.getMiddlewareFactories());
+  clonedRouter.useMiddleware(...middlewareFactories);
   clonedRouter.usePlugin(...router.getPlugins());
   clonedRouter.config = router.config;
 

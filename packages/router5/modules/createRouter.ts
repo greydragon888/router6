@@ -1,5 +1,3 @@
-import { Router, Route, Options, DefaultDependencies } from "./types/router";
-
 import withOptions from "./core/options";
 import withRoutes from "./core/routes";
 import withDependencies from "./core/dependencies";
@@ -10,14 +8,22 @@ import withObservability from "./core/observable";
 import withNavigation from "./core/navigation";
 import withRouterLifecycle from "./core/routerLifecycle";
 import withRouteLifecycle from "./core/routeLifecycle";
-import { RouteNode } from "route-node";
 
-type Enhancer<Dependencies> = (
-  router: Router<Dependencies>,
-) => Router<Dependencies>;
+import type {
+  DefaultDependencies,
+  Options,
+  Route,
+  Router,
+} from "./types/router";
+import type { RouteNode } from "route-node";
+
+type Enhancer<Dependencies extends DefaultDependencies = DefaultDependencies> =
+  (router: Router<Dependencies>) => Router<Dependencies>;
 
 const pipe =
-  <Dependencies>(...fns: Array<Enhancer<Dependencies>>) =>
+  <Dependencies extends DefaultDependencies = DefaultDependencies>(
+    ...fns: Array<Enhancer<Dependencies>>
+  ) =>
   (arg: Router<Dependencies>): Router<Dependencies> =>
     fns.reduce((prev: Router<Dependencies>, fn) => fn(prev), arg);
 

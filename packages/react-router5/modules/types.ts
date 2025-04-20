@@ -5,7 +5,7 @@ export type RouteContext = {
 } & RouteState;
 
 export interface RouteState {
-  route: State;
+  route: State | null;
   previousRoute: State | null;
 }
 

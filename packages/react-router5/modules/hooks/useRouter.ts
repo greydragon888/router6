@@ -3,5 +3,11 @@ import { RouterContext } from "../context";
 import { Router } from "router5";
 
 export const useRouter = (): Router => {
-  return useContext(RouterContext);
+  const router = useContext(RouterContext);
+
+  if (!router) {
+    throw new Error("useRouter must be used within a RouterProvider");
+  }
+
+  return router;
 };

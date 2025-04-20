@@ -1,6 +1,10 @@
-import { Browser } from "./types";
+import type { Browser, HistoryState } from "./types";
+import type { State } from "router5";
 
-const value = (arg) => () => arg;
+const value =
+  <T>(arg: T) =>
+  (): T =>
+    arg;
 const noop = () => {};
 
 const isBrowser = typeof window !== "undefined" && window.history;
@@ -10,32 +14,42 @@ const getBase = () => window.location.pathname;
 const supportsPopStateOnHashChange = () =>
   window.navigator.userAgent.indexOf("Trident") === -1;
 
-const pushState = (state, title, path) =>
+const pushState = (state: State, title: string, path: string | URL | null) =>
   window.history.pushState(state, title, path);
 
-const replaceState = (state, title, path) =>
+const replaceState = (state: State, title: string, path: string | URL | null) =>
   window.history.replaceState(state, title, path);
 
-const addPopstateListener = (fn, opts) => {
+const addPopstateListener: Browser["addPopstateListener"] = (
+  fn,
+  opts,
+): (() => void) => {
   const shouldAddHashChangeListener =
     opts.useHash && !supportsPopStateOnHashChange();
 
-  window.addEventListener("popstate", fn);
+  window.addEventListener("popstate", fn as (evt: PopStateEvent) => void);
 
   if (shouldAddHashChangeListener) {
-    window.addEventListener("hashchange", fn);
+    window.addEventListener("hashchange", fn as (evt: HashChangeEvent) => void);
   }
 
   return () => {
-    window.removeEventListener("popstate", fn);
+    window.removeEventListener("popstate", fn as (evt: PopStateEvent) => void);
 
     if (shouldAddHashChangeListener) {
-      window.removeEventListener("hashchange", fn);
+      window.removeEventListener(
+        "hashchange",
+        fn as (evt: HashChangeEvent) => void,
+      );
     }
   };
 };
 
-const getLocation = (opts) => {
+const getLocation = (opts: {
+  useHash: boolean;
+  hashPrefix: string;
+  base: string;
+}) => {
   const path = opts.useHash
     ? window.location.hash.replace(new RegExp("^#" + opts.hashPrefix), "")
     : window.location.pathname.replace(new RegExp("^" + opts.base), "");
@@ -46,7 +60,7 @@ const getLocation = (opts) => {
   return (correctedPath || "/") + window.location.search;
 };
 
-const safelyEncodePath = (path) => {
+const safelyEncodePath = (path: string) => {
   try {
     return encodeURI(decodeURI(path));
   } catch (_) {
@@ -69,13 +83,17 @@ const browser: Browser = isBrowser
       getHash,
     }
   : {
-      getBase: value(""),
-      pushState: noop,
-      replaceState: noop,
-      addPopstateListener: noop,
-      getLocation: value(""),
-      getState: value(null),
-      getHash: value(""),
+      getBase: value<string>("") as Browser["getBase"],
+      pushState: noop as Browser["pushState"],
+      replaceState: noop as Browser["replaceState"],
+      addPopstateListener: () => () => undefined,
+      getLocation: value<string>("") as Browser["getLocation"],
+      getState: value<HistoryState>({
+        name: "",
+        params: {},
+        path: "",
+      }) as Browser["getState"],
+      getHash: value<string>("") as Browser["getHash"],
     };
 
 export default browser as Browser;

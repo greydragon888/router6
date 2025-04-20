@@ -1,6 +1,13 @@
-import { PluginFactory, errorCodes, constants, Router, State } from "router5";
 import safeBrowser from "./browser";
-import { BrowserPluginOptions } from "./types";
+import { errorCodes, constants } from "router5";
+import type { BrowserPluginOptions, HistoryState } from "./types";
+import type {
+  PluginFactory,
+  Router,
+  State,
+  NavigationOptions,
+  DoneFn,
+} from "router5";
 
 declare module "router5" {
   interface Router {
@@ -14,6 +21,12 @@ declare module "router5" {
     lastKnownState: State;
   }
 }
+
+type StartRouterArguments =
+  | []
+  | [done?: DoneFn]
+  | [startPathOrState: string | State]
+  | [startPathOrState: string | State, done?: DoneFn];
 
 const defaultOptions: BrowserPluginOptions = {
   forceDeactivate: true,
@@ -35,7 +48,7 @@ function browserPluginFactory(
     forceDeactivate: options.forceDeactivate,
     source,
   };
-  let removePopStateListener;
+  let removePopStateListener: (() => void) | undefined;
 
   return function browserPlugin(router: Router) {
     const routerOptions = router.getOptions();
@@ -74,18 +87,45 @@ function browserPluginFactory(
 
     router.matchUrl = (url) => router.matchPath(urlToPath(url));
 
-    router.start = function (...args) {
-      if (args.length === 0 || typeof args[0] === "function") {
-        routerStart(browser.getLocation(options), ...args);
-      } else {
-        routerStart(...args);
+    const getStartRouterArguments = (
+      args: StartRouterArguments,
+    ): [startPathOrState: string | State, done: DoneFn] => {
+      const noop = () => {};
+
+      switch (args.length) {
+        case 0:
+          return [browser.getLocation(options), noop];
+        case 1:
+          if (typeof args[0] === "function") {
+            return [browser.getLocation(options), args[0]];
+          }
+          return [args[0]!, noop];
+        case 2:
+          return [args[0], args[1] || noop];
+        default:
+          throw new Error("Invalid number of arguments");
       }
+    };
+
+    router.start = function (...args: StartRouterArguments) {
+      const [startPath, done] = getStartRouterArguments(args);
+
+      routerStart(startPath, done);
 
       return router;
     };
 
     router.replaceHistoryState = function (name, params = {}, title = "") {
       const route = router.buildState(name, params);
+
+      if (!route) {
+        throw new Error(
+          `[router5] Cannot replace state for route ${name} with params ${JSON.stringify(
+            params,
+          )}`,
+        );
+      }
+
       const state = router.makeState(
         route.name,
         route.params,
@@ -97,16 +137,20 @@ function browserPluginFactory(
       browser.replaceState(state, title, url);
     };
 
-    function updateBrowserState(state, url, replace) {
+    function updateBrowserState(
+      state: State | undefined,
+      url: string,
+      replace?: boolean,
+    ) {
       const trimmedState = state
-        ? {
+        ? ({
             meta: state.meta,
             name: state.name,
             params: state.params,
             path: state.path,
-          }
-        : state;
-      const finalState =
+          } as State)
+        : state!;
+      const finalState: HistoryState =
         options.mergeState === true
           ? { ...browser.getState(), ...trimmedState }
           : trimmedState;
@@ -150,7 +194,7 @@ function browserPluginFactory(
         routerState,
         transitionOptions,
         (err, toState) => {
-          if (err) {
+          if (err && typeof err === "object" && "redirect" in err) {
             if (err.redirect) {
               const { name, params } = err.redirect;
 
@@ -160,7 +204,10 @@ function browserPluginFactory(
                 force: true,
                 redirected: true,
               });
-            } else if (err.code === errorCodes.CANNOT_DEACTIVATE) {
+            } else if (
+              err.code === errorCodes.CANNOT_DEACTIVATE &&
+              routerState
+            ) {
               const url = router.buildUrl(routerState.name, routerState.params);
               if (!newState) {
                 // Keep history state unchanged but use current URL
@@ -171,7 +218,7 @@ function browserPluginFactory(
             } else {
               // Force navigation to default state
               defaultRoute &&
-                router.navigate(defaultRoute, defaultParams, {
+                router.navigate(defaultRoute, defaultParams ?? {}, {
                   ...transitionOptions,
                   reload: true,
                   replace: true,
@@ -205,7 +252,11 @@ function browserPluginFactory(
       }
     }
 
-    function onTransitionSuccess(toState, fromState, opts) {
+    function onTransitionSuccess(
+      toState: State,
+      fromState?: State,
+      opts?: NavigationOptions,
+    ) {
       const historyState = browser.getState();
       const hasState =
         historyState &&
@@ -214,7 +265,7 @@ function browserPluginFactory(
         historyState.params;
       const statesAreEqual =
         fromState && router.areStatesEqual(fromState, toState, false);
-      const replace = opts.replace || !hasState || statesAreEqual;
+      const replace = opts?.replace || !hasState || statesAreEqual;
       let url = router.buildUrl(toState.name, toState.params);
       if (
         fromState === null &&

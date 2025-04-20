@@ -43,129 +43,111 @@ describe("listenersPlugin", () => {
     router.stop();
   });
 
-  it("should call root node listener on first transition", () =>
-    new Promise((done) => {
-      router.setOption("defaultRoute", "home");
+  it("should call root node listener on first transition", () => {
+    router.setOption("defaultRoute", "home");
 
-      const nodeListener = vi.fn();
+    const nodeListener = vi.fn();
 
-      router.addNodeListener("", nodeListener);
+    router.addNodeListener("", nodeListener);
 
-      router.start((_err, state) => {
-        expect(state).toEqual({
-          meta: {
-            id: 1,
-            options: { replace: true },
-            params: { home: {} },
-          },
-          name: "home",
-          path: "/home",
-          params: {},
-        });
-
-        expect(nodeListener).toHaveBeenCalled();
-
-        done(null);
+    router.start((_err, state) => {
+      expect(state).toMatchObject({
+        meta: {
+          id: 1,
+          options: { replace: true },
+          params: { home: {} },
+        },
+        name: "home",
+        path: "/home",
+        params: {},
       });
-    }));
 
-  it("should invoke listeners on navigation", () =>
-    new Promise((done) => {
-      router.start(() => {
-        router.navigate("home", {}, {}, () => {
-          const previousState = router.getState();
-          const listener = vi.fn();
+      expect(nodeListener).toHaveBeenCalled();
+    });
+  });
 
-          router.addListener("*", listener);
+  it("should invoke listeners on navigation", () => {
+    router.start(() => {
+      router.navigate("home", {}, {}, () => {
+        const previousState = router.getState();
+        const listener = vi.fn();
 
-          router.navigate("orders.pending", {}, {}, () => {
-            expect(listener).toHaveBeenCalledWith(
-              router.getState(),
-              previousState,
-            );
+        router.addListener("*", listener);
 
-            done(null);
-          });
+        router.navigate("orders.pending", {}, {}, () => {
+          expect(listener).toHaveBeenCalledWith(
+            router.getState(),
+            previousState,
+          );
         });
       });
-    }));
+    });
+  });
 
-  it("should not invoke listeners if trying to navigate to the current route", () =>
-    new Promise((done) => {
-      router.start(() => {
+  it("should not invoke listeners if trying to navigate to the current route", () => {
+    router.start(() => {
+      router.navigate("orders.view", { id: 123 }, {}, () => {
+        const listener = vi.fn();
+
+        router.addListener("*", listener);
+
         router.navigate("orders.view", { id: 123 }, {}, () => {
-          const listener = vi.fn();
-
-          router.addListener("*", listener);
-
-          router.navigate("orders.view", { id: 123 }, {}, () => {
-            expect(listener).not.toHaveBeenCalled();
-
-            done(null);
-          });
+          expect(listener).not.toHaveBeenCalled();
         });
       });
-    }));
+    });
+  });
 
-  it("should invoke node listeners", () =>
-    new Promise((done) => {
-      router.start(() => {
-        router.navigate("users.list", {}, {}, () => {
-          const nodeListener = vi.fn();
+  it("should invoke node listeners", () => {
+    router.start(() => {
+      router.navigate("users.list", {}, {}, () => {
+        const nodeListener = vi.fn();
 
-          router.addNodeListener("users", nodeListener);
+        router.addNodeListener("users", nodeListener);
+
+        router.navigate("users.view", { id: 1 }, {}, () => {
+          expect(nodeListener).toHaveBeenCalled();
 
           router.navigate("users.view", { id: 1 }, {}, () => {
-            expect(nodeListener).toHaveBeenCalled();
-
-            router.navigate("users.view", { id: 1 }, {}, () => {
-              router.navigate("users.view", { id: 2 }, {}, function () {
-                expect(nodeListener).toHaveBeenCalledTimes(2);
-
-                done(null);
-              });
+            router.navigate("users.view", { id: 2 }, {}, function () {
+              expect(nodeListener).toHaveBeenCalledTimes(2);
             });
           });
         });
       });
-    }));
+    });
+  });
 
-  it("should invoke node listeners on root", () =>
-    new Promise((done) => {
-      router.start(() => {
-        router.navigate("orders", {}, {}, () => {
-          const nodeListener = vi.fn();
+  it("should invoke node listeners on root", () => {
+    router.start(() => {
+      router.navigate("orders", {}, {}, () => {
+        const nodeListener = vi.fn();
 
-          router.addNodeListener("", nodeListener);
+        router.addNodeListener("", nodeListener);
 
-          router.navigate("users", {}, {}, () => {
-            expect(nodeListener).toHaveBeenCalled();
-
-            done(null);
-          });
+        router.navigate("users", {}, {}, () => {
+          expect(nodeListener).toHaveBeenCalled();
         });
       });
-    }));
+    });
+  });
 
-  it("should invoke route listeners", () =>
-    new Promise((done) => {
-      router.start(() => {
-        router.navigate("users.list", {}, {}, () => {
-          const nodeListener = vi.fn();
+  it("should invoke route listeners", () => {
+    router.start(() => {
+      router.navigate("users.list", {}, {}, () => {
+        const nodeListener = vi.fn();
 
-          router.addRouteListener("users", nodeListener);
+        router.addRouteListener("users", nodeListener);
 
-          router.navigate("users", {}, {}, () => {
-            expect(nodeListener).toHaveBeenCalled();
-
-            done(null);
-          });
+        router.navigate("users", {}, {}, () => {
+          expect(nodeListener).toHaveBeenCalled();
         });
       });
-    }));
+    });
+  });
 
-  it("should automatically remove node listeners if autoCleanUp", () =>
-    new Promise((done) => {
+  it("should automatically remove node listeners if autoCleanUp", async () => {
+    await new Promise((done) => {
       router.start(() => {
         router.navigate("orders.completed", {}, {}, function () {
           router.addNodeListener("orders", () => {});
@@ -179,7 +161,8 @@ describe("listenersPlugin", () => {
           });
         });
       });
-    }));
+    });
+  });
 
   it("should warn if trying to register a listener on an unknown route", () => {
     vi.spyOn(console, "warn").mockImplementation(() => {});
@@ -191,22 +174,19 @@ describe("listenersPlugin", () => {
     vi.resetAllMocks();
   });
 
-  it("should not invoke listeners removed by previously called listeners", () =>
-    new Promise((done) => {
-      router.start(() => {
-        router.navigate("home", {}, {}, () => {
-          const listener2 = vi.fn();
-          const listener1 = vi.fn(() => router.removeListener("*", listener2));
+  it("should not invoke listeners removed by previously called listeners", () => {
+    router.start(() => {
+      router.navigate("home", {}, {}, () => {
+        const listener2 = vi.fn();
+        const listener1 = vi.fn(() => router.removeListener("*", listener2));
 
-          router.addListener("*", listener1);
-          router.addListener("*", listener2);
+        router.addListener("*", listener1);
+        router.addListener("*", listener2);
 
-          router.navigate("orders.pending", {}, {}, () => {
-            expect(listener2).not.toHaveBeenCalled();
-
-            done(null);
-          });
+        router.navigate("orders.pending", {}, {}, () => {
+          expect(listener2).not.toHaveBeenCalled();
         });
       });
-    }));
+    });
+  });
 });

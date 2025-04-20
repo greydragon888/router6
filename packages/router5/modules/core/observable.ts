@@ -1,35 +1,52 @@
 import $$observable from "symbol-observable";
-import { Router } from "../types/router";
 import { constants } from "../constants";
+import type {
+  DefaultDependencies,
+  Listener,
+  Router,
+  SubscribeFn,
+  Subscription,
+} from "../types/router";
+import type { State, Unsubscribe } from "../types/base";
 
-export default function withObservability<Dependencies>(
-  router: Router<Dependencies>,
-): Router<Dependencies> {
-  const callbacks = {};
+export default function withObservability<
+  Dependencies extends DefaultDependencies,
+>(router: Router<Dependencies>): Router<Dependencies> {
+  const callbacks: Record<string, Function[]> = {};
 
-  router.invokeEventListeners = (eventName, ...args) => {
+  router.invokeEventListeners = (eventName: string, ...args: unknown[]) => {
     (callbacks[eventName] || []).forEach((cb) => cb(...args));
   };
 
-  router.removeEventListener = (eventName, cb) => {
+  router.removeEventListener = (
+    eventName: string,
+    cb: (toState: State, fromState?: State) => void,
+  ) => {
     callbacks[eventName] = callbacks[eventName].filter((_cb) => _cb !== cb);
   };
 
-  router.addEventListener = (eventName, cb) => {
+  router.addEventListener = (
+    eventName: string,
+    cb: (toState: State, fromState?: State) => void,
+  ): Unsubscribe => {
     callbacks[eventName] = (callbacks[eventName] || []).concat(cb);
 
     return () => router.removeEventListener(eventName, cb);
   };
 
-  function subscribe(listener) {
+  function subscribe(
+    listener: SubscribeFn | Listener,
+  ): Unsubscribe | Subscription {
     const isObject = typeof listener === "object";
     const finalListener = isObject ? listener.next.bind(listener) : listener;
+
+    // Automatically listens to the TRANSITION_SUCCESS event
     const unsubscribeHandler = router.addEventListener(
       constants.TRANSITION_SUCCESS,
       (toState, fromState) => {
         finalListener({
           route: toState,
-          previousRoute: fromState,
+          previousRoute: fromState ?? null,
         });
       },
     );
@@ -39,7 +56,7 @@ export default function withObservability<Dependencies>(
 
   function observable() {
     return {
-      subscribe(observer) {
+      subscribe(observer: SubscribeFn | Listener): Unsubscribe | Subscription {
         if (typeof observer !== "object" || observer === null) {
           throw new TypeError("Expected the observer to be an object.");
         }

@@ -1,4 +1,4 @@
-import {
+import type {
   TrailingSlashMode,
   QueryParamsMode,
   QueryParamsOptions,
@@ -6,7 +6,7 @@ import {
   RouteNodeState,
   URLParamsEncodingType,
 } from "route-node";
-import {
+import type {
   State,
   SimpleState,
   Params,
@@ -14,6 +14,7 @@ import {
   NavigationOptions,
   Unsubscribe,
   CancelFn,
+  StateMeta,
 } from "./base";
 
 export interface Route<
@@ -52,7 +53,7 @@ export type ActivationFn = (
 
 export type ActivationFnFactory<
   Dependencies extends DefaultDependencies = DefaultDependencies,
-> = (router: Router, dependencies?: Dependencies) => ActivationFn;
+> = (router: Router<Dependencies>, dependencies?: Dependencies) => ActivationFn;
 
 export type DefaultDependencies = Record<string, any>;
 
@@ -95,15 +96,15 @@ export interface Router<
     name: string,
     params?: Params,
     path?: string,
-    meta?: any,
+    meta?: Partial<StateMeta>,
     forceId?: number,
   ): State;
   makeNotFoundState(path: string, options?: NavigationOptions): State;
-  getState(): State;
-  setState(state: State): void;
+  getState(): State | null;
+  setState(state: State | null): void;
   areStatesEqual(
-    state1: State,
-    state2: State,
+    state1: State | null | undefined,
+    state2: State | null | undefined,
     ignoreQueryParams?: boolean,
   ): boolean;
   areStatesDescendants(parentState: State, childState: State): boolean;
@@ -119,7 +120,7 @@ export interface Router<
     name: string,
     canDeactivateHandler: ActivationFnFactory<Dependencies> | boolean,
   ): Router<Dependencies>;
-  clearCanDeactivate(name: string): Router;
+  clearCanDeactivate(name: string): Router<Dependencies>;
   canActivate(
     name: string,
     canActivateHandler: ActivationFnFactory<Dependencies> | boolean,
@@ -140,43 +141,64 @@ export interface Router<
   useMiddleware(
     ...middlewares: Array<MiddlewareFactory<Dependencies>>
   ): Unsubscribe;
-  clearMiddleware(): Router;
+  clearMiddleware(): Router<Dependencies>;
   getMiddlewareFactories: () => Array<MiddlewareFactory<Dependencies>>;
   getMiddlewareFunctions: () => Middleware[];
 
-  setDependency(dependencyName: string, dependency: any): Router;
-  setDependencies(deps: Dependencies): Router;
+  setDependency(
+    dependencyName: keyof Dependencies,
+    dependency: Dependencies[keyof Dependencies],
+  ): Router<Dependencies>;
+  setDependencies(deps: Dependencies): Router<Dependencies>;
   getDependencies(): Dependencies;
   getInjectables(): [Router<Dependencies>, Dependencies];
-  executeFactory(
+  executeFactory<Return>(
     factory: (
-      router?: Router<Dependencies>,
-      dependencies?: Dependencies,
-    ) => any,
-  ): any;
+      router: Router<Dependencies>,
+      dependencies: Dependencies,
+    ) => Return,
+  ): Return;
 
-  invokeEventListeners: (eventName, ...args) => void;
-  removeEventListener: (eventName, cb) => void;
-  addEventListener: (eventName, cb) => Unsubscribe;
+  // ToDo: improve arguments types
+  invokeEventListeners: (eventName: string, ...args: unknown[]) => void;
+  removeEventListener: (
+    eventName: string,
+    cb: (toState: State, fromState?: State) => void,
+  ) => void;
+  addEventListener: (
+    eventName: string,
+    cb: (toState: State, fromState?: State) => void,
+  ) => Unsubscribe;
 
   cancel(): Router<Dependencies>;
   forward(fromRoute: string, toRoute: string): Router<Dependencies>;
+  navigate(routeName: string): CancelFn;
+  navigate(routeName: string, routeParams: Params): CancelFn;
+  navigate(routeName: string, done: DoneFn): CancelFn;
   navigate(
     routeName: string,
     routeParams: Params,
     options: NavigationOptions,
-    done?: DoneFn,
   ): CancelFn;
-  navigate(routeName: string, routeParams: Params, done?: DoneFn): CancelFn;
-  navigate(routeName: string, done?: DoneFn): CancelFn;
-  navigateToDefault(opts: NavigationOptions, done?: DoneFn): CancelFn;
-  navigateToDefault(done?: DoneFn): CancelFn;
+  navigate(routeName: string, routeParams: Params, done: DoneFn): CancelFn;
+  navigate(
+    routeName: string,
+    routeParams: Params,
+    options: NavigationOptions,
+    done: DoneFn,
+  ): CancelFn;
+  navigateToDefault(done: DoneFn | undefined): CancelFn;
+  navigateToDefault(opts: NavigationOptions): CancelFn;
+  navigateToDefault(
+    opts: NavigationOptions,
+    done: DoneFn | undefined,
+  ): CancelFn;
   transitionToState(
     toState: State,
-    fromState: State,
+    fromState: State | null,
     opts: NavigationOptions,
     done: DoneFn,
-  );
+  ): CancelFn;
 
   subscribe(listener: SubscribeFn | Listener): Unsubscribe | Subscription;
 }
@@ -184,11 +206,11 @@ export interface Router<
 export interface Plugin {
   onStart?(): void;
   onStop?(): void;
-  onTransitionStart?(toState?: State, fromState?: State): void;
-  onTransitionCancel?(toState?: State, fromState?: State): void;
-  onTransitionError?(toState?: State, fromState?: State, err?: any): void;
+  onTransitionStart?(toState: State, fromState?: State): void;
+  onTransitionCancel?(toState: State, fromState?: State): void;
+  onTransitionError?(toState: State, fromState?: State, err?: any): void;
   onTransitionSuccess?(
-    toState?: State,
+    toState: State,
     fromState?: State,
     opts?: NavigationOptions,
   ): void;
@@ -203,15 +225,15 @@ export type Middleware = (
 
 export type MiddlewareFactory<
   Dependencies extends DefaultDependencies = DefaultDependencies,
-> = (router: Router, dependencies: Dependencies) => Middleware;
+> = (router: Router<Dependencies>, dependencies: Dependencies) => Middleware;
 
 export type PluginFactory<
   Dependencies extends DefaultDependencies = DefaultDependencies,
-> = (router?: Router, dependencies?: Dependencies) => Plugin;
+> = (router: Router<Dependencies>, dependencies?: Dependencies) => Plugin;
 
 export interface SubscribeState {
   route: State;
-  previousRoute: State;
+  previousRoute: State | null;
 }
 
 export type SubscribeFn = (state: SubscribeState) => void;

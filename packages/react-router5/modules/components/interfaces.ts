@@ -4,8 +4,8 @@ import type { NavigationOptions, Router, State } from "router5";
 export interface BaseLinkProps extends HTMLAttributes<HTMLAnchorElement> {
   router: Router;
   routeName: string;
-  route?: State;
-  previousRoute?: State;
+  route?: State | null;
+  previousRoute?: State | null;
   routeParams?: { [key: string]: any };
   routeOptions?: NavigationOptions;
   className?: string;
