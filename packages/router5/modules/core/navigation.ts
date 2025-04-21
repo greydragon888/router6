@@ -13,20 +13,14 @@ const noop = () => {};
 
 type NavigationArguments =
   | [name: string]
-  | [name: string, done?: DoneFn]
-  | [name: string, params?: Params, done?: DoneFn]
-  | [name: string, params?: Params, opts?: NavigationOptions, done?: DoneFn];
+  | [name: string, done: DoneFn]
+  | [name: string, params: Params]
+  | [name: string, params: Params, done: DoneFn]
+  | [name: string, params: Params, opts: NavigationOptions]
+  | [name: string, params: Params, opts: NavigationOptions, done: DoneFn];
 
 type NavigationFn = {
-  (routeName: string): CancelFn;
-  (routeName: string, done?: DoneFn): CancelFn;
-  (routeName: string, routeParams: Params, done?: DoneFn): CancelFn;
-  (
-    routeName: string,
-    routeParams: Params,
-    options: NavigationOptions,
-    done?: DoneFn,
-  ): CancelFn;
+  (...args: NavigationArguments): CancelFn;
 };
 
 const getNavigationArguments = (
@@ -37,41 +31,17 @@ const getNavigationArguments = (
       return [args[0], {}, {}, noop];
     case 2:
       if (typeof args[1] === "function") {
-        return [
-          args[0],
-          {},
-          {},
-          (args as [name: string, done?: DoneFn])[1] ?? noop,
-        ];
+        return [args[0], {}, {}, args[1]];
       }
 
-      return [
-        args[0],
-        (args as [name: string, params?: Params])[1] ?? {},
-        {},
-        noop,
-      ];
+      return [args[0], args[1], {}, noop];
     case 3:
       if (typeof args[2] === "function") {
-        return [
-          args[0],
-          (args as [name: string, params?: Params])[1] ?? {},
-          {},
-          (args as [name: string, params?: Params, done?: DoneFn])[2] ?? noop,
-        ];
+        return [args[0], args[1], {}, args[2]];
       }
-      return [
-        args[0],
-        (
-          args as [name: string, params?: Params, opts?: NavigationOptions]
-        )[1] ?? {},
-        (
-          args as [name: string, params?: Params, opts?: NavigationOptions]
-        )[2] ?? {},
-        noop,
-      ];
+      return [args[0], args[1], args[2], noop];
     case 4:
-      return [args[0], args[1] ?? {}, args[2] ?? {}, args[3] ?? noop];
+      return [args[0], args[1], args[2], args[3]];
     default:
       throw new Error("Invalid number of arguments");
   }
@@ -79,20 +49,21 @@ const getNavigationArguments = (
 
 type NavigationToDefaultArguments =
   | []
-  | [done?: DoneFn]
-  | [opts: NavigationOptions, done?: DoneFn];
+  | [done: DoneFn]
+  | [opts: NavigationOptions]
+  | [opts: NavigationOptions, done: DoneFn];
 
 const getNavigationToDefaultArguments = (
   args: NavigationToDefaultArguments,
-): [opts: NavigationOptions, done?: DoneFn] => {
+): [opts: NavigationOptions, done: DoneFn] => {
   switch (args.length) {
     case 0:
       return [{}, noop];
     case 1:
       if (typeof args[0] === "function") {
-        return [{}, (args as [done?: DoneFn])[0]];
+        return [{}, args[0]];
       }
-      return [args[0] || {}, noop];
+      return [args[0], noop];
     case 2:
       return [args[0], args[1]];
     default:
@@ -199,9 +170,9 @@ export default function withNavigation<
     if (options.defaultRoute) {
       return navigate(
         options.defaultRoute,
-        options.defaultParams || {},
-        opts,
-        done,
+        options.defaultParams ?? {},
+        opts ?? {},
+        done ?? noop,
       );
     }
 

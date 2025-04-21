@@ -7,14 +7,21 @@ export interface State {
   params: {
     [key: string]: any;
   };
-  meta?: {
-    options?: {
-      [key: string]: boolean;
-    };
-    params?: {
-      [key: string]: SegementParams | unknown;
-    };
-  };
+  meta?:
+    | {
+        options?: {
+          [key: string]:
+            | string
+            | number
+            | boolean
+            | Record<string, unknown>
+            | undefined;
+        };
+        params?: {
+          [key: string]: SegementParams | unknown;
+        };
+      }
+    | undefined;
   [key: string]: any;
 }
 

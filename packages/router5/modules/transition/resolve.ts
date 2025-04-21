@@ -39,8 +39,8 @@ export function resolve(
           meta: {
             id: fromState.meta?.id ?? toState.meta?.id ?? 1,
             ...toState.meta,
-            params: fromState.params ?? toState.params,
-            options: fromState.params ?? toState.params,
+            params: fromState.meta?.params ?? toState.meta?.params ?? {},
+            options: fromState.meta?.options ?? toState.meta?.options ?? {},
             redirected:
               fromState.meta?.redirected ?? toState.meta?.redirected ?? false,
           },

@@ -33,7 +33,7 @@ const loggerPlugin: PluginFactory = () => {
     onTransitionCancel() {
       console.warn("Transition cancelled");
     },
-    onTransitionError(toState, fromState, err) {
+    onTransitionError(_toState, _fromState, err) {
       console.warn("Transition error with code " + err.code);
       endGroup();
     },
