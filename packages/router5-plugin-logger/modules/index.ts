@@ -1,20 +1,20 @@
 import { PluginFactory } from "router5";
 
-const noop = () => {};
-
 const loggerPlugin: PluginFactory = () => {
   let startGroup, endGroup;
 
-  if (console.groupCollapsed) {
-    startGroup = (label: string) => console.groupCollapsed(label);
-    endGroup = () => console.groupEnd();
-  } else if (console.group) {
-    startGroup = (label: string) => console.group(label);
-    endGroup = () => console.groupEnd();
-  } else {
-    startGroup = noop;
-    endGroup = noop;
-  }
+  startGroup = (label: string) => {
+    console.groupCollapsed(label);
+  };
+  endGroup = () => {
+    console.groupEnd();
+  };
+  startGroup = (label: string) => {
+    console.group(label);
+  };
+  endGroup = () => {
+    console.groupEnd();
+  };
 
   console.info("Router started");
 
@@ -33,8 +33,8 @@ const loggerPlugin: PluginFactory = () => {
     onTransitionCancel() {
       console.warn("Transition cancelled");
     },
-    onTransitionError(_toState, _fromState, err) {
-      console.warn("Transition error with code " + err.code);
+    onTransitionError(_toState, _fromState, err: { code: string }) {
+      console.warn(`Transition error with code ${err.code}`);
       endGroup();
     },
     onTransitionSuccess() {

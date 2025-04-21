@@ -4,7 +4,7 @@ describe("router5-transition-path", () => {
   it("should return a transition path with from null state", () => {
     expect(
       transitionPath({ name: "a.b.c", params: {}, meta: {} }, null),
-    ).toEqual({
+    ).toStrictEqual({
       intersection: "",
       toActivate: ["a", "a.b", "a.b.c"],
       toDeactivate: [],
@@ -26,7 +26,7 @@ describe("router5-transition-path", () => {
         { name: "a.b.c.d", params: {}, meta },
         { name: "a.b.e.f", params: {}, meta },
       ),
-    ).toEqual({
+    ).toStrictEqual({
       intersection: "a.b",
       toActivate: ["a.b.c", "a.b.c.d"],
       toDeactivate: ["a.b.e.f", "a.b.e"],
@@ -48,21 +48,21 @@ describe("router5-transition-path", () => {
         { name: "a.b.c.d", params: { p1: 0, p2: 2, p3: 3 }, meta },
         { name: "a.b.c.d", params: { p1: 1, p2: 2, p3: 3 }, meta },
       ).intersection,
-    ).toBe("a");
+    ).toStrictEqual("a");
 
     expect(
       transitionPath(
         { name: "a.b.c.d", params: { p1: 1, p2: 0, p3: 3 }, meta },
         { name: "a.b.c.d", params: { p1: 1, p2: 2, p3: 3 }, meta },
       ).intersection,
-    ).toBe("a.b");
+    ).toStrictEqual("a.b");
 
     expect(
       transitionPath(
         { name: "a.b.c.d", params: { p1: 1, p2: 2, p3: 0 }, meta },
         { name: "a.b.c.d", params: { p1: 1, p2: 2, p3: 3 }, meta },
       ).intersection,
-    ).toBe("a.b.c");
+    ).toStrictEqual("a.b.c");
   });
 
   describe("shouldUpdateNode", () => {
@@ -82,7 +82,7 @@ describe("router5-transition-path", () => {
         { name: "a.b.c.d", params: { p1: 1, p2: 2, p3: 3 }, meta },
       );
 
-      expect(shouldUpdate).toBe(true);
+      expect(shouldUpdate).toStrictEqual(true);
     });
 
     it("should tell node above intersection to not update", () => {
@@ -91,7 +91,7 @@ describe("router5-transition-path", () => {
         { name: "a.b.c.d", params: { p1: 1, p2: 2, p3: 3 }, meta },
       );
 
-      expect(shouldUpdate).toBe(false);
+      expect(shouldUpdate).toStrictEqual(false);
     });
 
     it("should tell node below intersection to update if not deactivated", () => {
@@ -106,9 +106,11 @@ describe("router5-transition-path", () => {
         meta,
       };
 
-      expect(shouldUpdateNode("a.b")(toState, fromState)).toBe(true);
-      expect(shouldUpdateNode("a.b.c")(toState, fromState)).toBe(true);
-      expect(shouldUpdateNode("a.b.c.e")(toState, fromState)).toBe(false);
+      expect(shouldUpdateNode("a.b")(toState, fromState)).toStrictEqual(true);
+      expect(shouldUpdateNode("a.b.c")(toState, fromState)).toStrictEqual(true);
+      expect(shouldUpdateNode("a.b.c.e")(toState, fromState)).toStrictEqual(
+        false,
+      );
     });
   });
 
@@ -126,7 +128,7 @@ describe("router5-transition-path", () => {
           meta: {},
         },
       ),
-    ).toEqual({
+    ).toStrictEqual({
       intersection: "",
       toActivate: ["a", "a.b", "a.b.c", "a.b.c.d"],
       toDeactivate: ["a.b.c", "a.b", "a"],

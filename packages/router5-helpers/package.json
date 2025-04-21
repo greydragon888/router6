@@ -32,7 +32,8 @@
     "test": "vitest",
     "build": "tsup",
     "type-check": "tsc --noEmit",
-    "type-check:watch": "tsc --watch --noEmit"
+    "type-check:watch": "tsc --watch --noEmit",
+    "lint": "eslint --ext .ts modules/"
   },
   "sideEffects": false
 }

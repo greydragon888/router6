@@ -1,6 +1,7 @@
 import createRouter from "router5";
 import listenersPlugin from "..";
 import type { Router } from "router5";
+import { expect } from "vitest";
 
 let router: Router;
 const routes = [
@@ -32,6 +33,8 @@ const routes = [
     ],
   },
 ];
+
+const noop = () => undefined;
 
 describe("listenersPlugin", () => {
   beforeEach(() => {
@@ -109,7 +112,7 @@ describe("listenersPlugin", () => {
           expect(nodeListener).toHaveBeenCalled();
 
           router.navigate("users.view", { id: 1 }, {}, () => {
-            router.navigate("users.view", { id: 2 }, {}, function () {
+            router.navigate("users.view", { id: 2 }, {}, () => {
               expect(nodeListener).toHaveBeenCalledTimes(2);
             });
           });
@@ -149,12 +152,12 @@ describe("listenersPlugin", () => {
   it("should automatically remove node listeners if autoCleanUp", async () => {
     await new Promise((done) => {
       router.start(() => {
-        router.navigate("orders.completed", {}, {}, function () {
-          router.addNodeListener("orders", () => {});
+        router.navigate("orders.completed", {}, {}, () => {
+          router.addNodeListener("orders", noop);
 
           router.navigate("users", {}, {}, () => {
             setTimeout(() => {
-              expect(router.getListeners()["^orders"]).toEqual([]);
+              expect(router.getListeners()["^orders"]).toStrictEqual([]);
 
               done(null);
             });
@@ -165,9 +168,9 @@ describe("listenersPlugin", () => {
   });
 
   it("should warn if trying to register a listener on an unknown route", () => {
-    vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.spyOn(console, "warn").mockImplementation(noop);
 
-    router.addRouteListener("fake.route", () => {});
+    router.addRouteListener("fake.route", noop);
 
     expect(console.warn).toHaveBeenCalled();
 
@@ -178,12 +181,15 @@ describe("listenersPlugin", () => {
     router.start(() => {
       router.navigate("home", {}, {}, () => {
         const listener2 = vi.fn();
-        const listener1 = vi.fn(() => router.removeListener("*", listener2));
+        const listener1 = vi.fn(() => {
+          router.removeListener("*", listener2);
+        });
 
         router.addListener("*", listener1);
         router.addListener("*", listener2);
 
         router.navigate("orders.pending", {}, {}, () => {
+          expect(listener1).toHaveBeenCalled();
           expect(listener2).not.toHaveBeenCalled();
         });
       });

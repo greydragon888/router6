@@ -16,6 +16,7 @@ describe("Persistent params plugin", () => {
 
       router.usePlugin(persistentParamsPlugin(["mode"]));
     });
+
     afterEach(() => {
       router.stop();
     });
@@ -23,16 +24,17 @@ describe("Persistent params plugin", () => {
     it("should persist specified parameters", () => {
       router.start("route1");
       router.navigate("route2", { id: "2" }, {}, (_err, state) => {
-        expect(state?.path).toBe("/route2/2");
+        expect(state?.path).toStrictEqual("/route2/2");
+
         router.navigate(
           "route1",
           { id: "1", mode: "dev" },
           {},
           (_err, state) => {
-            expect(state?.path).toBe("/route1/1?mode=dev");
+            expect(state?.path).toStrictEqual("/route1/1?mode=dev");
 
             router.navigate("route2", { id: "2" }, {}, (_err, state) => {
-              expect(state?.path).toBe("/route2/2?mode=dev");
+              expect(state?.path).toStrictEqual("/route2/2?mode=dev");
             });
           },
         );
@@ -41,10 +43,10 @@ describe("Persistent params plugin", () => {
 
     it("should save value on start", () => {
       router.start("/route2/1?mode=dev", (_err, state) => {
-        expect(state?.params).toEqual({ mode: "dev", id: "1" });
+        expect(state?.params).toStrictEqual({ mode: "dev", id: "1" });
 
         router.navigate("route2", { id: "2" }, {}, (_err, state) => {
-          expect(state?.path).toBe("/route2/2?mode=dev");
+          expect(state?.path).toStrictEqual("/route2/2?mode=dev");
         });
       });
     });
@@ -59,7 +61,7 @@ describe("Persistent params plugin", () => {
       router.start();
 
       router.navigate("route1", { id: "1" }, {}, (_err, state) => {
-        expect(state?.path).toBe("/route1/1?mode=dev");
+        expect(state?.path).toStrictEqual("/route1/1?mode=dev");
       });
     });
   });

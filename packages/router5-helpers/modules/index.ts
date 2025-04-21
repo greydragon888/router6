@@ -3,9 +3,7 @@ const dotOrStart = "(^.+\\.|^)";
 
 export interface State {
   name: string;
-  params?: {
-    [key: string]: any;
-  };
+  params?: Record<string, any>;
   [key: string]: any;
 }
 
@@ -21,33 +19,31 @@ const normaliseSegment = (name: string): string => {
   return name.replace(".", "\\.");
 };
 
-const testRouteWithSegment = (start: string, end: string) => {
-  return (route: State | string, segment?: string) => {
-    const applySegment = (segment: string) => {
-      return test(route, new RegExp(start + normaliseSegment(segment) + end));
-    };
-
+const testRouteWithSegment =
+  // eslint-disable-next-line sonarjs/function-return-type
+  (start: string, end: string) => (route: State | string, segment?: string) => {
     if (segment) {
-      return applySegment(segment);
+      return test(route, new RegExp(start + normaliseSegment(segment) + end));
     }
 
-    return applySegment;
+    return (segment: string) =>
+      test(route, new RegExp(start + normaliseSegment(segment)));
   };
-};
 
-export interface SegmentTestFunction {
-  (route: string | State, segment: string): boolean;
-  (route: string | State): (segment: string) => boolean;
-}
+export type SegmentTestFunction = (
+  route: State | string,
+  segment?: string,
+) => boolean | ((segment: string) => boolean);
+
 export const startsWithSegment: SegmentTestFunction = testRouteWithSegment(
   "^",
   dotOrEnd,
-) as SegmentTestFunction;
+);
 export const endsWithSegment: SegmentTestFunction = testRouteWithSegment(
   dotOrStart,
   "$",
-) as SegmentTestFunction;
+);
 export const includesSegment: SegmentTestFunction = testRouteWithSegment(
   dotOrStart,
   dotOrEnd,
-) as SegmentTestFunction;
+);

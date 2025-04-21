@@ -4,7 +4,7 @@ import type { Params } from "../types/base";
 import type { Router, Route, DefaultDependencies } from "../types/router";
 
 export default function withRoutes<Dependencies extends DefaultDependencies>(
-  routes: Array<Route<Dependencies>> | RouteNode,
+  routes: Route<Dependencies>[] | RouteNode,
 ): (router: Router<Dependencies>) => Router<Dependencies> {
   return (router: Router<Dependencies>): Router<Dependencies> => {
     router.forward = (fromRoute, toRoute) => {
@@ -19,18 +19,27 @@ export default function withRoutes<Dependencies extends DefaultDependencies>(
         : new RouteNode("", "", routes, { onAdd: onRouteAdded });
 
     function onRouteAdded(route: Route<Dependencies>) {
-      if (route.canActivate) router.canActivate(route.name, route.canActivate);
+      if (route.canActivate) {
+        router.canActivate(route.name, route.canActivate);
+      }
 
-      if (route.forwardTo) router.forward(route.name, route.forwardTo);
+      if (route.forwardTo) {
+        router.forward(route.name, route.forwardTo);
+      }
 
-      if (route.decodeParams)
-        router.config.decoders[route.name] = route.decodeParams;
+      if (route.decodeParams) {
+        router.config.decoders[route.name] = (params: Params): Params =>
+          route.decodeParams!(params);
+      }
 
-      if (route.encodeParams)
-        router.config.encoders[route.name] = route.encodeParams;
+      if (route.encodeParams) {
+        router.config.encoders[route.name] = (params: Params): Params =>
+          route.encodeParams!(params);
+      }
 
-      if (route.defaultParams)
+      if (route.defaultParams) {
         router.config.defaultParams[route.name] = route.defaultParams;
+      }
     }
 
     router.rootNode = rootNode;
@@ -45,19 +54,23 @@ export default function withRoutes<Dependencies extends DefaultDependencies>(
 
     router.addNode = (name, path, canActivateHandler?) => {
       rootNode.addNode(name, path);
-      if (canActivateHandler) router.canActivate(name, canActivateHandler);
+      if (canActivateHandler) {
+        router.canActivate(name, canActivateHandler);
+      }
       return router;
     };
 
     router.isActive = (
       name: string,
       params: Params = {},
-      strictEquality: boolean = false,
-      ignoreQueryParams: boolean = true,
+      strictEquality = false,
+      ignoreQueryParams = true,
     ): boolean => {
       const activeState = router.getState();
 
-      if (!activeState) return false;
+      if (!activeState) {
+        return false;
+      }
 
       if (strictEquality || activeState.name === name) {
         return router.areStatesEqual(
@@ -73,9 +86,9 @@ export default function withRoutes<Dependencies extends DefaultDependencies>(
       );
     };
 
-    router.buildPath = (route: string, params: Params): string => {
+    router.buildPath = (route: string, params?: Params): string => {
       if (route === constants.UNKNOWN_ROUTE) {
-        return params.path as string;
+        return (params?.path ?? "") as string;
       }
 
       const paramsWithDefault = {

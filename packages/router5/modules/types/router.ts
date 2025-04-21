@@ -24,9 +24,9 @@ export interface Route<
   path: string;
   canActivate?: ActivationFnFactory<Dependencies>;
   forwardTo?: string;
-  children?: Array<Route<Dependencies>>;
-  encodeParams?(stateParams: Params): Params;
-  decodeParams?(pathParams: Params): Params;
+  children?: Route<Dependencies>[];
+  encodeParams?: (stateParams: Params) => Params;
+  decodeParams?: (pathParams: Params) => Params;
   defaultParams?: Params;
 }
 
@@ -70,96 +70,96 @@ export interface Router<
   config: Config;
 
   rootNode: RouteNode;
-  add(
-    routes: Array<Route<Dependencies>> | Route<Dependencies>,
+  add: (
+    routes: Route<Dependencies>[] | Route<Dependencies>,
     finalSort?: boolean,
-  ): Router<Dependencies>;
-  addNode(
+  ) => Router<Dependencies>;
+  addNode: (
     name: string,
     path: string,
     canActivateHandler?: ActivationFnFactory<Dependencies>,
-  ): Router<Dependencies>;
-  isActive(
+  ) => Router<Dependencies>;
+  isActive: (
     name: string,
     params?: Params,
     strictEquality?: boolean,
     ignoreQueryParams?: boolean,
-  ): boolean;
-  buildPath(route: string, params?: Params): string;
-  matchPath(path: string, source?: string): State | null;
-  setRootPath(rootPath: string): void;
+  ) => boolean;
+  buildPath: (route: string, params?: Params) => string;
+  matchPath: (path: string, source?: string) => State | null;
+  setRootPath: (rootPath: string) => void;
 
-  getOptions(): Options;
-  setOption(option: string, value: any): Router<Dependencies>;
+  getOptions: () => Options;
+  setOption: (option: keyof Options, value: any) => Router<Dependencies>;
 
-  makeState(
+  makeState: (
     name: string,
     params?: Params,
     path?: string,
     meta?: Partial<StateMeta>,
     forceId?: number,
-  ): State;
-  makeNotFoundState(path: string, options?: NavigationOptions): State;
-  getState(): State | null;
-  setState(state: State | null): void;
-  areStatesEqual(
+  ) => State;
+  makeNotFoundState: (path: string, options?: NavigationOptions) => State;
+  getState: () => State | null;
+  setState: (state: State | null) => void;
+  areStatesEqual: (
     state1: State | null | undefined,
     state2: State | null | undefined,
     ignoreQueryParams?: boolean,
-  ): boolean;
-  areStatesDescendants(parentState: State, childState: State): boolean;
-  forwardState(routeName: string, routeParams: Params): SimpleState;
-  buildState(routeName: string, routeParams: Params): RouteNodeState | null;
+  ) => boolean;
+  areStatesDescendants: (parentState: State, childState: State) => boolean;
+  forwardState: (routeName: string, routeParams: Params) => SimpleState;
+  buildState: (routeName: string, routeParams: Params) => RouteNodeState | null;
 
-  isStarted(): boolean;
-  start(): Router<Dependencies>;
-  start(done: DoneFn): Router<Dependencies>;
-  start(startPathOrState: string | State): Router<Dependencies>;
-  start(startPathOrState: string | State, done: DoneFn): Router<Dependencies>;
-  stop(): void;
+  isStarted: () => boolean;
+  start: (() => Router<Dependencies>) &
+    ((done: DoneFn) => Router<Dependencies>) &
+    ((startPathOrState: string | State) => Router<Dependencies>) &
+    ((startPathOrState: string | State, done: DoneFn) => Router<Dependencies>);
+  stop: () => void;
 
-  canDeactivate(
+  canDeactivate: (
     name: string,
     canDeactivateHandler: ActivationFnFactory<Dependencies> | boolean,
-  ): Router<Dependencies>;
-  clearCanDeactivate(name: string): Router<Dependencies>;
-  canActivate(
+  ) => Router<Dependencies>;
+  clearCanDeactivate: (name: string) => Router<Dependencies>;
+  canActivate: (
     name: string,
     canActivateHandler: ActivationFnFactory<Dependencies> | boolean,
-  ): Router<Dependencies>;
-  getLifecycleFactories(): [
-    { [key: string]: ActivationFnFactory<Dependencies> },
-    { [key: string]: ActivationFnFactory<Dependencies> },
+  ) => Router<Dependencies>;
+  getLifecycleFactories: () => [
+    Record<string, ActivationFnFactory<Dependencies>>,
+    Record<string, ActivationFnFactory<Dependencies>>,
   ];
-  getLifecycleFunctions(): [
-    { [key: string]: ActivationFn },
-    { [key: string]: ActivationFn },
+  getLifecycleFunctions: () => [
+    Record<string, ActivationFn>,
+    Record<string, ActivationFn>,
   ];
 
-  usePlugin(...plugins: Array<PluginFactory<Dependencies>>): Unsubscribe;
-  addPlugin(plugin: Plugin): Router<Dependencies>;
-  getPlugins(): Array<PluginFactory<Dependencies>>;
+  usePlugin: (...plugins: PluginFactory<Dependencies>[]) => Unsubscribe;
+  addPlugin: (plugin: Plugin) => Router<Dependencies>;
+  getPlugins: () => PluginFactory<Dependencies>[];
 
-  useMiddleware(
-    ...middlewares: Array<MiddlewareFactory<Dependencies>>
-  ): Unsubscribe;
-  clearMiddleware(): Router<Dependencies>;
-  getMiddlewareFactories: () => Array<MiddlewareFactory<Dependencies>>;
+  useMiddleware: (
+    ...middlewares: MiddlewareFactory<Dependencies>[]
+  ) => Unsubscribe;
+  clearMiddleware: () => Router<Dependencies>;
+  getMiddlewareFactories: () => MiddlewareFactory<Dependencies>[];
   getMiddlewareFunctions: () => Middleware[];
 
-  setDependency(
+  setDependency: (
     dependencyName: keyof Dependencies,
     dependency: Dependencies[keyof Dependencies],
-  ): Router<Dependencies>;
-  setDependencies(deps: Dependencies): Router<Dependencies>;
-  getDependencies(): Dependencies;
-  getInjectables(): [Router<Dependencies>, Dependencies];
-  executeFactory<Return>(
+  ) => Router<Dependencies>;
+  setDependencies: (deps: Dependencies) => Router<Dependencies>;
+  getDependencies: () => Dependencies;
+  getInjectables: () => [Router<Dependencies>, Dependencies];
+  executeFactory: <Return>(
     factory: (
       router: Router<Dependencies>,
       dependencies: Dependencies,
     ) => Return,
-  ): Return;
+  ) => Return;
 
   // ToDo: improve arguments types
   invokeEventListeners: (eventName: string, ...args: unknown[]) => void;
@@ -172,49 +172,49 @@ export interface Router<
     cb: (toState: State, fromState?: State) => void,
   ) => Unsubscribe;
 
-  cancel(): Router<Dependencies>;
-  forward(fromRoute: string, toRoute: string): Router<Dependencies>;
-  navigate(routeName: string): CancelFn;
-  navigate(routeName: string, routeParams: Params): CancelFn;
-  navigate(routeName: string, done: DoneFn): CancelFn;
-  navigate(
-    routeName: string,
-    routeParams: Params,
-    options: NavigationOptions,
-  ): CancelFn;
-  navigate(routeName: string, routeParams: Params, done: DoneFn): CancelFn;
-  navigate(
-    routeName: string,
-    routeParams: Params,
-    options: NavigationOptions,
-    done: DoneFn,
-  ): CancelFn;
-  navigateToDefault(): CancelFn;
-  navigateToDefault(done: DoneFn): CancelFn;
-  navigateToDefault(opts: NavigationOptions): CancelFn;
-  navigateToDefault(opts: NavigationOptions, done: DoneFn): CancelFn;
-  transitionToState(
+  cancel: () => Router<Dependencies>;
+  forward: (fromRoute: string, toRoute: string) => Router<Dependencies>;
+  navigate: ((routeName: string) => CancelFn) &
+    ((routeName: string, routeParams: Params) => CancelFn) &
+    ((routeName: string, done: DoneFn) => CancelFn) &
+    ((
+      routeName: string,
+      routeParams: Params,
+      options: NavigationOptions,
+    ) => CancelFn) &
+    ((routeName: string, routeParams: Params, done: DoneFn) => CancelFn) &
+    ((
+      routeName: string,
+      routeParams: Params,
+      options: NavigationOptions,
+      done: DoneFn,
+    ) => CancelFn);
+  navigateToDefault: (() => CancelFn) &
+    ((done: DoneFn) => CancelFn) &
+    ((opts: NavigationOptions) => CancelFn) &
+    ((opts: NavigationOptions, done: DoneFn) => CancelFn);
+  transitionToState: (
     toState: State,
     fromState: State | null,
     opts: NavigationOptions,
     done?: DoneFn,
-  ): CancelFn;
+  ) => CancelFn;
 
-  subscribe(listener: SubscribeFn | Listener): Unsubscribe | Subscription;
+  subscribe: (listener: SubscribeFn | Listener) => Unsubscribe | Subscription;
 }
 
 export interface Plugin {
-  onStart?(): void;
-  onStop?(): void;
-  onTransitionStart?(toState: State, fromState?: State): void;
-  onTransitionCancel?(toState: State, fromState?: State): void;
-  onTransitionError?(toState: State, fromState?: State, err?: any): void;
-  onTransitionSuccess?(
+  onStart?: () => void;
+  onStop?: () => void;
+  onTransitionStart?: (toState: State, fromState?: State) => void;
+  onTransitionCancel?: (toState: State, fromState?: State) => void;
+  onTransitionError?: (toState: State, fromState?: State, err?: any) => void;
+  onTransitionSuccess?: (
     toState: State,
     fromState?: State,
     opts?: NavigationOptions,
-  ): void;
-  teardown?(): void;
+  ) => void;
+  teardown?: () => void;
 }
 
 export type Middleware = (
@@ -239,7 +239,7 @@ export interface SubscribeState {
 export type SubscribeFn = (state: SubscribeState) => void;
 
 export interface Listener {
-  next: (val: any) => {};
+  next: (val: any) => object;
   [key: string]: any;
 }
 

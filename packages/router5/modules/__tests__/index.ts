@@ -24,9 +24,11 @@ describe("router5", () => {
           },
         ]);
 
-        expect(router.buildPath("home")).toBe("/home");
-        expect(router.buildPath("home.dashboard")).toBe("/home/dashboard");
-        expect(router.buildPath("home.notifications")).toBe(
+        expect(router.buildPath("home")).toStrictEqual("/home");
+        expect(router.buildPath("home.dashboard")).toStrictEqual(
+          "/home/dashboard",
+        );
+        expect(router.buildPath("home.notifications")).toStrictEqual(
           "/home/notifications",
         );
       });
@@ -49,9 +51,11 @@ describe("router5", () => {
           },
         ]);
 
-        expect(router.buildPath("home")).toBe("/home");
-        expect(router.buildPath("home.dashboard")).toBe("/home/dashboard");
-        expect(router.buildPath("home.notifications")).toBe(
+        expect(router.buildPath("home")).toStrictEqual("/home");
+        expect(router.buildPath("home.dashboard")).toStrictEqual(
+          "/home/dashboard",
+        );
+        expect(router.buildPath("home.notifications")).toStrictEqual(
           "/home/notifications",
         );
       });
@@ -65,9 +69,11 @@ describe("router5", () => {
         ]);
         const router = createRouter(rootNode);
 
-        expect(router.buildPath("home")).toBe("/home");
-        expect(router.buildPath("home.dashboard")).toBe("/home/dashboard");
-        expect(router.buildPath("home.notifications")).toBe(
+        expect(router.buildPath("home")).toStrictEqual("/home");
+        expect(router.buildPath("home.dashboard")).toStrictEqual(
+          "/home/dashboard",
+        );
+        expect(router.buildPath("home.notifications")).toStrictEqual(
           "/home/notifications",
         );
       });
@@ -77,7 +83,7 @@ describe("router5", () => {
       it("should have default options", () => {
         const router = createRouter([], {}, { store: {} });
 
-        expect(router.getDependencies()).toEqual({
+        expect(router.getDependencies()).toStrictEqual({
           store: {},
         });
       });
@@ -85,7 +91,7 @@ describe("router5", () => {
       it("should accept dependencies", () => {
         const router = createRouter([], {}, { store: {} });
 
-        expect(router.getDependencies()).toEqual({
+        expect(router.getDependencies()).toStrictEqual({
           store: {},
         });
       });

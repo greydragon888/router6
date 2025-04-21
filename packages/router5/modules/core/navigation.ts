@@ -9,7 +9,7 @@ import type {
   State,
 } from "../types/base";
 
-const noop = () => {};
+const noop = () => undefined;
 
 type NavigationArguments =
   | [name: string]
@@ -19,9 +19,7 @@ type NavigationArguments =
   | [name: string, params: Params, opts: NavigationOptions]
   | [name: string, params: Params, opts: NavigationOptions, done: DoneFn];
 
-type NavigationFn = {
-  (...args: NavigationArguments): CancelFn;
-};
+type NavigationFn = (...args: NavigationArguments) => CancelFn;
 
 const getNavigationArguments = (
   args: NavigationArguments,
@@ -105,7 +103,7 @@ export default function withNavigation<
     );
 
     const sameStates = router.getState()
-      ? router.areStatesEqual(router.getState() as State, toState, false)
+      ? router.areStatesEqual(router.getState(), toState, false)
       : false;
 
     // Do not proceed further if states are the same and no reload
@@ -132,7 +130,7 @@ export default function withNavigation<
     // Transition
     return router.transitionToState(toState, fromState, opts, (err, state) => {
       if (err) {
-        if (typeof err === "object" && "redirect" in err && err.redirect) {
+        if (typeof err === "object" && "redirect" in err) {
           const { name, params } = err.redirect;
 
           navigate(
@@ -171,8 +169,8 @@ export default function withNavigation<
       return navigate(
         options.defaultRoute,
         options.defaultParams ?? {},
-        opts ?? {},
-        done ?? noop,
+        opts,
+        done,
       );
     }
 
@@ -190,7 +188,7 @@ export default function withNavigation<
 
   router.transitionToState = (
     toState: State,
-    fromState: State,
+    fromState: State | null,
     options: NavigationOptions = {},
     done: DoneFn = noop,
   ): CancelFn => {
@@ -199,7 +197,7 @@ export default function withNavigation<
 
     const callback: DoneFn = (err, state) => {
       cancelCurrentTransition = null;
-      state = state || toState;
+      state = state ?? toState;
 
       if (err) {
         if (

@@ -9,34 +9,38 @@ describe("core/utils", () => {
     beforeEach(() => {
       router = createTestRouter().start();
     });
+
     afterEach(() => {
       router.stop();
     });
 
     it("should expose RouteNode path building function", () => {
-      expect(router.buildPath("users.list")).toBe("/users/list");
+      expect(router.buildPath("users.list")).toStrictEqual("/users/list");
     });
 
     it("should tell if a route is active or not", () => {
       router.navigate("users.view", { id: 1 });
 
-      expect(router.isActive("users.view", { id: 1 })).toBe(true);
-      expect(router.isActive("users.view", { id: 2 })).toBe(false);
+      expect(router.isActive("users.view", { id: 1 })).toStrictEqual(true);
+      expect(router.isActive("users.view", { id: 2 })).toStrictEqual(false);
       expect(() => router.isActive("users.view")).toThrow(Error);
-      expect(router.isActive("users")).toBe(true);
-      expect(router.isActive("users", {}, true)).toBe(false);
+      expect(router.isActive("users")).toStrictEqual(true);
+      expect(router.isActive("users", {}, true)).toStrictEqual(false);
 
       router.navigate("section.query", { section: "section1" });
-      expect(router.isActive("section", { section: "section1" })).toBe(true);
+
+      expect(router.isActive("section", { section: "section1" })).toStrictEqual(
+        true,
+      );
       expect(
         router.isActive("section.query", {
           section: "section1",
           param1: "123",
         }),
-      ).toBe(true);
-      expect(router.isActive("section.query", { section: "section2" })).toBe(
-        false,
-      );
+      ).toStrictEqual(true);
+      expect(
+        router.isActive("section.query", { section: "section2" }),
+      ).toStrictEqual(false);
       expect(
         router.isActive(
           "section.query",
@@ -44,12 +48,12 @@ describe("core/utils", () => {
           false,
           false,
         ),
-      ).toBe(false);
-      expect(router.isActive("users.view", { id: 123 })).toBe(false);
+      ).toStrictEqual(false);
+      expect(router.isActive("users.view", { id: 123 })).toStrictEqual(false);
     });
 
     it("should decode path params on match", () => {
-      expect(omitMeta(router.matchPath("/encoded/hello/123")!)).toEqual({
+      expect(omitMeta(router.matchPath("/encoded/hello/123")!)).toStrictEqual({
         name: "withEncoder",
         params: {
           one: "hello",
@@ -61,14 +65,16 @@ describe("core/utils", () => {
 
     it("should match deep `/` routes", () => {
       router.setOption("trailingSlashMode", "never");
-      expect(omitMeta(router.matchPath("/profile")!)).toEqual({
+
+      expect(omitMeta(router.matchPath("/profile")!)).toStrictEqual({
         name: "profile.me",
         params: {},
         path: "/profile",
       });
 
       router.setOption("trailingSlashMode", "always");
-      expect(omitMeta(router.matchPath("/profile")!)).toEqual({
+
+      expect(omitMeta(router.matchPath("/profile")!)).toStrictEqual({
         name: "profile.me",
         params: {},
         path: "/profile/",
@@ -82,6 +88,7 @@ describe("core/utils", () => {
         queryParamsMode: "loose",
       }).start();
     });
+
     afterEach(() => {
       router.stop();
     });
@@ -92,7 +99,7 @@ describe("core/utils", () => {
           id: "123",
           username: "thomas",
         }),
-      ).toBe("/users/view/123?username=thomas");
+      ).toStrictEqual("/users/view/123?username=thomas");
     });
   });
 
@@ -113,7 +120,10 @@ describe("core/utils", () => {
         },
       );
     });
-    afterAll(() => router.stop());
+
+    afterAll(() => {
+      router.stop();
+    });
 
     it("should build paths", () => {
       expect(
@@ -121,13 +131,13 @@ describe("core/utils", () => {
           param1: true,
           param2: false,
         }),
-      ).toBe("/query?param1=✓&param2=✗");
+      ).toStrictEqual("/query?param1=✓&param2=✗");
     });
 
     it("should match paths", () => {
       const match = router.matchPath("/query?param1=✓&param2=✗");
 
-      expect(match?.params).toEqual({
+      expect(match?.params).toStrictEqual({
         param1: true,
         param2: false,
       });
@@ -135,7 +145,7 @@ describe("core/utils", () => {
 
     it("should match on start", () => {
       router.start("/query?param1=✓&param2=✗", (_err, state) => {
-        expect(state?.params).toEqual({
+        expect(state?.params).toStrictEqual({
           param1: true,
           param2: false,
         });
@@ -152,7 +162,7 @@ describe("core/utils", () => {
       },
     ]);
 
-    expect(router.buildPath("withDefaults")).toBe("/with-defaults/1");
-    expect(router.makeState("withDefaults").params).toEqual({ id: "1" });
+    expect(router.buildPath("withDefaults")).toStrictEqual("/with-defaults/1");
+    expect(router.makeState("withDefaults").params).toStrictEqual({ id: "1" });
   });
 });

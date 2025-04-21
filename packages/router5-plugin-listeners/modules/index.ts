@@ -5,35 +5,34 @@ export type Listener = (toState: State, fromState: State | null) => void;
 
 declare module "router5" {
   interface Router {
-    getListeners(): { [key: string]: Listener[] };
-    addListener(name: string, callback: Listener): void;
-    removeListener(name: string, callback: Listener): void;
-    addNodeListener(name: string, callback: Listener): void;
-    removeNodeListener(name: string, callback: Listener): void;
-    addRouteListener(name: string, callback: Listener): void;
-    removeRouteListener(name: string, callback: Listener): void;
+    getListeners: () => Record<string, Listener[]>;
+    addListener: (name: string, callback: Listener) => void;
+    removeListener: (name: string, callback: Listener) => void;
+    addNodeListener: (name: string, callback: Listener) => void;
+    removeNodeListener: (name: string, callback: Listener) => void;
+    addRouteListener: (name: string, callback: Listener) => void;
+    removeRouteListener: (name: string, callback: Listener) => void;
   }
 }
 export interface ListenersPluginOptions {
   autoCleanUp?: boolean;
 }
 
-const defaultOptions: ListenersPluginOptions = {
-  autoCleanUp: true,
-};
-
 const listenersPluginFactory = (
-  options: ListenersPluginOptions = defaultOptions,
+  options: ListenersPluginOptions = {
+    autoCleanUp: true,
+  },
 ): PluginFactory => {
   return function listenersPlugin(router: Router) {
     let listeners: Record<string, Listener[]> = {};
 
     function removeListener(name: string, cb?: Listener) {
       if (cb) {
-        if (listeners[name])
+        if (name in listeners) {
           listeners[name] = listeners[name].filter(
             (callback) => callback !== cb,
           );
+        }
       } else {
         listeners[name] = [];
       }
@@ -41,19 +40,22 @@ const listenersPluginFactory = (
     }
 
     function addListener(name: string, cb: Listener, replace?: boolean) {
-      const normalizedName = name.replace(/^(\*|\^|=)/, "");
+      const normalizedName = name.replace(/^[*^=]/, "");
 
       if (normalizedName && !/^\$/.test(name)) {
-        //@ts-ignore
+        //@ts-expect-error: used private method
         const segments = router.rootNode.getSegmentsByName(normalizedName);
-        if (!segments)
+        if (!segments) {
           console.warn(
             `No route found for ${normalizedName}, listener might never be called!`,
           );
+        }
       }
 
-      if (!listeners[name]) listeners[name] = [];
-      listeners[name] = (replace ? [] : listeners[name]).concat(cb);
+      if (!(name in listeners)) {
+        listeners[name] = [];
+      }
+      listeners[name] = [...(replace ? [] : listeners[name]), cb];
 
       return router;
     }
@@ -63,19 +65,20 @@ const listenersPluginFactory = (
     router.addListener = (name, cb) => addListener(name || "*", cb);
     router.removeListener = (name, cb) => removeListener(name || "*", cb);
 
-    router.addNodeListener = (name, cb) => addListener("^" + name, cb, true);
-    router.removeNodeListener = (name, cb) => removeListener("^" + name, cb);
+    router.addNodeListener = (name, cb) => addListener(`^${name}`, cb, true);
+    router.removeNodeListener = (name, cb) => removeListener(`^${name}`, cb);
 
-    router.addRouteListener = (name, cb) => addListener("=" + name, cb);
-    router.removeRouteListener = (name, cb) => removeListener("=" + name, cb);
+    router.addRouteListener = (name, cb) => addListener(`=${name}`, cb);
+    router.removeRouteListener = (name, cb) => removeListener(`=${name}`, cb);
 
     function invokeListeners(
       name: string,
       toState: State,
       fromState: State | null,
     ) {
-      (listeners[name] || []).forEach((cb) => {
-        if (listeners[name].indexOf(cb) !== -1) {
+      (name in listeners ? listeners[name] : []).forEach((cb) => {
+        if (listeners[name].includes(cb)) {
+          // Attention! Calling the listener may remove it from the list and mutate the array!!!
           cb(toState, fromState);
         }
       });
@@ -94,11 +97,11 @@ const listenersPluginFactory = (
       const { name } = toState;
 
       if (options.autoCleanUp) {
-        toDeactivate.forEach((name) => removeListener("^" + name));
+        toDeactivate.forEach((name) => removeListener(`^${name}`));
       }
 
-      invokeListeners("^" + intersectionNode, toState, fromState ?? null);
-      invokeListeners("=" + name, toState, fromState ?? null);
+      invokeListeners(`^${intersectionNode}`, toState, fromState ?? null);
+      invokeListeners(`=${name}`, toState, fromState ?? null);
       invokeListeners("*", toState, fromState ?? null);
     }
 

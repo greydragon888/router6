@@ -6,20 +6,23 @@ let router: Router;
 
 describe("core/route-lifecycle", () => {
   beforeEach(() => (router = createTestRouter().start()));
-  afterEach(() => router.stop());
+
+  afterEach(() => {
+    router.stop();
+  });
 
   it("should block navigation if a component refuses deactivation", () => {
     router.navigate("users.list", () => {
       // Cannot deactivate
       router.canDeactivate("users.list", () => () => Promise.reject());
       router.navigate("users", (err) => {
-        expect((err as { code: string; segment: string }).code).toBe(
+        expect((err as { code: string; segment: string }).code).toStrictEqual(
           errorCodes.CANNOT_DEACTIVATE,
         );
-        expect((err as { code: string; segment: string }).segment).toBe(
-          "users.list",
-        );
-        expect(omitMeta(router.getState()!)).toEqual({
+        expect(
+          (err as { code: string; segment: string }).segment,
+        ).toStrictEqual("users.list");
+        expect(omitMeta(router.getState()!)).toStrictEqual({
           name: "users.list",
           params: {},
           path: "/users/list",
@@ -28,33 +31,35 @@ describe("core/route-lifecycle", () => {
         // Can deactivate
         router.canDeactivate("users.list", true);
         router.navigate("users", () => {
-          expect(omitMeta(router.getState()!)).toEqual({
+          expect(omitMeta(router.getState()!)).toStrictEqual({
             name: "users",
             params: {},
             path: "/users",
           });
           // Auto clean up
-          expect(router.getLifecycleFunctions()[0]["users.list"]).toBe(
+          expect(router.getLifecycleFunctions()[0]["users.list"]).toStrictEqual(
             undefined,
           );
         });
       });
     });
   });
+
   it("should register can deactivate status", () =>
     new Promise((done) => {
       router.navigate("users.list", () => {
         router.canDeactivate("users.list", false);
         router.navigate("users", (err) => {
-          expect((err as { code: string; segment: string }).code).toBe(
+          expect((err as { code: string; segment: string }).code).toStrictEqual(
             errorCodes.CANNOT_DEACTIVATE,
           );
-          expect((err as { code: string; segment: string }).segment).toBe(
-            "users.list",
-          );
+          expect(
+            (err as { code: string; segment: string }).segment,
+          ).toStrictEqual("users.list");
+
           router.canDeactivate("users.list", true);
           router.navigate("users", (err) => {
-            expect(err).toBe(null);
+            expect(err).toStrictEqual(null);
 
             done(null);
           });
@@ -65,13 +70,13 @@ describe("core/route-lifecycle", () => {
   it("should block navigation if a route cannot be activated", () => {
     router.navigate("home", () => {
       router.navigate("admin", (err) => {
-        expect((err as { code: string; segment: string }).code).toBe(
+        expect((err as { code: string; segment: string }).code).toStrictEqual(
           errorCodes.CANNOT_ACTIVATE,
         );
-        expect((err as { code: string; segment: string }).segment).toBe(
-          "admin",
-        );
-        expect(router.isActive("home")).toBe(true);
+        expect(
+          (err as { code: string; segment: string }).segment,
+        ).toStrictEqual("admin");
+        expect(router.isActive("home")).toStrictEqual(true);
       });
     });
   });
@@ -80,15 +85,16 @@ describe("core/route-lifecycle", () => {
     router.navigate("orders.view", { id: "1" }, {}, () => {
       router.canDeactivate("orders.view", false);
       router.navigate("home", (err) => {
-        expect((err as { code: string; segment: string }).code).toBe(
+        expect((err as { code: string; segment: string }).code).toStrictEqual(
           errorCodes.CANNOT_DEACTIVATE,
         );
+
         router.navigate(
           "home",
           {},
           { forceDeactivate: true },
           (_err, state) => {
-            expect(state?.name).toBe("home");
+            expect(state?.name).toStrictEqual("home");
           },
         );
       });

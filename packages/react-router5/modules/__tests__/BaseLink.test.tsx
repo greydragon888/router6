@@ -10,6 +10,7 @@ describe("BaseLink component", () => {
   beforeEach(() => {
     router = createTestRouter();
   });
+
   afterEach(() => {
     router.stop();
   });
@@ -25,7 +26,7 @@ describe("BaseLink component", () => {
 
     const linkElement = screen.queryByText(TEST_TEXT)!;
 
-    expect(linkElement.getAttribute("href")).toBe("/home");
+    expect(linkElement.getAttribute("href")).toStrictEqual("/home");
     expect(linkElement.getAttribute("class")).not.toContain("active");
   });
 });

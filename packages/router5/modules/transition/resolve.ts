@@ -20,7 +20,7 @@ export function resolve(
     ? functions
     : Object.keys(functions);
 
-  const isState = (obj?: State) =>
+  const isState = (obj?: Partial<State>) =>
     typeof obj === "object" &&
     obj.name !== undefined &&
     obj.params !== undefined &&
@@ -80,12 +80,15 @@ export function resolve(
     } else if (res && typeof res.then === "function") {
       res.then(
         (resVal?: State | Error) => {
-          if (resVal instanceof Error) done({ error: resVal });
-          else done(null, resVal);
+          if (resVal instanceof Error) {
+            done({ error: resVal });
+          } else {
+            done(null, resVal);
+          }
         },
         (err: Error | object) => {
           if (err instanceof Error) {
-            console.error(err.stack || err);
+            console.error(err.stack ?? err);
 
             done({ ...errBase, promiseError: err });
           } else {

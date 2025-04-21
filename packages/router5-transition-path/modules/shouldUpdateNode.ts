@@ -11,7 +11,7 @@ export default function shouldUpdateNode(nodeName: string) {
 
     const toDeactivate = [...toDeactivateReversed].reverse();
 
-    if (toState.meta?.options && toState.meta.options.reload) {
+    if (toState.meta?.options?.reload) {
       return true;
     }
 
@@ -19,7 +19,7 @@ export default function shouldUpdateNode(nodeName: string) {
       return true;
     }
 
-    if (toActivate.indexOf(nodeName) === -1) {
+    if (!toActivate.includes(nodeName)) {
       return false;
     }
 

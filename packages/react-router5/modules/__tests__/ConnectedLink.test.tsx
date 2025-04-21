@@ -16,6 +16,7 @@ describe("ConnectedLink component", () => {
     });
     router.start();
   });
+
   afterEach(() => {
     router.stop();
   });
@@ -33,7 +34,7 @@ describe("ConnectedLink component", () => {
 
     await userEvent.click(a);
 
-    expect(a.getAttribute("target")).toBeDefined();
+    expect(a.getAttribute("target")).not.toStrictEqual(undefined);
     expect(navSpy).not.toHaveBeenCalled();
   });
 
@@ -48,9 +49,9 @@ describe("ConnectedLink component", () => {
 
     const a = screen.queryByText(TEST_TEXT)!;
 
-    expect(a.getAttribute("title")).toBe("Hello");
-    expect(a.getAttribute("data-testid")).toBe("Link");
-    expect(a.getAttribute("href")).toBe("/home");
+    expect(a.getAttribute("title")).toStrictEqual("Hello");
+    expect(a.getAttribute("data-testid")).toStrictEqual("Link");
+    expect(a.getAttribute("href")).toStrictEqual("/home");
 
     await userEvent.click(a);
 

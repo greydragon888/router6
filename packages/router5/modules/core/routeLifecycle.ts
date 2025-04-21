@@ -14,7 +14,7 @@ function toFunction(val: unknown): unknown {
 export default function withRouteLifecycle<
   Dependencies extends DefaultDependencies = DefaultDependencies,
 >(router: Router<Dependencies>): Router<Dependencies> {
-  const canDeactivateFactories: Record<
+  let canDeactivateFactories: Record<
     string,
     ActivationFnFactory<Dependencies>
   > = {};
@@ -22,12 +22,12 @@ export default function withRouteLifecycle<
     string,
     ActivationFnFactory<Dependencies>
   > = {};
-  const canDeactivateFunctions: Record<string, ActivationFn> = {};
+  let canDeactivateFunctions: Record<string, ActivationFn> = {};
   const canActivateFunctions: Record<string, ActivationFn> = {};
 
   router.getLifecycleFactories = (): [
-    { [key: string]: ActivationFnFactory<Dependencies> },
-    { [key: string]: ActivationFnFactory<Dependencies> },
+    Record<string, ActivationFnFactory<Dependencies>>,
+    Record<string, ActivationFnFactory<Dependencies>>,
   ] => {
     return [canDeactivateFactories, canActivateFactories];
   };
@@ -48,8 +48,22 @@ export default function withRouteLifecycle<
   };
 
   router.clearCanDeactivate = (name): Router<Dependencies> => {
-    delete canDeactivateFactories[name];
-    delete canDeactivateFunctions[name];
+    canDeactivateFactories = Object.keys(canDeactivateFactories).reduce(
+      (record, key) => {
+        return key === name
+          ? record
+          : { ...record, [key]: canDeactivateFactories[key] };
+      },
+      {},
+    );
+    canDeactivateFunctions = Object.keys(canDeactivateFunctions).reduce(
+      (record, key) => {
+        return key === name
+          ? record
+          : { ...record, [key]: canDeactivateFunctions[key] };
+      },
+      {},
+    );
 
     return router;
   };

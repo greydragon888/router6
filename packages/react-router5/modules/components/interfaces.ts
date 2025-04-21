@@ -6,7 +6,7 @@ export interface BaseLinkProps extends HTMLAttributes<HTMLAnchorElement> {
   routeName: string;
   route?: State | null;
   previousRoute?: State | null;
-  routeParams?: { [key: string]: any };
+  routeParams?: Record<string, any>;
   routeOptions?: NavigationOptions;
   className?: string;
   activeClassName?: string;
@@ -15,6 +15,6 @@ export interface BaseLinkProps extends HTMLAttributes<HTMLAnchorElement> {
   target?: string;
   onClick?: MouseEventHandler<HTMLAnchorElement>;
   onMouseOver?: MouseEventHandler<HTMLAnchorElement>;
-  successCallback?(state?: State): void;
-  errorCallback?(error?: any): void;
+  successCallback?: (state?: State) => void;
+  errorCallback?: (error?: any) => void;
 }
