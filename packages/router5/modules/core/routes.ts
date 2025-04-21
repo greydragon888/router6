@@ -89,6 +89,7 @@ export default function withRoutes<Dependencies extends DefaultDependencies>(
         ? router.config.encoders[route](paramsWithDefault)
         : paramsWithDefault;
 
+      // @ts-expect-error TS2379. Should make fixes to route-node
       return router.rootNode.buildPath(route, encodedParams, {
         trailingSlashMode,
         queryParamsMode,

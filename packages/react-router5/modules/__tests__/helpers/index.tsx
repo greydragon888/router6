@@ -2,9 +2,8 @@ import { RouterProvider } from "../..";
 import { render } from "@testing-library/react";
 import createRouter from "router5";
 import browserPlugin from "router5-plugin-browser";
-import type { FC } from "react";
+import type { FC, ComponentType } from "react";
 import type { Router } from "router5";
-import { JSX } from "react/jsx-runtime";
 
 export const FnChild: FC<Record<string, any>> = () => <div />;
 
@@ -35,7 +34,7 @@ export const createTestRouterWithADefaultRoute = (): Router => {
 };
 
 export const renderWithRouter =
-  (router: Router) => (BaseComponent: React.ComponentType) =>
+  (router: Router) => (BaseComponent: ComponentType) =>
     render(
       <RouterProvider router={router}>
         <BaseComponent />

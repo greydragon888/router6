@@ -112,8 +112,10 @@ export interface Router<
   buildState(routeName: string, routeParams: Params): RouteNodeState | null;
 
   isStarted(): boolean;
-  start(startPathOrState: string | State, done?: DoneFn): Router<Dependencies>;
-  start(done?: DoneFn): Router<Dependencies>;
+  start(): Router<Dependencies>;
+  start(done: DoneFn): Router<Dependencies>;
+  start(startPathOrState: string | State): Router<Dependencies>;
+  start(startPathOrState: string | State, done: DoneFn): Router<Dependencies>;
   stop(): void;
 
   canDeactivate(
@@ -187,17 +189,15 @@ export interface Router<
     options: NavigationOptions,
     done: DoneFn,
   ): CancelFn;
-  navigateToDefault(done: DoneFn | undefined): CancelFn;
+  navigateToDefault(): CancelFn;
+  navigateToDefault(done: DoneFn): CancelFn;
   navigateToDefault(opts: NavigationOptions): CancelFn;
-  navigateToDefault(
-    opts: NavigationOptions,
-    done: DoneFn | undefined,
-  ): CancelFn;
+  navigateToDefault(opts: NavigationOptions, done: DoneFn): CancelFn;
   transitionToState(
     toState: State,
     fromState: State | null,
     opts: NavigationOptions,
-    done: DoneFn,
+    done?: DoneFn,
   ): CancelFn;
 
   subscribe(listener: SubscribeFn | Listener): Unsubscribe | Subscription;

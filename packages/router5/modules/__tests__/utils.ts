@@ -134,7 +134,7 @@ describe("core/utils", () => {
     });
 
     it("should match on start", () => {
-      router.start("/query?param1=✓&param2=✗", (err, state) => {
+      router.start("/query?param1=✓&param2=✗", (_err, state) => {
         expect(state?.params).toEqual({
           param1: true,
           param2: false,

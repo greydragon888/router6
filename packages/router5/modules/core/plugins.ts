@@ -54,6 +54,8 @@ export default function withPlugins<
             eventsMap[methodName],
             appliedPlugin[methodName],
           );
+        } else {
+          return;
         }
       })
       .filter(Boolean) as Unsubscribe[];

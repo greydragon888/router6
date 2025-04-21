@@ -6,9 +6,9 @@ const noop = () => {};
 
 type StartRouterArguments =
   | []
-  | [done?: DoneFn]
+  | [done: DoneFn]
   | [startPathOrState: string | State]
-  | [startPathOrState: string | State, done?: DoneFn];
+  | [startPathOrState: string | State, done: DoneFn];
 
 const getStartRouterArguments = (
   args: StartRouterArguments,
@@ -18,11 +18,11 @@ const getStartRouterArguments = (
       return [undefined, noop];
     case 1:
       if (typeof args[0] === "function") {
-        return [undefined, (args as [done?: DoneFn])[0] || noop];
+        return [undefined, args[0]];
       }
       return [args[0], noop];
     case 2:
-      return [args[0], args[1] || noop];
+      return [args[0], args[1]];
     default:
       throw new Error("Invalid number of arguments");
   }

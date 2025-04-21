@@ -27,7 +27,7 @@ export interface State {
   name: string;
   params: Params;
   path: string;
-  meta?: StateMeta;
+  meta?: StateMeta | undefined;
 }
 
 export interface StateMeta {
@@ -35,7 +35,7 @@ export interface StateMeta {
   params: Params;
   options: NavigationOptions;
   redirected: boolean;
-  source?: string;
+  source?: string | undefined;
 }
 
 export interface NavigationOptions {
@@ -43,7 +43,12 @@ export interface NavigationOptions {
   reload?: boolean;
   skipTransition?: boolean;
   force?: boolean;
-  [key: string]: any;
+  [key: string]:
+    | string
+    | number
+    | boolean
+    | Record<string, unknown>
+    | undefined;
 }
 
 export type Params = {

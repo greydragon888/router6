@@ -6,7 +6,7 @@
       "outputs": ["dist/**"]
     },
     "test": {
-      "dependsOn": ["build", "^build"],
+      "dependsOn": ["build"],
       "outputs": ["coverage/**"]
     },
     "type-check": {
