@@ -53,7 +53,7 @@ export default function withObservability<
       (toState, fromState) => {
         finalListener({
           route: toState,
-          previousRoute: fromState ?? null,
+          previousRoute: fromState,
         });
       },
     );

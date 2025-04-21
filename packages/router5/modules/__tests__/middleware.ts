@@ -11,7 +11,7 @@ const listeners: Record<string, Middleware> = {
       path: toState.path,
       hitMware: true,
     };
-    done(null, newState);
+    done(undefined, newState);
   },
   transitionMutate: (toState, _fromState, done) => {
     const newState = {
@@ -20,7 +20,7 @@ const listeners: Record<string, Middleware> = {
       path: toState.path,
       hitMware: true,
     };
-    done(null, newState);
+    done(undefined, newState);
   },
   transitionErr: (_toState, _fromState, done) => {
     done({ reason: "because" });
@@ -47,7 +47,7 @@ describe("core/middleware", () => {
         expect((state as State & { hitMware: boolean }).hitMware).toStrictEqual(
           true,
         );
-        expect(err).toStrictEqual(null);
+        expect(err).toStrictEqual(undefined);
       });
     });
   });
@@ -59,7 +59,7 @@ describe("core/middleware", () => {
     router.start("", () => {
       router.navigate("orders", (err) => {
         expect(console.error).toHaveBeenCalled();
-        expect(err).toStrictEqual(null);
+        expect(err).toStrictEqual(undefined);
 
         router.clearMiddleware();
       });
@@ -102,7 +102,7 @@ describe("core/middleware", () => {
 
   it("should pass state from middleware to middleware", () => {
     const m1: MiddlewareFactory = () => (toState, _fromState, done) => {
-      done(null, { ...toState, m1: true } as State & { m1: boolean });
+      done(undefined, { ...toState, m1: true } as State & { m1: boolean });
     };
     const m2: MiddlewareFactory = () => (toState) =>
       Promise.resolve({
@@ -111,7 +111,7 @@ describe("core/middleware", () => {
       });
 
     const m3: MiddlewareFactory = () => (toState, _fromState, done) => {
-      done(null, {
+      done(undefined, {
         ...toState,
         m3: (toState as State & { m2: boolean }).m2,
       } as State & { m2: boolean; m3: boolean });

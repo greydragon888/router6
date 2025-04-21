@@ -21,7 +21,7 @@ describe("core/router-lifecycle", () => {
   });
 
   it("should start with the default route", () => {
-    expect(router.getState()).toStrictEqual(null);
+    expect(router.getState()).toStrictEqual(undefined);
     expect(router.isActive("home")).toStrictEqual(false);
 
     router.start("/not-existing", () => {

@@ -13,11 +13,11 @@ export default function withState<Dependencies extends DefaultDependencies>(
   router: Router<Dependencies>,
 ): Router<Dependencies> {
   let stateId = 0;
-  let routerState: State | null = null;
+  let routerState: State | undefined = undefined;
 
   router.getState = () => routerState;
 
-  router.setState = (state: State | null) => {
+  router.setState = (state: State | undefined) => {
     routerState = state;
   };
 
@@ -133,10 +133,12 @@ export default function withState<Dependencies extends DefaultDependencies>(
   router.buildState = (
     routeName: string,
     routeParams: Params,
-  ): RouteNodeState | null => {
+  ): RouteNodeState | undefined => {
     const { name, params } = router.forwardState(routeName, routeParams);
 
-    return router.rootNode.buildState(name, params);
+    return router.rootNode.buildState(name, params) as
+      | RouteNodeState
+      | undefined;
   };
 
   return router;

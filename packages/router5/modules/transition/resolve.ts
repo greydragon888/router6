@@ -11,7 +11,7 @@ export function resolve(
   }: {
     isCancelled: () => boolean;
     toState: State;
-    fromState: State | null;
+    fromState?: State | undefined;
     errorKey?: string;
   },
   callback: DoneFn,
@@ -63,27 +63,27 @@ export function resolve(
           );
         }
 
-        doneCb(null, mergeStates(newState, state));
+        doneCb(undefined, mergeStates(newState, state));
       } else {
-        doneCb(null, state);
+        doneCb(undefined, state);
       }
     };
 
     const res = stepFn.call(null, state, fromState, done);
 
     if (isCancelled()) {
-      done(null);
+      done();
     } else if (typeof res === "boolean") {
-      done(res ? null : errBase);
+      done(res ? undefined : errBase);
     } else if (isState(res)) {
-      done(null, res);
+      done(undefined, res);
     } else if (res && typeof res.then === "function") {
       res.then(
         (resVal?: State | Error) => {
           if (resVal instanceof Error) {
             done({ error: resVal });
           } else {
-            done(null, resVal);
+            done(undefined, resVal);
           }
         },
         (err: Error | object) => {
@@ -107,7 +107,7 @@ export function resolve(
       callback(err);
     } else {
       if (!remainingFunctions.length) {
-        callback(null, state);
+        callback(undefined, state);
       } else {
         const isMapped = typeof remainingFunctions[0] === "string";
         const errBase =
@@ -125,5 +125,5 @@ export function resolve(
     }
   };
 
-  next(null, toState);
+  next(undefined, toState);
 }

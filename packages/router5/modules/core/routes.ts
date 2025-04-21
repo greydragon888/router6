@@ -134,7 +134,7 @@ export default function withRoutes<Dependencies extends DefaultDependencies>(
         });
       }
 
-      return null;
+      return undefined;
     };
 
     router.setRootPath = (rootPath) => {

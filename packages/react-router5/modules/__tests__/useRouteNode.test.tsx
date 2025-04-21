@@ -28,8 +28,8 @@ describe("useRouteNode hook", () => {
 
     expect(ChildSpy).toHaveBeenCalledWith({
       router,
-      route: null,
-      previousRoute: null,
+      route: undefined,
+      previousRoute: undefined,
     });
   });
 

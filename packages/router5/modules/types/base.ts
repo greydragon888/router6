@@ -11,8 +11,7 @@ export type DoneFnError =
     } // Errors with a code and additional properties
   | { promiseError: Error; redirect?: State; [key: string]: unknown } // Errors from promises
   | Error // Standard errors
-  | string // String errors
-  | null;
+  | string; // String errors
 
 export type DoneFn = (err?: DoneFnError, state?: State) => void;
 

@@ -86,7 +86,7 @@ export interface Router<
     ignoreQueryParams?: boolean,
   ) => boolean;
   buildPath: (route: string, params?: Params) => string;
-  matchPath: (path: string, source?: string) => State | null;
+  matchPath: (path: string, source?: string) => State | undefined;
   setRootPath: (rootPath: string) => void;
 
   getOptions: () => Options;
@@ -100,16 +100,19 @@ export interface Router<
     forceId?: number,
   ) => State;
   makeNotFoundState: (path: string, options?: NavigationOptions) => State;
-  getState: () => State | null;
-  setState: (state: State | null) => void;
+  getState: () => State | undefined;
+  setState: (state?: State) => void;
   areStatesEqual: (
-    state1: State | null | undefined,
-    state2: State | null | undefined,
+    state1: State | undefined,
+    state2: State | undefined,
     ignoreQueryParams?: boolean,
   ) => boolean;
   areStatesDescendants: (parentState: State, childState: State) => boolean;
   forwardState: (routeName: string, routeParams: Params) => SimpleState;
-  buildState: (routeName: string, routeParams: Params) => RouteNodeState | null;
+  buildState: (
+    routeName: string,
+    routeParams: Params,
+  ) => RouteNodeState | undefined;
 
   isStarted: () => boolean;
   start: (() => Router<Dependencies>) &
@@ -195,7 +198,7 @@ export interface Router<
     ((opts: NavigationOptions, done: DoneFn) => CancelFn);
   transitionToState: (
     toState: State,
-    fromState: State | null,
+    fromState: State | undefined,
     opts: NavigationOptions,
     done?: DoneFn,
   ) => CancelFn;
@@ -233,7 +236,7 @@ export type PluginFactory<
 
 export interface SubscribeState {
   route: State;
-  previousRoute: State | null;
+  previousRoute?: State | undefined;
 }
 
 export type SubscribeFn = (state: SubscribeState) => void;

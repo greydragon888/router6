@@ -1,7 +1,7 @@
 import transitionPath from "router5-transition-path";
 import type { NavigationOptions, PluginFactory, Router, State } from "router5";
 
-export type Listener = (toState: State, fromState: State | null) => void;
+export type Listener = (toState: State, fromState?: State) => void;
 
 declare module "router5" {
   interface Router {
@@ -71,11 +71,7 @@ const listenersPluginFactory = (
     router.addRouteListener = (name, cb) => addListener(`=${name}`, cb);
     router.removeRouteListener = (name, cb) => removeListener(`=${name}`, cb);
 
-    function invokeListeners(
-      name: string,
-      toState: State,
-      fromState: State | null,
-    ) {
+    function invokeListeners(name: string, toState: State, fromState?: State) {
       (name in listeners ? listeners[name] : []).forEach((cb) => {
         if (listeners[name].includes(cb)) {
           // Attention! Calling the listener may remove it from the list and mutate the array!!!
@@ -89,10 +85,7 @@ const listenersPluginFactory = (
       fromState?: State,
       opts?: NavigationOptions,
     ) {
-      const { intersection, toDeactivate } = transitionPath(
-        toState,
-        fromState ?? null,
-      );
+      const { intersection, toDeactivate } = transitionPath(toState, fromState);
       const intersectionNode = opts?.reload ? "" : intersection;
       const { name } = toState;
 
@@ -100,9 +93,9 @@ const listenersPluginFactory = (
         toDeactivate.forEach((name) => removeListener(`^${name}`));
       }
 
-      invokeListeners(`^${intersectionNode}`, toState, fromState ?? null);
-      invokeListeners(`=${name}`, toState, fromState ?? null);
-      invokeListeners("*", toState, fromState ?? null);
+      invokeListeners(`^${intersectionNode}`, toState, fromState);
+      invokeListeners(`=${name}`, toState, fromState);
+      invokeListeners("*", toState, fromState);
     }
 
     return {

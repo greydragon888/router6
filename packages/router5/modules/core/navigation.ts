@@ -123,7 +123,8 @@ export default function withNavigation<
     const fromState = router.getState();
 
     if (opts.skipTransition) {
-      done(null, toState);
+      done(undefined, toState);
+
       return noop;
     }
 
@@ -149,7 +150,7 @@ export default function withNavigation<
           fromState,
           opts,
         );
-        done(null, state);
+        done(undefined, state);
       }
     });
   };
@@ -188,7 +189,7 @@ export default function withNavigation<
 
   router.transitionToState = (
     toState: State,
-    fromState: State | null,
+    fromState?: State,
     options: NavigationOptions = {},
     done: DoneFn = noop,
   ): CancelFn => {
@@ -221,7 +222,7 @@ export default function withNavigation<
         done(err);
       } else {
         router.setState(state);
-        done(null, state);
+        done(undefined, state);
       }
     };
 

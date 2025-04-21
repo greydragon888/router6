@@ -2,7 +2,7 @@ import transitionPath from "./transitionPath";
 import { State } from "./transitionPath";
 
 export default function shouldUpdateNode(nodeName: string) {
-  return (toState: State, fromSate: State | null): boolean => {
+  return (toState: State, fromSate?: State): boolean => {
     const {
       intersection,
       toActivate,

@@ -13,7 +13,7 @@ import type {
 export function transition(
   router: Router,
   toState: State,
-  fromState: State | null,
+  fromState: State | undefined,
   opts: NavigationOptions,
   callback: DoneFn,
 ): CancelFn {
@@ -82,7 +82,7 @@ export function transition(
               cb(
                 err
                   ? makeError({ code: errorCodes.CANNOT_DEACTIVATE }, err)
-                  : null,
+                  : undefined,
               );
             },
           );
@@ -106,7 +106,9 @@ export function transition(
           { ...asyncBase, errorKey: "segment" },
           (err?: DoneFnError) => {
             cb(
-              err ? makeError({ code: errorCodes.CANNOT_ACTIVATE }, err) : null,
+              err
+                ? makeError({ code: errorCodes.CANNOT_ACTIVATE }, err)
+                : undefined,
             );
           },
         );
@@ -117,7 +119,9 @@ export function transition(
     : (toState: State, _fromState: State, cb: DoneFn) => {
         resolve(middlewareFunctions, { ...asyncBase }, (err, state?: State) => {
           cb(
-            err ? makeError({ code: errorCodes.TRANSITION_ERR }, err) : null,
+            err
+              ? makeError({ code: errorCodes.TRANSITION_ERR }, err)
+              : undefined,
             state ?? toState,
           );
         });

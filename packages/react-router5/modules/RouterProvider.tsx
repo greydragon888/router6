@@ -17,7 +17,7 @@ export const RouterProvider: FC<RouteProviderProps> = ({
   const store = useMemo(() => {
     let currentState: RouteState = {
       route: router.getState(),
-      previousRoute: null,
+      previousRoute: undefined,
     };
 
     // This will be called to return the current state snapshot

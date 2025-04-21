@@ -23,7 +23,7 @@ export const useRouteNode = (nodeName: string): RouteContext => {
     // Local mutable state to keep track of the current and previous route
     let currentState: RouteState = {
       route: router.getState(),
-      previousRoute: null,
+      previousRoute: undefined,
     };
 
     // This function is called by React to read the current value of the store

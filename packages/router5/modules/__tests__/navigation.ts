@@ -36,7 +36,7 @@ describe("core/navigation", () => {
         );
 
         router.navigate("orders.pending", {}, { reload: true }, (err) => {
-          expect(err).toStrictEqual(null);
+          expect(err).toStrictEqual(undefined);
         });
       });
     });

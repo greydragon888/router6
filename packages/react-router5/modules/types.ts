@@ -5,8 +5,8 @@ export type RouteContext = {
 } & RouteState;
 
 export interface RouteState {
-  route: State | null;
-  previousRoute: State | null;
+  route?: State | undefined;
+  previousRoute?: State | undefined;
 }
 
 export type UnsubscribeFn = () => void;

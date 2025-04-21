@@ -49,7 +49,7 @@ const extractSegmentParams = (name: string, state: State): SegementParams => {
 
 export default function transitionPath(
   toState: State,
-  fromState: State | null,
+  fromState?: State,
 ): TransitionPath {
   const toStateOptions = toState.meta?.options ?? {};
   const fromStateIds = fromState ? nameToIDs(fromState.name) : [];

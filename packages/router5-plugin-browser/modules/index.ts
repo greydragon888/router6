@@ -12,7 +12,7 @@ import type {
 declare module "router5" {
   interface Router {
     buildUrl: (name: string, params?: Record<string, any>) => string;
-    matchUrl: (url: string) => State | null;
+    matchUrl: (url: string) => State | undefined;
     replaceHistoryState: (
       name: string,
       params?: Record<string, any>,

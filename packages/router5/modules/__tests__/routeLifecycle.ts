@@ -45,27 +45,24 @@ describe("core/route-lifecycle", () => {
     });
   });
 
-  it("should register can deactivate status", () =>
-    new Promise((done) => {
-      router.navigate("users.list", () => {
-        router.canDeactivate("users.list", false);
+  it("should register can deactivate status", () => {
+    router.navigate("users.list", () => {
+      router.canDeactivate("users.list", false);
+      router.navigate("users", (err) => {
+        expect((err as { code: string; segment: string }).code).toStrictEqual(
+          errorCodes.CANNOT_DEACTIVATE,
+        );
+        expect(
+          (err as { code: string; segment: string }).segment,
+        ).toStrictEqual("users.list");
+
+        router.canDeactivate("users.list", true);
         router.navigate("users", (err) => {
-          expect((err as { code: string; segment: string }).code).toStrictEqual(
-            errorCodes.CANNOT_DEACTIVATE,
-          );
-          expect(
-            (err as { code: string; segment: string }).segment,
-          ).toStrictEqual("users.list");
-
-          router.canDeactivate("users.list", true);
-          router.navigate("users", (err) => {
-            expect(err).toStrictEqual(null);
-
-            done(null);
-          });
+          expect(err).toStrictEqual(undefined);
         });
       });
-    }));
+    });
+  });
 
   it("should block navigation if a route cannot be activated", () => {
     router.navigate("home", () => {

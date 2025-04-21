@@ -51,7 +51,7 @@ export default function withRouterLifecycle<
     router.invokeEventListeners(constants.ROUTER_START);
 
     // callback
-    const cb = (err: DoneFnError, state?: State, invokeErrCb = true) => {
+    const cb = (err?: DoneFnError, state?: State, invokeErrCb = true) => {
       if (!err) {
         router.invokeEventListeners(constants.TRANSITION_SUCCESS, state, null, {
           replace: true,
@@ -97,7 +97,7 @@ export default function withRouterLifecycle<
       const transitionToState = (state: State) => {
         router.transitionToState(state, router.getState(), {}, (err, state) => {
           if (!err) {
-            cb(null, state);
+            cb(undefined, state);
           } else if (typeof err === "object" && "redirect" in err) {
             redirect(err.redirect);
           } else if (options.defaultRoute) {
@@ -124,7 +124,7 @@ export default function withRouterLifecycle<
     } else {
       // Initialise router with provided start state
       router.setState(startState);
-      cb(null, startState);
+      cb(undefined, startState);
     }
 
     return router;
@@ -132,7 +132,7 @@ export default function withRouterLifecycle<
 
   router.stop = (): Router<Dependencies> => {
     if (started) {
-      router.setState(null);
+      router.setState(undefined);
       started = false;
       router.invokeEventListeners(constants.ROUTER_STOP);
     }

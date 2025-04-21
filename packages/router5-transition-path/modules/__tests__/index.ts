@@ -3,7 +3,7 @@ import transitionPath, { shouldUpdateNode } from "../";
 describe("router5-transition-path", () => {
   it("should return a transition path with from null state", () => {
     expect(
-      transitionPath({ name: "a.b.c", params: {}, meta: {} }, null),
+      transitionPath({ name: "a.b.c", params: {}, meta: {} }),
     ).toStrictEqual({
       intersection: "",
       toActivate: ["a", "a.b", "a.b.c"],
