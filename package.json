@@ -3,7 +3,7 @@
   "private": true,
   "description": "Router6 is a modern continuation of router5 — keeping its powerful API while bringing updated tooling, simplified structure, and active maintenance.",
   "scripts": {
-    "build": "turbo run build",
+    "build": "turbo run build --force",
     "test": "turbo run test --force -- --coverage",
     "type-check": "turbo run type-check --force",
     "lint": "turbo run lint --force",
