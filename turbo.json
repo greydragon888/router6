@@ -2,12 +2,15 @@
   "$schema": "https://turborepo.org/schema.json",
   "tasks": {
     "build": {
-      "dependsOn": ["type-check", "^type-check"],
+      "dependsOn": ["type-check", "lint"],
       "outputs": ["dist/**"]
     },
     "test": {
       "dependsOn": ["build"],
       "outputs": ["coverage/**"]
+    },
+    "lint": {
+      "outputs": []
     },
     "type-check": {
       "outputs": []

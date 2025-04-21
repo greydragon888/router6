@@ -3,25 +3,26 @@ import type { Router, Subscription } from "..";
 
 let router: Router;
 
-describe("core/observable", function () {
+describe("core/observable", () => {
   beforeEach(() => {
     router = createTestRouter().start();
   });
+
   afterEach(() => {
     router.stop();
   });
 
   it("should accept a listener function", () => {
-    const unsubscribe = router.subscribe(() => {});
+    const unsubscribe = router.subscribe(() => undefined);
 
-    expect(typeof unsubscribe).toBe("function");
+    expect(typeof unsubscribe).toStrictEqual("function");
   });
 
   it("should accept a listener object", () => {
     const subscription = router.subscribe({
-      next: async () => undefined,
+      next: () => Promise.resolve(undefined),
     }) as Subscription;
 
-    expect(typeof subscription.unsubscribe).toBe("function");
+    expect(typeof subscription.unsubscribe).toStrictEqual("function");
   });
 });

@@ -1,11 +1,7 @@
 import transitionPath, { nameToIDs } from "router5-transition-path";
 import { resolve } from "./resolve";
 import { constants, errorCodes } from "../constants";
-import type {
-  ActivationFn,
-  DefaultDependencies,
-  Router,
-} from "../types/router";
+import type { ActivationFn, Router } from "../types/router";
 import type {
   State,
   NavigationOptions,
@@ -15,7 +11,7 @@ import type {
 } from "../types/base";
 
 export function transition(
-  router: Router<DefaultDependencies>,
+  router: Router,
   toState: State,
   fromState: State | null,
   opts: NavigationOptions,
@@ -23,6 +19,7 @@ export function transition(
 ): CancelFn {
   let cancelled = false;
   let completed = false;
+
   const options = router.getOptions();
   const [canDeactivateFunctions, canActivateFunctions] =
     router.getLifecycleFunctions();
@@ -44,8 +41,9 @@ export function transition(
     if (!err && options.autoCleanUp) {
       const activeSegments = nameToIDs(toState.name);
       Object.keys(canDeactivateFunctions).forEach((name) => {
-        if (activeSegments.indexOf(name) === -1)
+        if (!activeSegments.includes(name)) {
           router.clearCanDeactivate(name);
+        }
       });
     }
 
@@ -56,7 +54,7 @@ export function transition(
     err?: Record<string, unknown> | Error | string | null,
   ) => ({
     ...base,
-    ...(err && Object.keys(err).length ? (err as Object) : { error: err }),
+    ...(err && Object.keys(err).length ? (err as object) : { error: err }),
   });
 
   const isUnknownRoute = toState.name === constants.UNKNOWN_ROUTE;
@@ -68,7 +66,7 @@ export function transition(
       ? undefined
       : (_toState: State, _fromState: State, cb: DoneFn) => {
           const canDeactivateFunctionMap = toDeactivate
-            .filter((name) => canDeactivateFunctions[name])
+            .filter((name) => name in canDeactivateFunctions)
             .reduce(
               (fnMap, name) => ({
                 ...fnMap,
@@ -80,12 +78,13 @@ export function transition(
           resolve(
             canDeactivateFunctionMap,
             { ...asyncBase, errorKey: "segment" },
-            (err) =>
+            (err) => {
               cb(
                 err
                   ? makeError({ code: errorCodes.CANNOT_DEACTIVATE }, err)
                   : null,
-              ),
+              );
+            },
           );
         };
 
@@ -93,7 +92,7 @@ export function transition(
     ? undefined
     : (_toState: State, _fromState: State, cb: DoneFn) => {
         const canActivateFunctionMap = toActivate
-          .filter((name) => canActivateFunctions[name])
+          .filter((name) => name in canActivateFunctions)
           .reduce(
             (fnMap, name) => ({
               ...fnMap,

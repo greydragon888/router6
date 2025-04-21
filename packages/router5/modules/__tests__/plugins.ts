@@ -12,14 +12,15 @@ describe("core/plugins", () => {
     myPluginMethods = {
       onTransitionStart: vi.fn(),
       onTransitionSuccess: vi.fn(),
-      onTransitionError: () => {},
+      onTransitionError: () => undefined,
     };
     myPlugin = (router?: Router & { myCustomMethod?: Function }) => {
-      router!.myCustomMethod = () => {};
+      router!.myCustomMethod = () => undefined;
 
       return myPluginMethods;
     };
   });
+
   afterEach(() => {
     router.stop();
   });
@@ -30,7 +31,7 @@ describe("core/plugins", () => {
     router.start("", () => {
       expect(
         (router as Router & { myCustomMethod?: Function }).myCustomMethod,
-      ).not.toBe(undefined);
+      ).not.toStrictEqual(undefined);
 
       router.navigate("orders", () => {
         expect(myPluginMethods.onTransitionStart).toHaveBeenCalled();
@@ -46,11 +47,11 @@ describe("core/plugins", () => {
       teardown,
     }));
 
-    expect(router.getPlugins().length).toBe(1);
+    expect(router.getPlugins()).toHaveLength(1);
 
     unsubscribe();
 
-    expect(router.getPlugins().length).toBe(0);
+    expect(router.getPlugins()).toHaveLength(0);
     expect(teardown).toHaveBeenCalled();
   });
 });

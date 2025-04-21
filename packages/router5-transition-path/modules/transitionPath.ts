@@ -1,25 +1,15 @@
-export interface SegementParams {
-  [key: string]: string;
-}
+export type SegementParams = Record<string, string>;
 
 export interface State {
   name: string;
-  params: {
-    [key: string]: any;
-  };
+  params: Record<string, any>;
   meta?:
     | {
-        options?: {
-          [key: string]:
-            | string
-            | number
-            | boolean
-            | Record<string, unknown>
-            | undefined;
-        };
-        params?: {
-          [key: string]: SegementParams | unknown;
-        };
+        options?: Record<
+          string,
+          string | number | boolean | Record<string, unknown> | undefined
+        >;
+        params?: Record<string, SegementParams | unknown>;
       }
     | undefined;
   [key: string]: any;
@@ -36,35 +26,32 @@ export const nameToIDs = (name: string): string[] =>
     .split(".")
     .reduce(
       (ids: string[], name: string) =>
-        ids.concat(ids.length ? ids[ids.length - 1] + "." + name : name),
+        ids.concat(ids.length ? `${ids[ids.length - 1]}.${name}` : name),
       [],
     );
 
 const exists = (val: unknown) => val !== undefined && val !== null;
 
-const hasMetaParams = (state: State) =>
-  state && state.meta && state.meta.params;
+const hasMetaParams = (state: State) => state.meta?.params;
 
 const extractSegmentParams = (name: string, state: State): SegementParams => {
-  if (!hasMetaParams(state) || !exists(state.meta?.params?.[name])) return {};
+  if (!hasMetaParams(state) || !exists(state.meta?.params?.[name])) {
+    return {};
+  }
 
-  return Object.keys(state?.meta?.params?.[name] ?? {}).reduce(
-    (params, param) => {
-      return {
-        ...params,
-        [param]: state.params?.[param],
-      };
-    },
-    {},
-  );
+  return Object.keys(state.meta.params[name] ?? {}).reduce((params, param) => {
+    return {
+      ...params,
+      [param]: state.params[param],
+    };
+  }, {});
 };
 
 export default function transitionPath(
   toState: State,
   fromState: State | null,
 ): TransitionPath {
-  const toStateOptions =
-    (toState.meta && toState.meta && toState.meta.options) || {};
+  const toStateOptions = toState.meta?.options ?? {};
   const fromStateIds = fromState ? nameToIDs(fromState.name) : [];
   const toStateIds = nameToIDs(toState.name);
   const maxI = Math.min(fromStateIds.length, toStateIds.length);
@@ -75,16 +62,21 @@ export default function transitionPath(
       const left = fromStateIds[i];
       const right = toStateIds[i];
 
-      if (left !== right) return i;
+      if (left !== right) {
+        return i;
+      }
 
       const leftParams = extractSegmentParams(left, toState);
       const rightParams = fromState
         ? extractSegmentParams(right, fromState)
         : {};
 
-      if (Object.keys(leftParams).length !== Object.keys(rightParams).length)
+      if (Object.keys(leftParams).length !== Object.keys(rightParams).length) {
         return i;
-      if (Object.keys(leftParams).length === 0) continue;
+      }
+      if (Object.keys(leftParams).length === 0) {
+        continue;
+      }
 
       const different = Object.keys(leftParams).some(
         (p) => rightParams[p] !== leftParams[p],

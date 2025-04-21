@@ -16,6 +16,7 @@ describe("useRouteNode hook", () => {
     router = createTestRouter();
     routerWithADefaultRoute = createTestRouterWithADefaultRoute();
   });
+
   afterEach(() => {
     router.stop();
   });
@@ -24,6 +25,7 @@ describe("useRouteNode hook", () => {
     const ChildSpy = vi.fn(FnChild);
 
     renderWithRouter(router)(() => ChildSpy(useRouteNode("")));
+
     expect(ChildSpy).toHaveBeenCalledWith({
       router,
       route: null,
@@ -38,8 +40,9 @@ describe("useRouteNode hook", () => {
 
     routerWithADefaultRoute.start(() => {
       renderWithRouter(routerWithADefaultRoute)(BaseComponent);
+
       /* first call, first argument */
-      expect(ChildSpy.mock.calls[0][0].route.name).toBe("test");
+      expect(ChildSpy.mock.calls[0][0].route.name).toStrictEqual("test");
     });
   });
 });

@@ -15,7 +15,9 @@ export default function withObservability<
   const callbacks: Record<string, Function[]> = {};
 
   router.invokeEventListeners = (eventName: string, ...args: unknown[]) => {
-    (callbacks[eventName] || []).forEach((cb) => cb(...args));
+    (eventName in callbacks ? callbacks[eventName] : []).forEach((cb) =>
+      cb(...args),
+    );
   };
 
   router.removeEventListener = (
@@ -29,9 +31,14 @@ export default function withObservability<
     eventName: string,
     cb: (toState: State, fromState?: State) => void,
   ): Unsubscribe => {
-    callbacks[eventName] = (callbacks[eventName] || []).concat(cb);
+    callbacks[eventName] = [
+      ...(eventName in callbacks ? callbacks[eventName] : []),
+      cb,
+    ];
 
-    return () => router.removeEventListener(eventName, cb);
+    return () => {
+      router.removeEventListener(eventName, cb);
+    };
   };
 
   function subscribe(
@@ -57,7 +64,7 @@ export default function withObservability<
   function observable() {
     return {
       subscribe(observer: SubscribeFn | Listener): Unsubscribe | Subscription {
-        if (typeof observer !== "object" || observer === null) {
+        if (typeof observer !== "object") {
           throw new TypeError("Expected the observer to be an object.");
         }
         return subscribe(observer);
@@ -70,9 +77,9 @@ export default function withObservability<
   }
 
   router.subscribe = subscribe;
-  //@ts-ignore
+  //@ts-expect-error: TypeScript does not allow indexing with a symbol, but this is required for observable interop
   router[$$observable] = observable;
-  //@ts-ignore
+  //@ts-expect-error: TypeScript does not allow indexing with a symbol, but this is required for observable interop
   router["@@observable"] = observable;
 
   return router;

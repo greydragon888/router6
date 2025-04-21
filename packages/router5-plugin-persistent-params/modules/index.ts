@@ -10,53 +10,46 @@ function persistentParamsPluginFactory(
   params: Params | string[] = {},
 ): PluginFactory {
   return function persistentParamsPlugin(router): Plugin {
-    if (!router) {
-      throw new Error("Router instance is required");
-    }
-
     // Persistent parameters
     const persistentParams: Params = Array.isArray(params)
       ? params.reduce((acc, param) => ({ ...acc, [param]: undefined }), {})
       : params;
 
     const paramNames = Object.keys(persistentParams);
-    const hasQueryParams = router.rootNode.path.indexOf("?") !== -1;
-    const queryParams = paramNames.join("&");
-    const search = queryParams
-      ? `${hasQueryParams ? "&" : "?"}${queryParams}`
-      : "";
+    const hasQueryParams = router.rootNode.path.includes("?");
+    const queryParamsStr = `${hasQueryParams ? "&" : "?"}${paramNames.join("&")}`;
+    const search = queryParamsStr.length ? queryParamsStr : "";
 
     // Root node path
     const path = router.rootNode.path.split("?")[0] + search;
+
     router.setRootPath(path);
 
-    const { buildPath, buildState } = router;
+    const originalBuildPath = router.buildPath.bind(router);
+    const originalBuildState = router.buildState.bind(router);
 
     // Decorators
-    router.buildPath = function (route, params) {
+
+    router.buildPath = (route, params) => {
       const routeParams = {
         ...getDefinedParams(persistentParams),
         ...params,
       };
-      return buildPath.call(router, route, routeParams);
+      return originalBuildPath(route, routeParams);
     };
 
-    router.buildState = function (route, params) {
+    router.buildState = (route, params) => {
       const routeParams = {
         ...getDefinedParams(persistentParams),
         ...params,
       };
-      return buildState.call(router, route, routeParams);
+      return originalBuildState(route, routeParams);
     };
 
     return {
       onTransitionSuccess(toState) {
-        if (!toState) {
-          throw new Error("State is required");
-        }
-
         Object.keys(toState.params)
-          .filter((param) => paramNames.indexOf(param) !== -1)
+          .filter((param) => paramNames.includes(param))
           .forEach(
             (param) => (persistentParams[param] = toState.params[param]),
           );

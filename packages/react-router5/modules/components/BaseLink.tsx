@@ -19,8 +19,11 @@ export const BaseLink: FC<BaseLinkProps> = ({
   children,
   ...linkProps
 }) => {
-  const getActiveState = () =>
-    router.isActive(routeName, routeParams, activeStrict, ignoreQueryParams);
+  const getActiveState = useCallback(
+    () =>
+      router.isActive(routeName, routeParams, activeStrict, ignoreQueryParams),
+    [activeStrict, ignoreQueryParams, routeName, routeParams, router],
+  );
 
   // State to track if the link is active or not
   const [active, setActive] = useState<boolean>(getActiveState());
@@ -41,17 +44,13 @@ export const BaseLink: FC<BaseLinkProps> = ({
 
   // Build URL using router's buildUrl or buildPath methods
   const buildUrl = useMemo(() => {
-    if (router.buildUrl) {
-      return router.buildUrl(routeName, routeParams);
-    }
-
-    return router.buildPath(routeName, routeParams);
-  }, [routeName, routeParams]);
+    return router.buildUrl(routeName, routeParams);
+  }, [routeName, routeParams, router]);
 
   // Update the active state based on the isActive result
   useEffect(() => {
     setActive(getActiveState());
-  }, [routeName, routeParams, activeStrict, ignoreQueryParams]);
+  }, [routeName, routeParams, activeStrict, ignoreQueryParams, getActiveState]);
 
   // Handler for click events, handles navigation
   const clickHandler = useCallback(
@@ -74,7 +73,7 @@ export const BaseLink: FC<BaseLinkProps> = ({
         router.navigate(routeName, routeParams, routeOptions, callback);
       }
     },
-    [onClick, routeName, routeParams, routeOptions, callback, target],
+    [onClick, target, router, routeName, routeParams, routeOptions, callback],
   );
 
   // Build the class name string for the link

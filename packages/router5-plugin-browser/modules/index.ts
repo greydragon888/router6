@@ -11,22 +11,22 @@ import type {
 
 declare module "router5" {
   interface Router {
-    buildUrl(name: string, params?: { [key: string]: any }): string;
-    matchUrl(url: string): State | null;
-    replaceHistoryState(
+    buildUrl: (name: string, params?: Record<string, any>) => string;
+    matchUrl: (url: string) => State | null;
+    replaceHistoryState: (
       name: string,
-      params?: { [key: string]: any },
+      params?: Record<string, any>,
       title?: string,
-    ): void;
+    ) => void;
     lastKnownState: State;
   }
 }
 
 type StartRouterArguments =
   | []
-  | [done?: DoneFn]
+  | [done: DoneFn]
   | [startPathOrState: string | State]
-  | [startPathOrState: string | State, done?: DoneFn];
+  | [startPathOrState: string | State, done: DoneFn];
 
 const defaultOptions: BrowserPluginOptions = {
   forceDeactivate: true,
@@ -38,6 +38,8 @@ const defaultOptions: BrowserPluginOptions = {
 };
 
 const source = "popstate";
+
+const noop = () => undefined;
 
 function browserPluginFactory(
   opts?: BrowserPluginOptions,
@@ -55,34 +57,36 @@ function browserPluginFactory(
     const routerStart = router.start;
 
     router.buildUrl = (route, params) => {
-      const base = options.base || "";
-      const prefix = options.useHash ? `#${options.hashPrefix}` : "";
+      const base = options.base ?? "";
+      const prefix = options.useHash ? `#${options.hashPrefix ?? ""}` : "";
       const path = router.buildPath(route, params);
 
       return base + prefix + path;
     };
 
     const urlToPath = (url: string) => {
-      const match = url.match(
-        /^(?:http|https):\/\/(?:[0-9a-z_\-.:]+?)(?=\/)(.*)$/,
-      );
+      const match = /^(?:http|https):\/\/[0-9a-z_\-.:]+?(?=\/)(.*)$/.exec(url);
       const path = match ? match[1] : url;
 
-      const pathParts = path.match(/^(.+?)(#.+?)?(\?.+)?$/);
+      const pathParts = /^([^#?]+)(#[^?]*)?(\?.*)?$/.exec(path);
 
-      if (!pathParts) throw new Error(`[router5] Could not parse url ${url}`);
+      if (!pathParts) {
+        throw new Error(`[router5] Could not parse url ${url}`);
+      }
 
       const pathname = pathParts[1];
       const hash = pathParts[2] || "";
       const search = pathParts[3] || "";
 
-      return (
-        (options.useHash
-          ? hash.replace(new RegExp("^#" + options.hashPrefix), "")
-          : options.base
-            ? pathname.replace(new RegExp("^" + options.base), "")
-            : pathname) + search
-      );
+      if (options.useHash) {
+        return (
+          hash.replace(new RegExp(`^#${options.hashPrefix ?? ""}`), "") + search
+        );
+      } else if (options.base) {
+        return pathname.replace(new RegExp(`^${options.base}`), "") + search;
+      }
+
+      return pathname + search;
     };
 
     router.matchUrl = (url) => router.matchPath(urlToPath(url));
@@ -90,8 +94,6 @@ function browserPluginFactory(
     const getStartRouterArguments = (
       args: StartRouterArguments,
     ): [startPathOrState: string | State, done: DoneFn] => {
-      const noop = () => {};
-
       switch (args.length) {
         case 0:
           return [browser.getLocation(options), noop];
@@ -99,9 +101,9 @@ function browserPluginFactory(
           if (typeof args[0] === "function") {
             return [browser.getLocation(options), args[0]];
           }
-          return [args[0]!, noop];
+          return [args[0], noop];
         case 2:
-          return [args[0], args[1] || noop];
+          return [args[0], args[1]];
         default:
           throw new Error("Invalid number of arguments");
       }
@@ -138,7 +140,7 @@ function browserPluginFactory(
     };
 
     function updateBrowserState(
-      state: State | undefined,
+      state: State | null,
       url: string,
       replace?: boolean,
     ) {
@@ -155,14 +157,17 @@ function browserPluginFactory(
           ? { ...browser.getState(), ...trimmedState }
           : trimmedState;
 
-      if (replace) browser.replaceState(finalState, "", url);
-      else browser.pushState(finalState, "", url);
+      if (replace) {
+        browser.replaceState(finalState, "", url);
+      } else {
+        browser.pushState(finalState, "", url);
+      }
     }
 
     function onPopState(evt: PopStateEvent) {
       const routerState = router.getState();
       // Do nothing if no state or if last know state is poped state (it should never happen)
-      const newState = !evt.state || !evt.state.name;
+      const newState = !evt.state?.name;
       const state = newState
         ? router.matchPath(browser.getLocation(options), source)
         : router.makeState(
@@ -174,15 +179,15 @@ function browserPluginFactory(
           );
       const { defaultRoute, defaultParams } = routerOptions;
 
-      if (!state) {
+      if (!state || defaultRoute) {
         // If current state is already the default route, we will have a double entry
         // Navigating back and forth will emit SAME_STATES error
-        defaultRoute &&
-          router.navigateToDefault({
-            ...transitionOptions,
-            reload: true,
-            replace: true,
-          });
+
+        router.navigateToDefault({
+          ...transitionOptions,
+          reload: true,
+          replace: true,
+        });
         return;
       }
       if (routerState && router.areStatesEqual(state, routerState, false)) {
@@ -194,8 +199,8 @@ function browserPluginFactory(
         routerState,
         transitionOptions,
         (err, toState) => {
-          if (err && typeof err === "object" && "redirect" in err) {
-            if (err.redirect) {
+          if (err && typeof err === "object") {
+            if ("redirect" in err) {
               const { name, params } = err.redirect;
 
               router.navigate(name, params, {
@@ -205,6 +210,7 @@ function browserPluginFactory(
                 redirected: true,
               });
             } else if (
+              "code" in err &&
               err.code === errorCodes.CANNOT_DEACTIVATE &&
               routerState
             ) {
@@ -215,14 +221,13 @@ function browserPluginFactory(
               }
               // else do nothing or history will be messed up
               // TODO: history.back()?
-            } else {
+            } else if (defaultRoute) {
               // Force navigation to default state
-              defaultRoute &&
-                router.navigate(defaultRoute, defaultParams ?? {}, {
-                  ...transitionOptions,
-                  reload: true,
-                  replace: true,
-                });
+              router.navigate(defaultRoute, defaultParams ?? {}, {
+                ...transitionOptions,
+                reload: true,
+                replace: true,
+              });
             }
           } else {
             router.invokeEventListeners(
@@ -265,10 +270,10 @@ function browserPluginFactory(
         historyState.params;
       const statesAreEqual =
         fromState && router.areStatesEqual(fromState, toState, false);
-      const replace = opts?.replace || !hasState || statesAreEqual;
+      const replace = Boolean((opts?.replace ?? !hasState) || statesAreEqual);
       let url = router.buildUrl(toState.name, toState.params);
       if (
-        fromState === null &&
+        fromState === undefined &&
         options.useHash === false &&
         options.preserveHash === true
       ) {

@@ -22,7 +22,7 @@ type Enhancer<Dependencies extends DefaultDependencies = DefaultDependencies> =
 
 const pipe =
   <Dependencies extends DefaultDependencies = DefaultDependencies>(
-    ...fns: Array<Enhancer<Dependencies>>
+    ...fns: Enhancer<Dependencies>[]
   ) =>
   (arg: Router<Dependencies>): Router<Dependencies> =>
     fns.reduce((prev: Router<Dependencies>, fn) => fn(prev), arg);
@@ -30,7 +30,7 @@ const pipe =
 const createRouter = <
   Dependencies extends DefaultDependencies = DefaultDependencies,
 >(
-  routes: Array<Route<Dependencies>> | RouteNode = [],
+  routes: Route<Dependencies>[] | RouteNode = [],
   options: Partial<Options> = {},
   dependencies: Dependencies = {} as Dependencies,
 ): Router<Dependencies> => {

@@ -2,7 +2,7 @@ import { constants, errorCodes } from "../constants";
 import type { DefaultDependencies, Router } from "../types/router";
 import type { DoneFn, DoneFnError, State } from "../types/base";
 
-const noop = () => {};
+const noop = () => undefined;
 
 type StartRouterArguments =
   | []
@@ -52,17 +52,19 @@ export default function withRouterLifecycle<
 
     // callback
     const cb = (err: DoneFnError, state?: State, invokeErrCb = true) => {
-      if (!err)
+      if (!err) {
         router.invokeEventListeners(constants.TRANSITION_SUCCESS, state, null, {
           replace: true,
         });
-      if (err && invokeErrCb)
+      }
+      if (err && invokeErrCb) {
         router.invokeEventListeners(
           constants.TRANSITION_ERROR,
           state,
           null,
           err,
         );
+      }
       done(err, state);
     };
 
@@ -78,7 +80,7 @@ export default function withRouterLifecycle<
 
     if (!startState) {
       // If no supplied start state, get start state
-      startState = startPath === undefined ? null : router.matchPath(startPath);
+      startState = !startPath ? null : router.matchPath(startPath);
 
       // Navigate to default function
       const navigateToDefault = () =>
@@ -87,7 +89,7 @@ export default function withRouterLifecycle<
       const redirect = (state: State) =>
         router.navigate(
           state.name,
-          state?.params ?? {},
+          state.params,
           { replace: true, reload: true, redirected: true },
           done,
         );
@@ -96,11 +98,7 @@ export default function withRouterLifecycle<
         router.transitionToState(state, router.getState(), {}, (err, state) => {
           if (!err) {
             cb(null, state);
-          } else if (
-            typeof err === "object" &&
-            "redirect" in err &&
-            err.redirect
-          ) {
+          } else if (typeof err === "object" && "redirect" in err) {
             redirect(err.redirect);
           } else if (options.defaultRoute) {
             navigateToDefault();

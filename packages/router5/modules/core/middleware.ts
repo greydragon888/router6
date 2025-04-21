@@ -35,7 +35,11 @@ export default function withMiddleware<
       },
     );
 
-    return () => removePluginFns.forEach((fn) => fn());
+    return () => {
+      removePluginFns.forEach((fn) => {
+        fn();
+      });
+    };
   };
 
   router.clearMiddleware = () => {

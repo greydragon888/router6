@@ -15,6 +15,7 @@ describe("Link component", () => {
       path: "/home",
     });
   });
+
   afterEach(() => {
     router.stop();
   });
@@ -28,7 +29,7 @@ describe("Link component", () => {
 
     const linkElement = screen.queryByText(TEST_TEXT)!;
 
-    expect(linkElement.getAttribute("href")).toBe("/home");
+    expect(linkElement.getAttribute("href")).toStrictEqual("/home");
     expect(linkElement.getAttribute("class")).not.toContain("active");
   });
 

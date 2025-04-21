@@ -51,14 +51,12 @@ export interface NavigationOptions {
     | undefined;
 }
 
-export type Params = {
+export interface Params {
   [key: string]:
     | string
     | number
     | boolean
     | Params
-    | {
-        [key: string]: string;
-      }
+    | Record<string, string>
     | undefined;
-};
+}

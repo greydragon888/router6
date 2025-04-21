@@ -8,7 +8,6 @@ import type {
 } from "../types/base";
 import type { DefaultDependencies, Router } from "../types/router";
 import type { RouteNode, RouteNodeState } from "route-node";
-import type { Path } from "path-parser";
 
 export default function withState<Dependencies extends DefaultDependencies>(
   router: Router<Dependencies>,
@@ -18,7 +17,7 @@ export default function withState<Dependencies extends DefaultDependencies>(
 
   router.getState = () => routerState;
 
-  router.setState = (state: State) => {
+  router.setState = (state: State | null) => {
     routerState = state;
   };
 
@@ -34,14 +33,14 @@ export default function withState<Dependencies extends DefaultDependencies>(
       ...router.config.defaultParams[name],
       ...params,
     },
-    path: path || router.buildPath(name, params ?? {}),
+    path: path ?? router.buildPath(name, params ?? {}),
     meta: meta
       ? {
           ...meta,
-          id: forceId === undefined ? ++stateId : forceId,
-          params: meta.params || {},
-          options: meta.options || {},
-          redirected: meta.redirected || false,
+          id: forceId ?? ++stateId,
+          params: meta.params ?? {},
+          options: meta.options ?? {},
+          redirected: meta.redirected ?? false,
         }
       : undefined,
   });
@@ -62,20 +61,23 @@ export default function withState<Dependencies extends DefaultDependencies>(
     );
 
   router.areStatesEqual = (
-    state1: State,
-    state2: State,
-    ignoreQueryParams: boolean = true,
+    state1: State | null | undefined,
+    state2: State | null | undefined,
+    ignoreQueryParams = true,
   ): boolean => {
-    if (state1.name !== state2.name) return false;
+    if (!state1 || !state2) {
+      return !state1 === !state2;
+    }
+
+    if (state1.name !== state2.name) {
+      return false;
+    }
 
     const getUrlParams = (name: string): string[] =>
       router.rootNode
         // @ts-expect-error use private method
         .getSegmentsByName(name)
-        .map(
-          (segment: RouteNode) =>
-            (segment.parser as Path)["urlParams"] as string[],
-        )
+        .map((segment: RouteNode) => segment.parser!.urlParams)
         .reduce(
           (params: string[], param: string[]) => params.concat(param),
           [],
@@ -100,8 +102,10 @@ export default function withState<Dependencies extends DefaultDependencies>(
     parentState: State,
     childState: State,
   ): boolean => {
-    const regex = new RegExp("^" + parentState.name + "\\.(.*)$");
-    if (!regex.test(childState.name)) return false;
+    const regex = new RegExp(`^${parentState.name}\\.(.*)$`);
+    if (!regex.test(childState.name)) {
+      return false;
+    }
     // If child state name extends parent state name, and all parent state params
     // are in child state params.
     return Object.keys(parentState.params).every(
@@ -113,7 +117,7 @@ export default function withState<Dependencies extends DefaultDependencies>(
     routeName: string,
     routeParams: Params,
   ): SimpleState => {
-    const name = router.config.forwardMap[routeName] || routeName;
+    const name = router.config.forwardMap[routeName] ?? routeName;
     const params = {
       ...router.config.defaultParams[routeName],
       ...router.config.defaultParams[name],

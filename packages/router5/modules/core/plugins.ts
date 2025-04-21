@@ -33,10 +33,12 @@ export default function withPlugins<
 
     return () => {
       routerPlugins = routerPlugins.filter(
-        (plugin) => plugins.indexOf(plugin) === -1,
+        (plugin) => !plugins.includes(plugin),
       );
 
-      removePluginFns.forEach((removePlugin) => removePlugin());
+      removePluginFns.forEach((removePlugin) => {
+        removePlugin();
+      });
     };
   };
 
@@ -61,7 +63,9 @@ export default function withPlugins<
       .filter(Boolean) as Unsubscribe[];
 
     return () => {
-      removeEventListeners.forEach((removeListener) => removeListener());
+      removeEventListeners.forEach((removeListener) => {
+        removeListener();
+      });
 
       if (appliedPlugin.teardown) {
         appliedPlugin.teardown();

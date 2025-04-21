@@ -5,20 +5,26 @@ const value =
   <T>(arg: T) =>
   (): T =>
     arg;
-const noop = () => {};
+const noop = () => undefined;
 
 const isBrowser = typeof window !== "undefined" && window.history;
 
 const getBase = () => window.location.pathname;
 
 const supportsPopStateOnHashChange = () =>
-  window.navigator.userAgent.indexOf("Trident") === -1;
+  !window.navigator.userAgent.includes("Trident");
 
-const pushState = (state: State, title: string, path: string | URL | null) =>
-  window.history.pushState(state, title, path);
+const pushState = (state: State, title: string | null, path: string | URL) => {
+  window.history.pushState(state, title ?? "", path);
+};
 
-const replaceState = (state: State, title: string, path: string | URL | null) =>
-  window.history.replaceState(state, title, path);
+const replaceState = (
+  state: State,
+  title: string | null,
+  path: string | URL,
+) => {
+  window.history.replaceState(state, title ?? "", path);
+};
 
 const addPopstateListener: Browser["addPopstateListener"] = (
   fn,
@@ -46,13 +52,13 @@ const addPopstateListener: Browser["addPopstateListener"] = (
 };
 
 const getLocation = (opts: {
-  useHash: boolean;
-  hashPrefix: string;
-  base: string;
+  useHash?: boolean;
+  hashPrefix?: string;
+  base?: string;
 }) => {
   const path = opts.useHash
-    ? window.location.hash.replace(new RegExp("^#" + opts.hashPrefix), "")
-    : window.location.pathname.replace(new RegExp("^" + opts.base), "");
+    ? window.location.hash.replace(new RegExp(`^#${opts.hashPrefix ?? ""}`), "")
+    : window.location.pathname.replace(new RegExp(`^${opts.base ?? ""}`), "");
 
   // Fix issue with browsers that don't URL encode characters (Edge)
   const correctedPath = safelyEncodePath(path);
@@ -63,7 +69,7 @@ const getLocation = (opts: {
 const safelyEncodePath = (path: string) => {
   try {
     return encodeURI(decodeURI(path));
-  } catch (_) {
+  } catch {
     return path;
   }
 };
@@ -96,4 +102,4 @@ const browser: Browser = isBrowser
       getHash: value<string>("") as Browser["getHash"],
     };
 
-export default browser as Browser;
+export default browser;

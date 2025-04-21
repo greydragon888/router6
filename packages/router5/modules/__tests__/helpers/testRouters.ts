@@ -73,9 +73,6 @@ export default function createTestRouter(options?: any) {
     .addNode(
       "auth-protected",
       "/auth-protected",
-      () => () =>
-        new Promise((_resolve, reject) =>
-          reject({ redirect: { name: "sign-in" } }),
-        ),
+      () => () => Promise.reject({ redirect: { name: "sign-in" } }),
     );
 }

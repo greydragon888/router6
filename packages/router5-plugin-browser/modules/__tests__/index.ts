@@ -13,7 +13,7 @@ const mockedBrowser: Browser = {
   pushState: (state) => (currentHistoryState = state),
   replaceState: (state) => (currentHistoryState = state),
   addPopstateListener: vi.fn(),
-  getState: () => currentHistoryState as State,
+  getState: () => currentHistoryState!,
 };
 const routerConfig = [
   {
@@ -52,7 +52,7 @@ describe("browserPlugin", () => {
     const prefix = "";
 
     const makeUrl = (path: string) => {
-      return "https://www.mysite.com:8080" + path;
+      return `https://www.mysite.com:8080${path}`;
     };
 
     beforeEach(() => {
@@ -74,39 +74,37 @@ describe("browserPlugin", () => {
       vi.clearAllMocks();
     });
 
-    it("should update history on start", () =>
-      new Promise((done) => {
-        router.start((_err, state) => {
-          expect(mockedBrowser.replaceState).toHaveBeenCalledWith(
+    it("should update history on start", () => {
+      router.start((_err, state) => {
+        expect(mockedBrowser.replaceState).toHaveBeenCalledWith(
+          state,
+          "",
+          `${prefix}/home`,
+        );
+      });
+    });
+
+    it("should update on route change", () => {
+      router.start(() => {
+        router.navigate("users", (_err, state) => {
+          expect(mockedBrowser.pushState).toHaveBeenCalledWith(
             state,
             "",
-            prefix + "/home",
+            `${prefix}/users`,
           );
-          done(null);
         });
-      }));
-
-    it("should update on route change", () =>
-      new Promise((done) => {
-        router.start(() => {
-          router.navigate("users", (_err, state) => {
-            expect(mockedBrowser.pushState).toHaveBeenCalledWith(
-              state,
-              "",
-              prefix + "/users",
-            );
-            done(null);
-          });
-        });
-      }));
+      });
+    });
 
     it("should match an URL", () => {
-      expect(withoutMeta(router.matchUrl(makeUrl("/home"))!)).toEqual({
+      expect(withoutMeta(router.matchUrl(makeUrl("/home"))!)).toStrictEqual({
         name: "home",
         params: {},
         path: "/home",
       });
-      expect(withoutMeta(router.matchUrl(makeUrl("/users/view/1"))!)).toEqual({
+      expect(
+        withoutMeta(router.matchUrl(makeUrl("/users/view/1"))!),
+      ).toStrictEqual({
         name: "users.view",
         params: { id: "1" },
         path: "/users/view/1",
@@ -114,20 +112,21 @@ describe("browserPlugin", () => {
     });
 
     it("should build URLs", () => {
-      expect(router.buildUrl("home", {})).toBe(prefix + "/home");
+      expect(router.buildUrl("home", {})).toStrictEqual(`${prefix}/home`);
       expect(
         router.buildUrl(constants.UNKNOWN_ROUTE, {
           path: "/route-not-found",
         }),
-      ).toBe(prefix + "/route-not-found");
+      ).toStrictEqual(`${prefix}/route-not-found`);
       expect(() => router.buildUrl("undefined", {})).toThrow();
     });
   });
+
   describe("With hash", () => {
     const prefix = "#!";
 
     const makeUrl = (path: string) => {
-      return "https://www.mysite.com:8080" + "#" + hashPrefix + path;
+      return `https://www.mysite.com:8080` + `#${hashPrefix}${path}`;
     };
 
     beforeEach(() => {
@@ -149,39 +148,37 @@ describe("browserPlugin", () => {
       vi.clearAllMocks();
     });
 
-    it("should update history on start", () =>
-      new Promise((done) => {
-        router.start((_err, state) => {
-          expect(mockedBrowser.replaceState).toHaveBeenCalledWith(
+    it("should update history on start", () => {
+      router.start((_err, state) => {
+        expect(mockedBrowser.replaceState).toHaveBeenCalledWith(
+          state,
+          "",
+          `/${prefix}/home`,
+        );
+      });
+    });
+
+    it("should update on route change", () => {
+      router.start(() => {
+        router.navigate("users", (_err, state) => {
+          expect(mockedBrowser.pushState).toHaveBeenCalledWith(
             state,
             "",
-            "/" + prefix + "/home",
+            `/${prefix}/users`,
           );
-          done(null);
         });
-      }));
-
-    it("should update on route change", () =>
-      new Promise((done) => {
-        router.start(() => {
-          router.navigate("users", (_err, state) => {
-            expect(mockedBrowser.pushState).toHaveBeenCalledWith(
-              state,
-              "",
-              "/" + prefix + "/users",
-            );
-            done(null);
-          });
-        });
-      }));
+      });
+    });
 
     it("should match an URL", () => {
-      expect(withoutMeta(router.matchUrl(makeUrl("/home"))!)).toEqual({
+      expect(withoutMeta(router.matchUrl(makeUrl("/home"))!)).toStrictEqual({
         name: "home",
         params: {},
         path: "/home",
       });
-      expect(withoutMeta(router.matchUrl(makeUrl("/users/view/1"))!)).toEqual({
+      expect(
+        withoutMeta(router.matchUrl(makeUrl("/users/view/1"))!),
+      ).toStrictEqual({
         name: "users.view",
         params: { id: "1" },
         path: "/users/view/1",
@@ -189,12 +186,12 @@ describe("browserPlugin", () => {
     });
 
     it("should build URLs", () => {
-      expect(router.buildUrl("home", {})).toBe(prefix + "/home");
+      expect(router.buildUrl("home", {})).toStrictEqual(`${prefix}/home`);
       expect(
         router.buildUrl(constants.UNKNOWN_ROUTE, {
           path: "/route-not-found",
         }),
-      ).toBe(prefix + "/route-not-found");
+      ).toStrictEqual(`${prefix}/route-not-found`);
       expect(() => router.buildUrl("undefined", {})).toThrow();
     });
   });
