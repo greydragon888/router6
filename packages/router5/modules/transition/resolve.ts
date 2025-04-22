@@ -1,6 +1,12 @@
 import type { DoneFn, State } from "../types/base";
 import type { ActivationFn } from "../types/router";
 
+type StepFnType = (
+  toState?: State,
+  fromState?: State,
+  done?: DoneFn,
+) => State | Promise<State | Error | undefined> | boolean | undefined;
+
 export function resolve(
   functions: ActivationFn[] | Record<string, ActivationFn>,
   {
@@ -20,7 +26,7 @@ export function resolve(
     ? functions
     : Object.keys(functions);
 
-  const isState = (obj?: Partial<State>) =>
+  const isState = (obj: Partial<State>) =>
     typeof obj === "object" &&
     obj.name !== undefined &&
     obj.params !== undefined &&
@@ -48,7 +54,7 @@ export function resolve(
       : toState;
 
   const processFn = (
-    stepFn: Function,
+    stepFn: StepFnType,
     errBase: Record<string, unknown>,
     state: State | undefined,
     doneCb: DoneFn,
@@ -71,22 +77,31 @@ export function resolve(
 
     const res = stepFn.call(null, state, fromState, done);
 
+    type ResErrType = State | Error | undefined;
+
     if (isCancelled()) {
       done();
+    }
+
+    if (res === undefined) {
+      // wait for done to be called
+      return;
     } else if (typeof res === "boolean") {
       done(res ? undefined : errBase);
-    } else if (isState(res)) {
+      // is it a state?
+    } else if ("name" in res && isState(res)) {
       done(undefined, res);
-    } else if (res && typeof res.then === "function") {
-      res.then(
-        (resVal?: State | Error) => {
+      // is it a promise?
+    } else if ("then" in res) {
+      (res as Promise<ResErrType>).then(
+        (resVal: ResErrType) => {
           if (resVal instanceof Error) {
             done({ error: resVal });
           } else {
             done(undefined, resVal);
           }
         },
-        (err: Error | object) => {
+        (err: unknown) => {
           if (err instanceof Error) {
             console.error(err.stack ?? err);
 
@@ -97,7 +112,6 @@ export function resolve(
         },
       );
     }
-    // else: wait for done to be called
   };
 
   const next: DoneFn = (err, state) => {
@@ -113,10 +127,10 @@ export function resolve(
         const errBase =
           errorKey && isMapped ? { [errorKey]: remainingFunctions[0] } : {};
         const stepFn = isMapped
-          ? (functions as Record<string, Function>)[
+          ? (functions as Record<string, StepFnType>)[
               remainingFunctions[0] as string
             ]
-          : (remainingFunctions[0] as Function);
+          : (remainingFunctions[0] as StepFnType);
 
         remainingFunctions = remainingFunctions.slice(1);
 
