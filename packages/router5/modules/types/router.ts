@@ -47,13 +47,13 @@ export interface Options {
 
 export type ActivationFn = (
   toState: State,
-  fromState: State,
+  fromState: State | undefined,
   done: DoneFn,
-) => boolean | Promise<boolean | Error | void> | void;
+) => boolean | Promise<boolean | object | Error | void> | State | void;
 
 export type ActivationFnFactory<
   Dependencies extends DefaultDependencies = DefaultDependencies,
-> = (router: Router<Dependencies>, dependencies?: Dependencies) => ActivationFn;
+> = (router: Router<Dependencies>, dependencies: Dependencies) => ActivationFn;
 
 export type DefaultDependencies = Record<string, any>;
 
@@ -236,11 +236,8 @@ export interface Plugin {
   teardown?: () => void;
 }
 
-export type Middleware = (
-  toState: State,
-  fromState: State,
-  done: DoneFn,
-) => boolean | Promise<any> | void;
+// eslint-disable-next-line sonarjs/redundant-type-aliases
+export type Middleware = ActivationFn;
 
 export type MiddlewareFactory<
   Dependencies extends DefaultDependencies = DefaultDependencies,
@@ -248,7 +245,7 @@ export type MiddlewareFactory<
 
 export type PluginFactory<
   Dependencies extends DefaultDependencies = DefaultDependencies,
-> = (router: Router<Dependencies>, dependencies?: Dependencies) => Plugin;
+> = (router: Router<Dependencies>, dependencies: Dependencies) => Plugin;
 
 export interface SubscribeState {
   route: State;

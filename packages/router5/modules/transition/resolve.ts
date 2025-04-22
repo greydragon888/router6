@@ -1,11 +1,5 @@
-import type { DoneFn, State } from "../types/base";
+import type { DoneFn, DoneFnError, State } from "../types/base";
 import type { ActivationFn } from "../types/router";
-
-type StepFnType = (
-  toState?: State,
-  fromState?: State,
-  done?: DoneFn,
-) => State | Promise<State | Error | undefined> | boolean | undefined;
 
 export function resolve(
   functions: ActivationFn[] | Record<string, ActivationFn>,
@@ -18,7 +12,7 @@ export function resolve(
     isCancelled: () => boolean;
     toState: State;
     fromState?: State | undefined;
-    errorKey?: string;
+    errorKey?: string | undefined;
   },
   callback: DoneFn,
 ) {
@@ -54,9 +48,9 @@ export function resolve(
       : toState;
 
   const processFn = (
-    stepFn: StepFnType,
+    stepFn: ActivationFn,
     errBase: Record<string, unknown>,
-    state: State | undefined,
+    state: State,
     doneCb: DoneFn,
   ) => {
     const done: DoneFn = (err, newState) => {
@@ -114,29 +108,48 @@ export function resolve(
     }
   };
 
-  const next: DoneFn = (err, state) => {
+  const next = (err: DoneFnError | undefined, state: State) => {
     if (isCancelled()) {
       callback();
-    } else if (err) {
-      callback(err);
-    } else {
-      if (!remainingFunctions.length) {
-        callback(undefined, state);
-      } else {
-        const isMapped = typeof remainingFunctions[0] === "string";
-        const errBase =
-          errorKey && isMapped ? { [errorKey]: remainingFunctions[0] } : {};
-        const stepFn = isMapped
-          ? (functions as Record<string, StepFnType>)[
-              remainingFunctions[0] as string
-            ]
-          : (remainingFunctions[0] as StepFnType);
 
-        remainingFunctions = remainingFunctions.slice(1);
-
-        processFn(stepFn, errBase, state, next);
-      }
+      return;
     }
+
+    if (err) {
+      callback(err);
+
+      return;
+    }
+
+    if (!remainingFunctions.length) {
+      callback(undefined, state);
+
+      return;
+    }
+
+    const firstRemainingFunctions = remainingFunctions[0];
+
+    const errBase =
+      errorKey && typeof firstRemainingFunctions === "string"
+        ? { [errorKey]: firstRemainingFunctions }
+        : {};
+
+    let stepFn: ActivationFn;
+
+    if (typeof firstRemainingFunctions !== "string") {
+      stepFn = firstRemainingFunctions;
+    } else if (
+      !Array.isArray(functions) &&
+      firstRemainingFunctions in functions
+    ) {
+      stepFn = functions[firstRemainingFunctions];
+    } else {
+      throw new Error("Invalid function name");
+    }
+
+    remainingFunctions = remainingFunctions.slice(1);
+
+    processFn(stepFn, errBase, state, next as DoneFn);
   };
 
   next(undefined, toState);
