@@ -14,9 +14,14 @@ export default function withObservability<
 >(router: Router<Dependencies>): Router<Dependencies> {
   const callbacks: Record<string, Function[]> = {};
 
-  router.invokeEventListeners = (eventName: string, ...args: unknown[]) => {
+  router.invokeEventListeners = (
+    eventName: string,
+    toState?: State,
+    fromState?: State,
+    ...args: unknown[]
+  ) => {
     (eventName in callbacks ? callbacks[eventName] : []).forEach((cb) =>
-      cb(...args),
+      cb(toState, fromState, ...args),
     );
   };
 

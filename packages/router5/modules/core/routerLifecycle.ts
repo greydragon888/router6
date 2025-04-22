@@ -53,15 +53,20 @@ export default function withRouterLifecycle<
     // callback
     const cb = (err?: DoneFnError, state?: State, invokeErrCb = true) => {
       if (!err) {
-        router.invokeEventListeners(constants.TRANSITION_SUCCESS, state, null, {
-          replace: true,
-        });
+        router.invokeEventListeners(
+          constants.TRANSITION_SUCCESS,
+          state,
+          undefined,
+          {
+            replace: true,
+          },
+        );
       }
       if (err && invokeErrCb) {
         router.invokeEventListeners(
           constants.TRANSITION_ERROR,
           state,
-          null,
+          undefined,
           err,
         );
       }

@@ -1,3 +1,5 @@
+import type { RouteNodeStateMeta } from "route-node/dist/RouteNode";
+
 export type Unsubscribe = () => void;
 
 export type DoneFnError =
@@ -17,21 +19,27 @@ export type DoneFn = (err?: DoneFnError, state?: State) => void;
 
 export type CancelFn = () => void;
 
-export interface SimpleState {
+export interface RouteNodeState<P extends Params = Params> {
   name: string;
-  params: Params;
+  params: P;
+  meta: RouteNodeStateMeta;
 }
 
-export interface State {
+export interface SimpleState<P extends Params = Params> {
   name: string;
-  params: Params;
+  params: P;
+}
+
+export interface State<P extends Params = Params, MP extends Params = Params> {
+  name: string;
+  params: P;
   path: string;
-  meta?: StateMeta | undefined;
+  meta?: StateMeta<MP> | undefined;
 }
 
-export interface StateMeta {
+export interface StateMeta<P extends Params = Params> {
   id: number;
-  params: Params;
+  params: P;
   options: NavigationOptions;
   redirected: boolean;
   source?: string | undefined;

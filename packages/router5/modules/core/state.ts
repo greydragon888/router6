@@ -2,12 +2,13 @@ import { constants } from "../constants";
 import type {
   NavigationOptions,
   Params,
+  RouteNodeState,
   SimpleState,
   State,
   StateMeta,
 } from "../types/base";
 import type { DefaultDependencies, Router } from "../types/router";
-import type { RouteNode, RouteNodeState } from "route-node";
+import type { RouteNode } from "route-node";
 
 export default function withState<Dependencies extends DefaultDependencies>(
   router: Router<Dependencies>,
@@ -15,19 +16,20 @@ export default function withState<Dependencies extends DefaultDependencies>(
   let stateId = 0;
   let routerState: State | undefined = undefined;
 
-  router.getState = () => routerState;
+  router.getState = <P extends Params = Params, MP extends Params = Params>() =>
+    routerState as State<P, MP>;
 
   router.setState = (state: State | undefined) => {
     routerState = state;
   };
 
-  router.makeState = (
+  router.makeState = <P extends Params = Params, MP extends Params = Params>(
     name: string,
-    params?: Params,
+    params?: P,
     path?: string,
-    meta?: Partial<StateMeta>,
+    meta?: Partial<StateMeta<MP>>,
     forceId?: number,
-  ): State => ({
+  ): State<P, MP> => ({
     name,
     params: {
       ...router.config.defaultParams[name],
@@ -38,8 +40,8 @@ export default function withState<Dependencies extends DefaultDependencies>(
       ? {
           ...meta,
           id: forceId ?? ++stateId,
-          params: meta.params ?? {},
-          options: meta.options ?? {},
+          params: meta.params ?? ({} as MP),
+          options: meta.options ?? ({} as NavigationOptions),
           redirected: meta.redirected ?? false,
         }
       : undefined,
@@ -49,13 +51,13 @@ export default function withState<Dependencies extends DefaultDependencies>(
     path: string,
     options?: NavigationOptions,
   ): State =>
-    router.makeState(
+    router.makeState<{ path: string }>(
       constants.UNKNOWN_ROUTE,
       { path },
       path,
       options
         ? {
-            options: options,
+            options,
           }
         : undefined,
     );
@@ -113,10 +115,11 @@ export default function withState<Dependencies extends DefaultDependencies>(
     );
   };
 
-  router.forwardState = (
+  router.forwardState = <P extends Params = Params>(
     routeName: string,
-    routeParams: Params,
-  ): SimpleState => {
+    routeParams: P,
+    // ToDo: it is not shure if this is correct
+  ): SimpleState<P> => {
     const name = router.config.forwardMap[routeName] ?? routeName;
     const params = {
       ...router.config.defaultParams[routeName],
@@ -130,14 +133,14 @@ export default function withState<Dependencies extends DefaultDependencies>(
     };
   };
 
-  router.buildState = (
+  router.buildState = <P extends Params = Params>(
     routeName: string,
-    routeParams: Params,
-  ): RouteNodeState | undefined => {
+    routeParams: P,
+  ): RouteNodeState<P> | undefined => {
     const { name, params } = router.forwardState(routeName, routeParams);
 
     return router.rootNode.buildState(name, params) as
-      | RouteNodeState
+      | RouteNodeState<P>
       | undefined;
   };
 

@@ -88,7 +88,7 @@ export default function withNavigation<
       done(err);
       router.invokeEventListeners(
         constants.TRANSITION_ERROR,
-        null,
+        undefined,
         router.getState(),
         err,
       );

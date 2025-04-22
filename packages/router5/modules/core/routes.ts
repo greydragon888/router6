@@ -1,6 +1,6 @@
 import { constants } from "../constants";
 import { RouteNode } from "route-node";
-import type { Params } from "../types/base";
+import type { Params, State } from "../types/base";
 import type { Router, Route, DefaultDependencies } from "../types/router";
 
 export default function withRoutes<Dependencies extends DefaultDependencies>(
@@ -111,7 +111,10 @@ export default function withRoutes<Dependencies extends DefaultDependencies>(
       });
     };
 
-    router.matchPath = (path, source) => {
+    router.matchPath = <P extends Params = Params, MP extends Params = Params>(
+      path: string,
+      source?: string,
+    ): State<P, MP> | undefined => {
       const options = router.getOptions();
       const match = router.rootNode.matchPath(path, options);
 
@@ -128,8 +131,8 @@ export default function withRoutes<Dependencies extends DefaultDependencies>(
           ? path
           : router.buildPath(routeName, routeParams);
 
-        return router.makeState(routeName, routeParams, builtPath, {
-          params: meta,
+        return router.makeState<P, MP>(routeName, routeParams, builtPath, {
+          params: meta as MP,
           source,
         });
       }

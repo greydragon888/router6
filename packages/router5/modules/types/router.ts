@@ -86,29 +86,39 @@ export interface Router<
     ignoreQueryParams?: boolean,
   ) => boolean;
   buildPath: (route: string, params?: Params) => string;
-  matchPath: (path: string, source?: string) => State | undefined;
+  matchPath: <P extends Params = Params, MP extends Params = Params>(
+    path: string,
+    source?: string,
+  ) => State<P, MP> | undefined;
   setRootPath: (rootPath: string) => void;
 
   getOptions: () => Options;
   setOption: (option: keyof Options, value: any) => Router<Dependencies>;
 
-  makeState: (
+  makeState: <P extends Params = Params, MP extends Params = Params>(
     name: string,
-    params?: Params,
+    params?: P,
     path?: string,
-    meta?: Partial<StateMeta>,
+    meta?: Partial<StateMeta<MP>>,
     forceId?: number,
-  ) => State;
+  ) => State<P, MP>;
   makeNotFoundState: (path: string, options?: NavigationOptions) => State;
-  getState: () => State | undefined;
-  setState: (state?: State) => void;
+  getState: <P extends Params = Params, MP extends Params = Params>() =>
+    | State<P, MP>
+    | undefined;
+  setState: <P extends Params = Params, MP extends Params = Params>(
+    state?: State<P, MP>,
+  ) => void;
   areStatesEqual: (
     state1: State | undefined,
     state2: State | undefined,
     ignoreQueryParams?: boolean,
   ) => boolean;
   areStatesDescendants: (parentState: State, childState: State) => boolean;
-  forwardState: (routeName: string, routeParams: Params) => SimpleState;
+  forwardState: <P extends Params = Params>(
+    routeName: string,
+    routeParams: P,
+  ) => SimpleState<P>;
   buildState: (
     routeName: string,
     routeParams: Params,
@@ -164,8 +174,14 @@ export interface Router<
     ) => Return,
   ) => Return;
 
-  // ToDo: improve arguments types
-  invokeEventListeners: (eventName: string, ...args: unknown[]) => void;
+  invokeEventListeners: (
+    eventName: string,
+    toState?: State,
+    fromState?: State,
+    // opts,
+    // err
+    ...args: unknown[]
+  ) => void;
   removeEventListener: (
     eventName: string,
     cb: (toState: State, fromState?: State) => void,

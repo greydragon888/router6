@@ -30,21 +30,24 @@ export const nameToIDs = (name: string): string[] =>
       [],
     );
 
-const exists = (val: unknown) => val !== undefined && val !== null;
+const exists = (val: unknown): boolean => val !== undefined && val !== null;
 
-const hasMetaParams = (state: State) => state.meta?.params;
+const hasMetaParams = (state: State): boolean => !!state.meta?.params;
 
 const extractSegmentParams = (name: string, state: State): SegementParams => {
   if (!hasMetaParams(state) || !exists(state.meta?.params?.[name])) {
     return {};
   }
 
-  return Object.keys(state.meta.params[name] ?? {}).reduce((params, param) => {
-    return {
-      ...params,
-      [param]: state.params[param],
-    };
-  }, {});
+  return Object.keys(state.meta?.params?.[name] ?? {}).reduce(
+    (params, param) => {
+      return {
+        ...params,
+        [param]: state.params[param],
+      };
+    },
+    {},
+  );
 };
 
 export default function transitionPath(
