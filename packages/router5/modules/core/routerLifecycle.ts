@@ -1,6 +1,7 @@
 import { constants, errorCodes } from "../constants";
+import { RouterError } from "../RouterError";
 import type { DefaultDependencies, Router } from "../types/router";
-import type { DoneFn, DoneFnError, State } from "../types/base";
+import type { DoneFn, State } from "../types/base";
 
 const noop = () => undefined;
 
@@ -40,7 +41,7 @@ export default function withRouterLifecycle<
     const [startPathOrState, done] = getStartRouterArguments(args);
 
     if (started) {
-      done({ code: errorCodes.ROUTER_ALREADY_STARTED });
+      done(new RouterError(errorCodes.ROUTER_ALREADY_STARTED));
       return router;
     }
 
@@ -51,7 +52,7 @@ export default function withRouterLifecycle<
     router.invokeEventListeners(constants.ROUTER_START);
 
     // callback
-    const cb = (err?: DoneFnError, state?: State, invokeErrCb = true) => {
+    const cb = (err?: RouterError, state?: State, invokeErrCb = true) => {
       if (!err) {
         router.invokeEventListeners(
           constants.TRANSITION_SUCCESS,
@@ -74,7 +75,7 @@ export default function withRouterLifecycle<
     };
 
     if (startPathOrState === undefined && !options.defaultRoute) {
-      cb({ code: errorCodes.NO_START_PATH_OR_STATE });
+      cb(new RouterError(errorCodes.NO_START_PATH_OR_STATE));
       return router;
     }
     if (typeof startPathOrState === "string") {
@@ -103,7 +104,7 @@ export default function withRouterLifecycle<
         router.transitionToState(state, router.getState(), {}, (err, state) => {
           if (!err) {
             cb(undefined, state);
-          } else if (typeof err === "object" && "redirect" in err) {
+          } else if (err.redirect) {
             redirect(err.redirect);
           } else if (options.defaultRoute) {
             navigateToDefault();
@@ -124,7 +125,7 @@ export default function withRouterLifecycle<
         );
       } else {
         // No start match, no default => do nothing
-        cb({ code: errorCodes.ROUTE_NOT_FOUND, path: startPath });
+        cb(new RouterError(errorCodes.ROUTE_NOT_FOUND, { path: startPath }));
       }
     } else {
       // Initialise router with provided start state

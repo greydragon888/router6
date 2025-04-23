@@ -60,7 +60,7 @@ export default function withPlugins<
           return;
         }
       })
-      .filter(Boolean) as Unsubscribe[];
+      .filter((listener): listener is Unsubscribe => Boolean(listener));
 
     return () => {
       removeEventListeners.forEach((removeListener) => {

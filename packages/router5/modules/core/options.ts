@@ -19,7 +19,7 @@ export default function withOptions<Dependencies extends DefaultDependencies>(
     const routerOptions = {
       ...defaultOptions,
       ...options,
-    } as Options;
+    };
 
     router.getOptions = () => routerOptions;
 

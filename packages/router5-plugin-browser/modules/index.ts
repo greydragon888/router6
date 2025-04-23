@@ -199,36 +199,33 @@ function browserPluginFactory(
         routerState,
         transitionOptions,
         (err, toState) => {
-          if (err && typeof err === "object") {
-            if ("redirect" in err) {
-              const { name, params } = err.redirect;
+          if (err?.redirect) {
+            const { name, params } = err.redirect;
 
-              router.navigate(name, params, {
-                ...transitionOptions,
-                replace: true,
-                force: true,
-                redirected: true,
-              });
-            } else if (
-              "code" in err &&
-              err.code === errorCodes.CANNOT_DEACTIVATE &&
-              routerState
-            ) {
-              const url = router.buildUrl(routerState.name, routerState.params);
-              if (!newState) {
-                // Keep history state unchanged but use current URL
-                updateBrowserState(state, url, true);
-              }
-              // else do nothing or history will be messed up
-              // TODO: history.back()?
-            } else if (defaultRoute) {
-              // Force navigation to default state
-              router.navigate(defaultRoute, defaultParams ?? {}, {
-                ...transitionOptions,
-                reload: true,
-                replace: true,
-              });
+            router.navigate(name, params, {
+              ...transitionOptions,
+              replace: true,
+              force: true,
+              redirected: true,
+            });
+          } else if (
+            err?.code === errorCodes.CANNOT_DEACTIVATE &&
+            routerState
+          ) {
+            const url = router.buildUrl(routerState.name, routerState.params);
+            if (!newState) {
+              // Keep history state unchanged but use current URL
+              updateBrowserState(state, url, true);
             }
+            // else do nothing or history will be messed up
+            // TODO: history.back()?
+          } else if (defaultRoute) {
+            // Force navigation to default state
+            router.navigate(defaultRoute, defaultParams ?? {}, {
+              ...transitionOptions,
+              reload: true,
+              replace: true,
+            });
           } else {
             router.invokeEventListeners(
               constants.TRANSITION_SUCCESS,

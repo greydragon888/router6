@@ -1,5 +1,6 @@
 import { constants, errorCodes } from "../constants";
 import { transition } from "../transition";
+import { RouterError } from "../RouterError";
 import type { DefaultDependencies, Router } from "../types/router";
 import type {
   CancelFn,
@@ -77,14 +78,16 @@ export default function withNavigation<
       getNavigationArguments(args);
 
     if (!router.isStarted()) {
-      done({ code: errorCodes.ROUTER_NOT_STARTED });
+      done(new RouterError(errorCodes.ROUTER_NOT_STARTED));
+
       return noop;
     }
 
     const route = router.buildState(name, params);
 
     if (!route) {
-      const err = { code: errorCodes.ROUTE_NOT_FOUND };
+      const err = new RouterError(errorCodes.ROUTE_NOT_FOUND);
+
       done(err);
       router.invokeEventListeners(
         constants.TRANSITION_ERROR,
@@ -92,6 +95,7 @@ export default function withNavigation<
         router.getState(),
         err,
       );
+
       return noop;
     }
 
@@ -109,7 +113,8 @@ export default function withNavigation<
     // Do not proceed further if states are the same and no reload
     // (no deactivation and no callbacks)
     if (sameStates && !opts.reload && !opts.force) {
-      const err = { code: errorCodes.SAME_STATES };
+      const err = new RouterError(errorCodes.SAME_STATES);
+
       done(err);
       router.invokeEventListeners(
         constants.TRANSITION_ERROR,
@@ -117,6 +122,7 @@ export default function withNavigation<
         router.getState(),
         err,
       );
+
       return noop;
     }
 
@@ -130,27 +136,26 @@ export default function withNavigation<
 
     // Transition
     return router.transitionToState(toState, fromState, opts, (err, state) => {
-      if (err) {
-        if (typeof err === "object" && "redirect" in err) {
-          const { name, params } = err.redirect;
-
-          navigate(
-            name,
-            params,
-            { ...opts, force: true, redirected: true },
-            done,
-          );
-        } else {
-          done(err);
-        }
-      } else {
+      if (!err) {
         router.invokeEventListeners(
           constants.TRANSITION_SUCCESS,
           state,
           fromState,
           opts,
         );
+
         done(undefined, state);
+      } else if (err.redirect) {
+        const { name, params } = err.redirect;
+
+        navigate(
+          name,
+          params,
+          { ...opts, force: true, redirected: true },
+          done,
+        );
+      } else {
+        done(err);
       }
     });
   };

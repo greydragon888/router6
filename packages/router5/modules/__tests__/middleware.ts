@@ -1,5 +1,6 @@
 import createTestRouter from "./helpers/testRouters";
 import { errorCodes } from "..";
+import { RouterError } from "../RouterError";
 import type { Middleware, State, Router } from "..";
 import type { MiddlewareFactory } from "../types/router";
 
@@ -23,7 +24,7 @@ const listeners: Record<string, Middleware> = {
     done(undefined, newState);
   },
   transitionErr: (_toState, _fromState, done) => {
-    done({ reason: "because" });
+    done(new RouterError("ERR_CODE"));
   },
 };
 
@@ -73,12 +74,7 @@ describe("core/middleware", () => {
     router.start("", () => {
       router.navigate("users", (err) => {
         expect(listeners.transitionErr).toHaveBeenCalled();
-        expect((err as { code: string; reason: string }).code).toStrictEqual(
-          errorCodes.TRANSITION_ERR,
-        );
-        expect((err as { code: string; reason: string }).reason).toStrictEqual(
-          "because",
-        );
+        expect(err?.code).toStrictEqual(errorCodes.TRANSITION_ERR);
       });
     });
   });

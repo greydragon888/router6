@@ -1,5 +1,16 @@
-import type { DoneFn, DoneFnError, State } from "../types/base";
+import { RouterError } from "../RouterError";
+import { errorCodes } from "../constants";
+import type { DoneFn, State } from "../types/base";
 import type { ActivationFn } from "../types/router";
+
+function isPromise<T = unknown>(obj: unknown): obj is Promise<T> {
+  return (
+    typeof obj === "object" &&
+    obj !== null &&
+    "then" in obj &&
+    typeof obj.then === "function"
+  );
+}
 
 export function resolve(
   functions: ActivationFn[] | Record<string, ActivationFn>,
@@ -12,7 +23,7 @@ export function resolve(
     isCancelled: () => boolean;
     toState: State;
     fromState?: State | undefined;
-    errorKey?: string | undefined;
+    errorKey?: "segment" | undefined;
   },
   callback: DoneFn,
 ) {
@@ -31,25 +42,30 @@ export function resolve(
     fromState.params !== toState.params ||
     fromState.path !== toState.path;
 
-  const mergeStates = (toState: State, fromState?: State): State =>
-    fromState
-      ? {
-          ...fromState,
-          ...toState,
-          meta: {
-            id: fromState.meta?.id ?? toState.meta?.id ?? 1,
-            ...toState.meta,
-            params: fromState.meta?.params ?? toState.meta?.params ?? {},
-            options: fromState.meta?.options ?? toState.meta?.options ?? {},
-            redirected:
-              fromState.meta?.redirected ?? toState.meta?.redirected ?? false,
-          },
-        }
-      : toState;
+  const mergeStates = (toState: State, fromState?: State): State => {
+    if (fromState) {
+      return {
+        ...fromState,
+        ...toState,
+        meta: {
+          id: fromState.meta?.id ?? toState.meta?.id ?? 1,
+          ...toState.meta,
+          params: fromState.meta?.params ?? toState.meta?.params ?? {},
+          options: fromState.meta?.options ?? toState.meta?.options ?? {},
+          redirected:
+            fromState.meta?.redirected ?? toState.meta?.redirected ?? false,
+        },
+      };
+    }
+
+    return toState;
+  };
 
   const processFn = (
     stepFn: ActivationFn,
-    errBase: Record<string, unknown>,
+    errBase: {
+      segment?: string | undefined;
+    },
     state: State,
     doneCb: DoneFn,
   ) => {
@@ -73,6 +89,8 @@ export function resolve(
 
     type ResErrType = State | Error | undefined;
 
+    const { segment } = errBase;
+
     if (isCancelled()) {
       done();
     }
@@ -80,35 +98,63 @@ export function resolve(
     if (res === undefined) {
       // wait for done to be called
       return;
+      // is activation or deactivation available?
     } else if (typeof res === "boolean") {
-      done(res ? undefined : errBase);
+      if (res) {
+        done();
+      } else {
+        // temporal code. Will be redefined
+        done(new RouterError(errorCodes.TRANSITION_ERR, { segment }));
+      }
       // is it a state?
     } else if ("name" in res && isState(res)) {
       done(undefined, res);
       // is it a promise?
-    } else if ("then" in res) {
-      (res as Promise<ResErrType>).then(
+    } else if (isPromise<ResErrType>(res)) {
+      res.then(
         (resVal: ResErrType) => {
           if (resVal instanceof Error) {
-            done({ error: resVal });
+            done(
+              // temporal code. Will be redefined
+              new RouterError(errorCodes.TRANSITION_ERR, {
+                segment,
+                message: resVal.message,
+                stack: resVal.stack,
+                cause: resVal.cause,
+              }),
+            );
           } else {
             done(undefined, resVal);
           }
         },
-        (err: unknown) => {
+        (err: Error | object | unknown) => {
           if (err instanceof Error) {
             console.error(err.stack ?? err);
 
-            done({ ...errBase, promiseError: err });
+            done(
+              // temporal code. Will be redefined
+              new RouterError(errorCodes.TRANSITION_ERR, {
+                segment,
+                message: err.message,
+                stack: err.stack,
+                cause: err.cause,
+              }),
+            );
+          } else if (typeof err === "object") {
+            done(
+              // temporal code. Will be redefined
+              new RouterError(errorCodes.TRANSITION_ERR, { segment, ...err }),
+            );
           } else {
-            done(typeof err === "object" ? { ...errBase, ...err } : errBase);
+            // temporal code. Will be redefined
+            done(new RouterError(errorCodes.TRANSITION_ERR, { segment }));
           }
         },
       );
     }
   };
 
-  const next = (err: DoneFnError | undefined, state: State) => {
+  const next = (err: RouterError | undefined, state: State) => {
     if (isCancelled()) {
       callback();
 

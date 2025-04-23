@@ -1,14 +1,9 @@
 import transitionPath, { nameToIDs } from "router5-transition-path";
 import { resolve } from "./resolve";
 import { constants, errorCodes } from "../constants";
+import { RouterError } from "../RouterError";
 import type { ActivationFn, Router } from "../types/router";
-import type {
-  State,
-  NavigationOptions,
-  DoneFn,
-  CancelFn,
-  DoneFnError,
-} from "../types/base";
+import type { State, NavigationOptions, DoneFn, CancelFn } from "../types/base";
 
 export function transition(
   router: Router,
@@ -28,7 +23,7 @@ export function transition(
   const cancel = () => {
     if (!cancelled && !completed) {
       cancelled = true;
-      callback({ code: errorCodes.TRANSITION_CANCELLED });
+      callback(new RouterError(errorCodes.TRANSITION_CANCELLED));
     }
   };
   const done: DoneFn = (err, state) => {
@@ -50,86 +45,94 @@ export function transition(
     callback(err, state ?? toState);
   };
   const makeError = (
-    base: { code: string },
-    err?: Record<string, unknown> | Error | string | null,
-  ) => ({
-    ...base,
-    ...(err && Object.keys(err).length ? (err as object) : { error: err }),
-  });
+    code: string,
+    err?: RouterError | Error | string,
+  ): RouterError | undefined => {
+    if (typeof err === "string") {
+      return new RouterError(code, { message: err });
+    }
+
+    if (err instanceof RouterError) {
+      err.setCode(code);
+
+      return err;
+    }
+
+    if (err instanceof Error) {
+      const result = new RouterError(code);
+
+      result.setErrorInstance(err);
+
+      return result;
+    }
+
+    if (typeof err === "object") {
+      const result = new RouterError(code);
+
+      result.setAdditionalFields(err);
+
+      return result;
+    }
+
+    return undefined;
+  };
 
   const isUnknownRoute = toState.name === constants.UNKNOWN_ROUTE;
   const asyncBase = { isCancelled, toState, fromState };
+
   const { toDeactivate, toActivate } = transitionPath(toState, fromState);
 
-  const canDeactivate =
-    !fromState || opts.forceDeactivate
-      ? undefined
-      : (_toState: State, _fromState: State, cb: DoneFn) => {
-          const canDeactivateFunctionMap = toDeactivate
-            .filter((name) => name in canDeactivateFunctions)
-            .reduce(
-              (fnMap, name) => ({
-                ...fnMap,
-                [name]: canDeactivateFunctions[name],
-              }),
-              {},
-            );
+  const canDeactivate = (_toState: State, _fromState: State, cb: DoneFn) => {
+    const canDeactivateFunctionMap = toDeactivate
+      .filter((name) => name in canDeactivateFunctions)
+      .reduce(
+        (fnMap, name) => ({
+          ...fnMap,
+          [name]: canDeactivateFunctions[name],
+        }),
+        {},
+      );
 
-          resolve(
-            canDeactivateFunctionMap,
-            { ...asyncBase, errorKey: "segment" },
-            (err) => {
-              cb(
-                err
-                  ? makeError({ code: errorCodes.CANNOT_DEACTIVATE }, err)
-                  : undefined,
-              );
-            },
-          );
-        };
+    resolve(
+      canDeactivateFunctionMap,
+      { ...asyncBase, errorKey: "segment" },
+      (err) => {
+        cb(makeError(errorCodes.CANNOT_DEACTIVATE, err));
+      },
+    );
+  };
 
-  const canActivate = isUnknownRoute
-    ? undefined
-    : (_toState: State, _fromState: State, cb: DoneFn) => {
-        const canActivateFunctionMap = toActivate
-          .filter((name) => name in canActivateFunctions)
-          .reduce(
-            (fnMap, name) => ({
-              ...fnMap,
-              [name]: canActivateFunctions[name],
-            }),
-            {},
-          );
+  const canActivate = (_toState: State, _fromState: State, cb: DoneFn) => {
+    const canActivateFunctionMap = toActivate
+      .filter((name) => name in canActivateFunctions)
+      .reduce(
+        (fnMap, name) => ({
+          ...fnMap,
+          [name]: canActivateFunctions[name],
+        }),
+        {},
+      );
 
-        resolve(
-          canActivateFunctionMap,
-          { ...asyncBase, errorKey: "segment" },
-          (err?: DoneFnError) => {
-            cb(
-              err
-                ? makeError({ code: errorCodes.CANNOT_ACTIVATE }, err)
-                : undefined,
-            );
-          },
-        );
-      };
+    resolve(
+      canActivateFunctionMap,
+      { ...asyncBase, errorKey: "segment" },
+      (err) => {
+        cb(makeError(errorCodes.CANNOT_ACTIVATE, err));
+      },
+    );
+  };
 
-  const middleware = !middlewareFunctions.length
-    ? undefined
-    : (toState: State, _fromState: State, cb: DoneFn) => {
-        resolve(middlewareFunctions, { ...asyncBase }, (err, state?: State) => {
-          cb(
-            err
-              ? makeError({ code: errorCodes.TRANSITION_ERR }, err)
-              : undefined,
-            state ?? toState,
-          );
-        });
-      };
+  const middleware = (toState: State, _fromState: State, cb: DoneFn) => {
+    resolve(middlewareFunctions, { ...asyncBase }, (err, state?: State) => {
+      cb(makeError(errorCodes.TRANSITION_ERR, err), state ?? toState);
+    });
+  };
 
-  const pipeline = [canDeactivate, canActivate, middleware].filter(
-    Boolean,
-  ) as ActivationFn[];
+  const pipeline = [
+    !fromState || opts.forceDeactivate ? undefined : canDeactivate,
+    isUnknownRoute ? undefined : canActivate,
+    !middlewareFunctions.length ? undefined : middleware,
+  ].filter((fn): fn is ActivationFn => Boolean(fn));
 
   resolve(pipeline, asyncBase, done);
 

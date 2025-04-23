@@ -37,9 +37,7 @@ describe("core/router-lifecycle", () => {
   it("should throw an error when starting with no start path or state", () => {
     router.setOption("defaultRoute", null);
     router.start((err) => {
-      expect((err as { code: string }).code).toStrictEqual(
-        errorCodes.NO_START_PATH_OR_STATE,
-      );
+      expect(err?.code).toStrictEqual(errorCodes.NO_START_PATH_OR_STATE);
 
       router.setOption("defaultRoute", "home");
     });
@@ -52,9 +50,7 @@ describe("core/router-lifecycle", () => {
   it("should give an error if trying to start when already started", () => {
     router.start("", () => {
       router.start("", (err) => {
-        expect((err as { code: string }).code).toStrictEqual(
-          errorCodes.ROUTER_ALREADY_STARTED,
-        );
+        expect(err?.code).toStrictEqual(errorCodes.ROUTER_ALREADY_STARTED);
       });
     });
   });
@@ -102,12 +98,8 @@ describe("core/router-lifecycle", () => {
   it("should start with an error if navigation to start route is not allowed and no default route is specified", () => {
     router.setOption("defaultRoute", null);
     router.start("/admin", (err) => {
-      expect((err as { code: string; segment: string }).code).toStrictEqual(
-        errorCodes.CANNOT_ACTIVATE,
-      );
-      expect((err as { code: string; segment: string }).segment).toStrictEqual(
-        "admin",
-      );
+      expect(err?.code).toStrictEqual(errorCodes.CANNOT_ACTIVATE);
+      expect(err?.segment).toStrictEqual("admin");
     });
   });
 
@@ -115,9 +107,7 @@ describe("core/router-lifecycle", () => {
     router.setOption("defaultRoute", null);
 
     router.start("/not-existing", (err) => {
-      expect((err as { code: string }).code).toStrictEqual(
-        errorCodes.ROUTE_NOT_FOUND,
-      );
+      expect(err?.code).toStrictEqual(errorCodes.ROUTE_NOT_FOUND);
     });
   });
 
@@ -127,9 +117,7 @@ describe("core/router-lifecycle", () => {
     router.setOption("strictTrailingSlash", true);
 
     router.start("/users/list/", (err, state) => {
-      expect((err as { code: string }).code).toStrictEqual(
-        errorCodes.ROUTE_NOT_FOUND,
-      );
+      expect(err?.code).toStrictEqual(errorCodes.ROUTE_NOT_FOUND);
       expect(state).toStrictEqual(undefined);
     });
   });
@@ -170,9 +158,7 @@ describe("core/router-lifecycle", () => {
     router.setOption("defaultRoute", "fake.route");
 
     router.start("/not-existing", (err) => {
-      expect((err as { code: string }).code).toStrictEqual(
-        errorCodes.ROUTE_NOT_FOUND,
-      );
+      expect(err?.code).toStrictEqual(errorCodes.ROUTE_NOT_FOUND);
     });
   });
 
@@ -185,9 +171,7 @@ describe("core/router-lifecycle", () => {
       expect(router.isStarted()).toStrictEqual(false);
 
       router.navigate("users.list", (err) => {
-        expect((err as { code: string }).code).toStrictEqual(
-          errorCodes.ROUTER_NOT_STARTED,
-        );
+        expect(err?.code).toStrictEqual(errorCodes.ROUTER_NOT_STARTED);
 
         // Stopping again shouldn't throw an error
         router.stop();

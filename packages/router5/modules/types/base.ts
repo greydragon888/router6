@@ -1,21 +1,9 @@
 import type { RouteNodeStateMeta } from "route-node/dist/RouteNode";
+import type { RouterError } from "../RouterError";
 
 export type Unsubscribe = () => void;
 
-export type DoneFnError =
-  | {
-      code?: string;
-      error?: State | Error;
-      segment?: string;
-      reason?: string;
-      redirect?: State;
-      [key: string]: unknown;
-    } // Errors with a code and additional properties
-  | { promiseError: Error; redirect?: State; [key: string]: unknown } // Errors from promises
-  | Error // Standard errors
-  | string; // String errors
-
-export type DoneFn = (err?: DoneFnError, state?: State) => void;
+export type DoneFn = (err?: RouterError, state?: State) => void;
 
 export type CancelFn = () => void;
 

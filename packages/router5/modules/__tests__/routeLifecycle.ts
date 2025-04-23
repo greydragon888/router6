@@ -16,12 +16,8 @@ describe("core/route-lifecycle", () => {
       // Cannot deactivate
       router.canDeactivate("users.list", () => () => Promise.reject());
       router.navigate("users", (err) => {
-        expect((err as { code: string; segment: string }).code).toStrictEqual(
-          errorCodes.CANNOT_DEACTIVATE,
-        );
-        expect(
-          (err as { code: string; segment: string }).segment,
-        ).toStrictEqual("users.list");
+        expect(err?.code).toStrictEqual(errorCodes.CANNOT_DEACTIVATE);
+        expect(err?.segment).toStrictEqual("users.list");
         expect(omitMeta(router.getState()!)).toStrictEqual({
           name: "users.list",
           params: {},
@@ -49,12 +45,8 @@ describe("core/route-lifecycle", () => {
     router.navigate("users.list", () => {
       router.canDeactivate("users.list", false);
       router.navigate("users", (err) => {
-        expect((err as { code: string; segment: string }).code).toStrictEqual(
-          errorCodes.CANNOT_DEACTIVATE,
-        );
-        expect(
-          (err as { code: string; segment: string }).segment,
-        ).toStrictEqual("users.list");
+        expect(err?.code).toStrictEqual(errorCodes.CANNOT_DEACTIVATE);
+        expect(err?.segment).toStrictEqual("users.list");
 
         router.canDeactivate("users.list", true);
         router.navigate("users", (err) => {
@@ -67,12 +59,8 @@ describe("core/route-lifecycle", () => {
   it("should block navigation if a route cannot be activated", () => {
     router.navigate("home", () => {
       router.navigate("admin", (err) => {
-        expect((err as { code: string; segment: string }).code).toStrictEqual(
-          errorCodes.CANNOT_ACTIVATE,
-        );
-        expect(
-          (err as { code: string; segment: string }).segment,
-        ).toStrictEqual("admin");
+        expect(err?.code).toStrictEqual(errorCodes.CANNOT_ACTIVATE);
+        expect(err?.segment).toStrictEqual("admin");
         expect(router.isActive("home")).toStrictEqual(true);
       });
     });
@@ -82,9 +70,7 @@ describe("core/route-lifecycle", () => {
     router.navigate("orders.view", { id: "1" }, {}, () => {
       router.canDeactivate("orders.view", false);
       router.navigate("home", (err) => {
-        expect((err as { code: string; segment: string }).code).toStrictEqual(
-          errorCodes.CANNOT_DEACTIVATE,
-        );
+        expect(err?.code).toStrictEqual(errorCodes.CANNOT_DEACTIVATE);
 
         router.navigate(
           "home",
