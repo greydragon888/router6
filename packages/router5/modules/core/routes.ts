@@ -1,5 +1,6 @@
 import { constants } from "../constants";
 import { RouteNode } from "route-node";
+import { isString } from "../typeGuards";
 import type { Params, State } from "../types/base";
 import type { Router, Route, DefaultDependencies } from "../types/router";
 
@@ -88,7 +89,7 @@ export default function withRoutes<Dependencies extends DefaultDependencies>(
 
     router.buildPath = (route: string, params?: Params): string => {
       if (route === constants.UNKNOWN_ROUTE) {
-        return (params?.path ?? "") as string;
+        return isString(params?.path) ? params.path : "";
       }
 
       const paramsWithDefault = {
@@ -132,8 +133,11 @@ export default function withRoutes<Dependencies extends DefaultDependencies>(
           : router.buildPath(routeName, routeParams);
 
         return router.makeState<P, MP>(routeName, routeParams, builtPath, {
-          params: meta as MP,
+          id: 1,
+          params: <MP>meta,
+          options: {},
           source,
+          redirected: false,
         });
       }
 

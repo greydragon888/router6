@@ -1,3 +1,4 @@
+import { isObjKey } from "../typeGuards";
 import type { DefaultDependencies, Router } from "../types/router";
 
 export default function withDependencies<
@@ -11,17 +12,22 @@ export default function withDependencies<
       dependency: Dependencies[keyof Dependencies],
     ): Router<Dependencies> => {
       routerDependencies[dependencyName] = dependency;
+
       return router;
     };
 
     router.setDependencies = (
       deps: Partial<Dependencies>,
     ): Router<Dependencies> => {
-      (Object.keys(deps) as (keyof Dependencies)[]).forEach((name) => {
-        if (deps[name]) {
-          router.setDependency(name, deps[name]);
-        }
-      });
+      Object.keys(deps)
+        .filter((key): key is Extract<keyof Dependencies, string> =>
+          isObjKey(key, deps),
+        )
+        .forEach((name) => {
+          if (deps[name]) {
+            router.setDependency(name, deps[name]);
+          }
+        });
       return router;
     };
 

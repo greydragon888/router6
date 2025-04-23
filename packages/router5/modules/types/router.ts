@@ -55,7 +55,7 @@ export type ActivationFnFactory<
   Dependencies extends DefaultDependencies = DefaultDependencies,
 > = (router: Router<Dependencies>, dependencies: Dependencies) => ActivationFn;
 
-export type DefaultDependencies = Record<string, any>;
+export type DefaultDependencies = Partial<Record<string, any>>;
 
 export interface Config {
   decoders: Record<string, any>;
@@ -67,6 +67,8 @@ export interface Config {
 export interface Router<
   Dependencies extends DefaultDependencies = DefaultDependencies,
 > {
+  [key: symbol]: unknown;
+  [key: string]: unknown;
   config: Config;
 
   rootNode: RouteNode;
@@ -99,7 +101,7 @@ export interface Router<
     name: string,
     params?: P,
     path?: string,
-    meta?: Partial<StateMeta<MP>>,
+    meta?: StateMeta<MP>,
     forceId?: number,
   ) => State<P, MP>;
   makeNotFoundState: (path: string, options?: NavigationOptions) => State;

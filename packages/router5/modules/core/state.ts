@@ -1,4 +1,5 @@
 import { constants } from "../constants";
+import { isRouteNodeState, isState } from "../typeGuards";
 import type {
   NavigationOptions,
   Params,
@@ -16,8 +17,10 @@ export default function withState<Dependencies extends DefaultDependencies>(
   let stateId = 0;
   let routerState: State | undefined = undefined;
 
-  router.getState = <P extends Params = Params, MP extends Params = Params>() =>
-    routerState as State<P, MP>;
+  router.getState = <
+    P extends Params = Params,
+    MP extends Params = Params,
+  >() => (isState<P, MP>(routerState) ? routerState : undefined);
 
   router.setState = (state: State | undefined) => {
     routerState = state;
@@ -27,7 +30,7 @@ export default function withState<Dependencies extends DefaultDependencies>(
     name: string,
     params?: P,
     path?: string,
-    meta?: Partial<StateMeta<MP>>,
+    meta?: StateMeta<MP>,
     forceId?: number,
   ): State<P, MP> => ({
     name,
@@ -35,14 +38,15 @@ export default function withState<Dependencies extends DefaultDependencies>(
       ...router.config.defaultParams[name],
       ...params,
     },
-    path: path ?? router.buildPath(name, params ?? {}),
+    path: path ?? router.buildPath(name, params),
+    // write guard is meta
     meta: meta
       ? {
           ...meta,
           id: forceId ?? ++stateId,
-          params: meta.params ?? ({} as MP),
-          options: meta.options ?? ({} as NavigationOptions),
-          redirected: meta.redirected ?? false,
+          params: meta.params,
+          options: meta.options,
+          redirected: meta.redirected,
         }
       : undefined,
   });
@@ -57,7 +61,10 @@ export default function withState<Dependencies extends DefaultDependencies>(
       path,
       options
         ? {
+            id: ++stateId,
             options,
+            params: {},
+            redirected: false,
           }
         : undefined,
     );
@@ -139,9 +146,9 @@ export default function withState<Dependencies extends DefaultDependencies>(
   ): RouteNodeState<P> | undefined => {
     const { name, params } = router.forwardState(routeName, routeParams);
 
-    return router.rootNode.buildState(name, params) as
-      | RouteNodeState<P>
-      | undefined;
+    const state = router.rootNode.buildState(name, params);
+
+    return isRouteNodeState<P>(state) ? state : undefined;
   };
 
   return router;

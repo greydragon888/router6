@@ -36,6 +36,10 @@ export default tsEslint.config(
       "@typescript-eslint/prefer-promise-reject-errors": "off",
       "@typescript-eslint/no-redundant-type-constituents": "off",
       "@typescript-eslint/no-invalid-void-type": "off",
+      "@typescript-eslint/consistent-type-assertions": [
+        "error",
+        { assertionStyle: "angle-bracket" },
+      ],
 
       "@typescript-eslint/unified-signatures": "off",
       /*"@typescript-eslint/member-ordering": [
@@ -218,6 +222,17 @@ export default tsEslint.config(
           next: "export",
         },
       ],*/
+    },
+  },
+  {
+    files: ["**/__tests__/*.ts?(x)"],
+    languageOptions: {
+      parserOptions: {
+        project: "./tsconfig.json",
+      },
+    },
+    rules: {
+      "@typescript-eslint/consistent-type-assertions": "off",
     },
   },
   {

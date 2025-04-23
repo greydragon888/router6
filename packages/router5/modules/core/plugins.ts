@@ -1,4 +1,5 @@
 import { constants } from "../constants";
+import { isObjKey } from "../typeGuards";
 import type {
   Router,
   Plugin,
@@ -47,9 +48,10 @@ export default function withPlugins<
   ): Unsubscribe {
     const appliedPlugin = router.executeFactory<Plugin>(pluginFactory);
 
-    const removeEventListeners = (
-      Object.keys(eventsMap) as (keyof typeof eventsMap)[]
-    )
+    const removeEventListeners = Object.keys(eventsMap)
+      .filter((eventName): eventName is keyof typeof eventsMap =>
+        isObjKey<typeof eventsMap>(eventName, eventsMap),
+      )
       .map((methodName) => {
         if (appliedPlugin[methodName]) {
           return router.addEventListener(

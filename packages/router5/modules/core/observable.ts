@@ -82,9 +82,7 @@ export default function withObservability<
   }
 
   router.subscribe = subscribe;
-  //@ts-expect-error: TypeScript does not allow indexing with a symbol, but this is required for observable interop
   router[$$observable] = observable;
-  //@ts-expect-error: TypeScript does not allow indexing with a symbol, but this is required for observable interop
   router["@@observable"] = observable;
 
   return router;

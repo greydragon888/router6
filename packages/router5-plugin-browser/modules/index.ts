@@ -132,7 +132,12 @@ function browserPluginFactory(
         route.name,
         route.params,
         router.buildPath(route.name, route.params),
-        { params: route.meta },
+        {
+          params: route.meta,
+          id: 1,
+          options: {},
+          redirected: false,
+        },
       );
       const url = router.buildUrl(name, params);
       router.lastKnownState = state;
@@ -145,12 +150,12 @@ function browserPluginFactory(
       replace?: boolean,
     ) {
       const trimmedState = state
-        ? ({
+        ? {
             meta: state.meta,
             name: state.name,
             params: state.params,
             path: state.path,
-          } as State)
+          }
         : state!;
       const finalState: HistoryState =
         options.mergeState === true

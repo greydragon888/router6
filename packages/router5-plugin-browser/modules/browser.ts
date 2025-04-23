@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/consistent-type-assertions */
 import type { Browser, HistoryState } from "./types";
 import type { State } from "router5";
 

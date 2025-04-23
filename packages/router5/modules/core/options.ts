@@ -16,19 +16,18 @@ export default function withOptions<Dependencies extends DefaultDependencies>(
   options: Partial<Options>,
 ): (router: Router<Dependencies>) => Router<Dependencies> {
   return (router: Router<Dependencies>): Router<Dependencies> => {
-    const routerOptions = {
+    const routerOptions: Options = {
       ...defaultOptions,
       ...options,
     };
 
     router.getOptions = () => routerOptions;
 
-    router.setOption = (
-      option: keyof Options,
-      value: Options[keyof Options],
+    router.setOption = <K extends keyof Options>(
+      option: K,
+      value: Options[K],
     ): Router<Dependencies> => {
-      (routerOptions as Record<keyof Options, Options[keyof Options]>)[option] =
-        value;
+      routerOptions[option] = value;
 
       return router;
     };

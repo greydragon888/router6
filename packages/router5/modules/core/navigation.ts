@@ -103,7 +103,7 @@ export default function withNavigation<
       route.name,
       route.params,
       router.buildPath(route.name, route.params),
-      { params: route.meta, options: opts },
+      { id: 1, params: route.meta, options: opts, redirected: false },
     );
 
     const sameStates = router.getState()
@@ -232,7 +232,7 @@ export default function withNavigation<
     };
 
     cancelCurrentTransition = transition(
-      router as Router,
+      router,
       toState,
       fromState,
       options,

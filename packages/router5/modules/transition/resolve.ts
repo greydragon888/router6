@@ -1,16 +1,10 @@
 import { RouterError } from "../RouterError";
 import { errorCodes } from "../constants";
+import { isPromise, isState } from "../typeGuards";
 import type { DoneFn, State } from "../types/base";
 import type { ActivationFn } from "../types/router";
 
-function isPromise<T = unknown>(obj: unknown): obj is Promise<T> {
-  return (
-    typeof obj === "object" &&
-    obj !== null &&
-    "then" in obj &&
-    typeof obj.then === "function"
-  );
-}
+type ResErrType = State | Error | undefined;
 
 export function resolve(
   functions: ActivationFn[] | Record<string, ActivationFn>,
@@ -30,12 +24,6 @@ export function resolve(
   let remainingFunctions = Array.isArray(functions)
     ? functions
     : Object.keys(functions);
-
-  const isState = (obj: Partial<State>) =>
-    typeof obj === "object" &&
-    obj.name !== undefined &&
-    obj.params !== undefined &&
-    obj.path !== undefined;
 
   const hasStateChanged = (toState: State, fromState?: State) =>
     fromState?.name !== toState.name ||
@@ -67,11 +55,11 @@ export function resolve(
       segment?: string | undefined;
     },
     state: State,
-    doneCb: DoneFn,
+    doneCb: (err: RouterError | undefined, state: State) => void,
   ) => {
     const done: DoneFn = (err, newState) => {
       if (err) {
-        doneCb(err);
+        doneCb(err, state);
       } else if (newState && newState !== state && isState(newState)) {
         if (hasStateChanged(newState, state)) {
           console.error(
@@ -86,8 +74,6 @@ export function resolve(
     };
 
     const res = stepFn.call(null, state, fromState, done);
-
-    type ResErrType = State | Error | undefined;
 
     const { segment } = errBase;
 
@@ -195,7 +181,7 @@ export function resolve(
 
     remainingFunctions = remainingFunctions.slice(1);
 
-    processFn(stepFn, errBase, state, next as DoneFn);
+    processFn(stepFn, errBase, state, next);
   };
 
   next(undefined, toState);

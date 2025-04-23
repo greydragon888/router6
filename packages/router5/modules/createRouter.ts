@@ -8,14 +8,13 @@ import withObservability from "./core/observable";
 import withNavigation from "./core/navigation";
 import withRouterLifecycle from "./core/routerLifecycle";
 import withRouteLifecycle from "./core/routeLifecycle";
-
+import type { RouteNode } from "route-node";
 import type {
   DefaultDependencies,
   Options,
   Route,
   Router,
 } from "./types/router";
-import type { RouteNode } from "route-node";
 
 type Enhancer<Dependencies extends DefaultDependencies = DefaultDependencies> =
   (router: Router<Dependencies>) => Router<Dependencies>;
@@ -32,13 +31,15 @@ const createRouter = <
 >(
   routes: Route<Dependencies>[] | RouteNode = [],
   options: Partial<Options> = {},
-  dependencies: Dependencies = {} as Dependencies,
+  dependencies: Dependencies = <Dependencies>{},
 ): Router<Dependencies> => {
-  const config = {
-    decoders: {},
-    encoders: {},
-    defaultParams: {},
-    forwardMap: {},
+  const uninitializedRouter = {
+    config: {
+      decoders: {},
+      encoders: {},
+      defaultParams: {},
+      forwardMap: {},
+    },
   };
 
   return pipe<Dependencies>(
@@ -52,7 +53,7 @@ const createRouter = <
     withPlugins,
     withMiddleware,
     withRoutes(routes),
-  )({ config } as Router<Dependencies>);
+  )(<Router<Dependencies>>uninitializedRouter);
 };
 
 export default createRouter;

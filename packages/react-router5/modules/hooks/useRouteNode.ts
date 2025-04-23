@@ -1,7 +1,7 @@
 import { useContext, useMemo, useSyncExternalStore } from "react";
 import { shouldUpdateNode } from "router5-transition-path";
 import { RouterContext } from "../context";
-import type { RouteContext, RouteState, UnsubscribeFn } from "../types";
+import type { RouteContext, RouteState } from "../types";
 
 /**
  * A hook that subscribes to a specific route node in router6
@@ -31,23 +31,28 @@ export const useRouteNode = (nodeName: string): RouteContext => {
 
     // Subscribe to router updates; notify React when the relevant node is updated
     const subscribe = (callback: () => void) => {
-      return router.subscribe(({ route, previousRoute }) => {
+      const unsubscribe = router.subscribe(({ route, previousRoute }) => {
         // Only update state if this route node is affected
         if (shouldUpdate(route, previousRoute)) {
           currentState = { route, previousRoute };
-          callback(); // Tell React to re-render
+          callback(); // Notify React to trigger re-render
         }
       });
+
+      return () => {
+        if (typeof unsubscribe !== "function") {
+          throw new Error("Router unsubscribe is not a function");
+        }
+
+        unsubscribe(); // Unsubscribe from router updates
+      };
     };
 
     return { getSnapshot, subscribe };
   }, [router, shouldUpdate]);
 
   // useSyncExternalStore handles subscription lifecycle and scheduling safely
-  const state = useSyncExternalStore(
-    store.subscribe as (callback: () => void) => UnsubscribeFn,
-    store.getSnapshot,
-  );
+  const state = useSyncExternalStore(store.subscribe, store.getSnapshot);
 
   // Return a memoized context object to avoid unnecessary rerenders
   return useMemo(() => ({ router, ...state }), [router, state]);

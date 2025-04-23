@@ -2,11 +2,15 @@ import transitionPath, { nameToIDs } from "router5-transition-path";
 import { resolve } from "./resolve";
 import { constants, errorCodes } from "../constants";
 import { RouterError } from "../RouterError";
-import type { ActivationFn, Router } from "../types/router";
+import type {
+  ActivationFn,
+  DefaultDependencies,
+  Router,
+} from "../types/router";
 import type { State, NavigationOptions, DoneFn, CancelFn } from "../types/base";
 
-export function transition(
-  router: Router,
+export function transition<Dependencies extends DefaultDependencies>(
+  router: Router<Dependencies>,
   toState: State,
   fromState: State | undefined,
   opts: NavigationOptions,

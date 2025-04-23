@@ -1,3 +1,4 @@
+import { isBoolean } from "../typeGuards";
 import type {
   ActivationFn,
   ActivationFnFactory,
@@ -37,12 +38,20 @@ export default function withRouteLifecycle<
   };
 
   router.canDeactivate = (name, canDeactivateHandler): Router<Dependencies> => {
-    const factory = toFunction(
-      canDeactivateHandler,
-    ) as ActivationFnFactory<Dependencies>;
+    // Yes!!! These blocks are duplicated. It needs for type safety.
+    if (isBoolean(canDeactivateHandler)) {
+      const boolFactory = toFunction(canDeactivateHandler);
 
-    canDeactivateFactories[name] = factory;
-    canDeactivateFunctions[name] = router.executeFactory<ActivationFn>(factory);
+      canDeactivateFactories[name] = boolFactory;
+      canDeactivateFunctions[name] =
+        router.executeFactory<ActivationFn>(boolFactory);
+    } else {
+      const factory = toFunction(canDeactivateHandler);
+
+      canDeactivateFactories[name] = factory;
+      canDeactivateFunctions[name] =
+        router.executeFactory<ActivationFn>(factory);
+    }
 
     return router;
   };
@@ -69,12 +78,19 @@ export default function withRouteLifecycle<
   };
 
   router.canActivate = (name, canActivateHandler): Router<Dependencies> => {
-    const factory = toFunction(
-      canActivateHandler,
-    ) as ActivationFnFactory<Dependencies>;
+    // Yes!!! These blocks are duplicated. It needs for type safety.
+    if (isBoolean(canActivateHandler)) {
+      const boolFactory = toFunction(canActivateHandler);
 
-    canActivateFactories[name] = factory;
-    canActivateFunctions[name] = router.executeFactory<ActivationFn>(factory);
+      canActivateFactories[name] = boolFactory;
+      canActivateFunctions[name] =
+        router.executeFactory<ActivationFn>(boolFactory);
+    } else {
+      const factory = toFunction(canActivateHandler);
+
+      canActivateFactories[name] = factory;
+      canActivateFunctions[name] = router.executeFactory<ActivationFn>(factory);
+    }
 
     return router;
   };
