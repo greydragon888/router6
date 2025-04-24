@@ -35,7 +35,7 @@ describe("core/router-lifecycle", () => {
   });
 
   it("should throw an error when starting with no start path or state", () => {
-    router.setOption("defaultRoute", null);
+    router.setOption("defaultRoute", undefined);
     router.start((err) => {
       expect(err?.code).toStrictEqual(errorCodes.NO_START_PATH_OR_STATE);
 
@@ -96,7 +96,7 @@ describe("core/router-lifecycle", () => {
   });
 
   it("should start with an error if navigation to start route is not allowed and no default route is specified", () => {
-    router.setOption("defaultRoute", null);
+    router.setOption("defaultRoute", undefined);
     router.start("/admin", (err) => {
       expect(err?.code).toStrictEqual(errorCodes.CANNOT_ACTIVATE);
       expect(err?.segment).toStrictEqual("admin");
@@ -104,7 +104,7 @@ describe("core/router-lifecycle", () => {
   });
 
   it("should start with a not found error if no matched start state and no default route", () => {
-    router.setOption("defaultRoute", null);
+    router.setOption("defaultRoute", undefined);
 
     router.start("/not-existing", (err) => {
       expect(err?.code).toStrictEqual(errorCodes.ROUTE_NOT_FOUND);
@@ -113,7 +113,7 @@ describe("core/router-lifecycle", () => {
 
   it("should not match an URL with extra trailing slashes", () => {
     // ToDo: WHY?
-    router.setOption("defaultRoute", null);
+    router.setOption("defaultRoute", undefined);
     router.setOption("strictTrailingSlash", true);
 
     router.start("/users/list/", (err, state) => {

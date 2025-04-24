@@ -2,6 +2,7 @@ import createRouter from "./createRouter";
 import transitionPath from "router5-transition-path";
 import { constants, errorCodes } from "./constants";
 import cloneRouter from "./clone";
+import { RouterError } from "./RouterError";
 import type { RouteNode } from "route-node";
 import type { ErrorCodes, Constants } from "./constants";
 
@@ -28,7 +29,14 @@ export type {
   DoneFn,
 } from "./types/base";
 
-export { createRouter, cloneRouter, transitionPath, constants, errorCodes };
+export {
+  createRouter,
+  cloneRouter,
+  transitionPath,
+  constants,
+  errorCodes,
+  RouterError,
+};
 
 export type { ErrorCodes, Constants, RouteNode };
 

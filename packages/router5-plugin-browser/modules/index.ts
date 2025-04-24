@@ -1,5 +1,6 @@
 import safeBrowser from "./browser";
 import { errorCodes, constants } from "router5";
+import type { Params } from "router5";
 import type { BrowserPluginOptions, HistoryState } from "./types";
 import type {
   PluginFactory,
@@ -11,11 +12,11 @@ import type {
 
 declare module "router5" {
   interface Router {
-    buildUrl: (name: string, params?: Record<string, any>) => string;
+    buildUrl: (name: string, params?: Params) => string;
     matchUrl: (url: string) => State | undefined;
     replaceHistoryState: (
       name: string,
-      params?: Record<string, any>,
+      params?: Params,
       title?: string,
     ) => void;
     lastKnownState: State;
@@ -141,7 +142,7 @@ function browserPluginFactory(
       );
       const url = router.buildUrl(name, params);
       router.lastKnownState = state;
-      browser.replaceState(state, title, url);
+      browser.replaceState(<HistoryState>state, title, url);
     };
 
     function updateBrowserState(
@@ -159,8 +160,8 @@ function browserPluginFactory(
         : state!;
       const finalState: HistoryState =
         options.mergeState === true
-          ? { ...browser.getState(), ...trimmedState }
-          : trimmedState;
+          ? { ...(browser.getState() ?? {}), ...(<HistoryState>trimmedState) }
+          : <HistoryState>trimmedState;
 
       if (replace) {
         browser.replaceState(finalState, "", url);

@@ -1,10 +1,12 @@
+import type { Params } from "router5";
+
 const dotOrEnd = "(\\..+$|$)";
 const dotOrStart = "(^.+\\.|^)";
 
 export interface State {
   name: string;
-  params?: Record<string, any>;
-  [key: string]: any;
+  params?: Params;
+  [key: string]: unknown;
 }
 
 const getName = (route: State | string): string => {

@@ -34,9 +34,11 @@ export default function withState<Dependencies extends DefaultDependencies>(
     forceId?: number,
   ): State<P, MP> => ({
     name,
-    params: {
+    // Important! It is not true!!! Idk what is defaultParams type
+    // Надо подумать, как привести router.config.defaultParams к P
+    params: <P>{
       ...router.config.defaultParams[name],
-      ...params,
+      ...(params ?? {}),
     },
     path: path ?? router.buildPath(name, params),
     // write guard is meta

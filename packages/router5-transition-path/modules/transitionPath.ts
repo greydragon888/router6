@@ -1,19 +1,43 @@
-export type SegementParams = Record<string, string>;
-
-export interface State {
-  name: string;
-  params: Record<string, any>;
-  meta?:
-    | {
-        options?: Record<
-          string,
-          string | number | boolean | Record<string, unknown> | undefined
-        >;
-        params?: Record<string, SegementParams | unknown>;
-      }
+// ToDo: fix import from router5
+export interface NavigationOptions {
+  replace?: boolean;
+  reload?: boolean;
+  skipTransition?: boolean;
+  force?: boolean;
+  [key: string]:
+    | string
+    | number
+    | boolean
+    | Record<string, unknown>
     | undefined;
-  [key: string]: any;
 }
+
+export interface Params {
+  [key: string]:
+    | string
+    | number
+    | boolean
+    | Params
+    | Record<string, string>
+    | undefined;
+}
+
+export interface StateMeta<P extends Params = Params> {
+  id: number;
+  params: P;
+  options: NavigationOptions;
+  redirected: boolean;
+  source?: string | undefined;
+}
+
+export interface State<P extends Params = Params, MP extends Params = Params> {
+  name: string;
+  params: P;
+  path: string;
+  meta?: StateMeta<MP> | undefined;
+}
+
+export type SegementParams = Record<string, string>;
 
 export interface TransitionPath {
   intersection: string;
@@ -35,19 +59,16 @@ const exists = (val: unknown): boolean => val !== undefined && val !== null;
 const hasMetaParams = (state: State): boolean => !!state.meta?.params;
 
 const extractSegmentParams = (name: string, state: State): SegementParams => {
-  if (!hasMetaParams(state) || !exists(state.meta?.params?.[name])) {
+  if (!hasMetaParams(state) || !exists(state.meta?.params[name])) {
     return {};
   }
 
-  return Object.keys(state.meta?.params?.[name] ?? {}).reduce(
-    (params, param) => {
-      return {
-        ...params,
-        [param]: state.params[param],
-      };
-    },
-    {},
-  );
+  return Object.keys(state.meta?.params[name] ?? {}).reduce((params, param) => {
+    return {
+      ...params,
+      [param]: state.params[param],
+    };
+  }, {});
 };
 
 export default function transitionPath(

@@ -52,6 +52,6 @@ export interface Params {
     | number
     | boolean
     | Params
-    | Record<string, string>
+    | Record<string, string | number | boolean>
     | undefined;
 }

@@ -42,6 +42,7 @@ describe("useRouteNode hook", () => {
       renderWithRouter(routerWithADefaultRoute)(BaseComponent);
 
       /* first call, first argument */
+      // @ts-expect-error: rewriting tests for hooks
       expect(ChildSpy.mock.calls[0][0].route.name).toStrictEqual("test");
     });
   });

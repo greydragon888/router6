@@ -7,7 +7,7 @@ import type {
   DefaultDependencies,
   Router,
 } from "../types/router";
-import type { State, NavigationOptions, DoneFn, CancelFn } from "../types/base";
+import type { NavigationOptions, DoneFn, CancelFn, State } from "../types/base";
 
 export function transition<Dependencies extends DefaultDependencies>(
   router: Router<Dependencies>,

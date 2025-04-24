@@ -1,4 +1,4 @@
-import { PluginFactory } from "router5";
+import { PluginFactory, RouterError } from "router5";
 
 const loggerPlugin: PluginFactory = () => {
   let startGroup, endGroup;
@@ -33,7 +33,11 @@ const loggerPlugin: PluginFactory = () => {
     onTransitionCancel() {
       console.warn("Transition cancelled");
     },
-    onTransitionError(_toState, _fromState, err: { code: string }) {
+    onTransitionError(_toState, _fromState, err?: RouterError) {
+      if (!err) {
+        return;
+      }
+
       console.warn(`Transition error with code ${err.code}`);
       endGroup();
     },

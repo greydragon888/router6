@@ -1,7 +1,7 @@
 import browserPlugin from "..";
 import browser from "../browser";
 import { createRouter, constants } from "router5";
-import type { Browser } from "../types";
+import type { Browser, HistoryState } from "../types";
 import type { Router, State } from "router5";
 
 let router: Router, currentHistoryState: State | undefined;
@@ -13,7 +13,7 @@ const mockedBrowser: Browser = {
   pushState: (state) => (currentHistoryState = state),
   replaceState: (state) => (currentHistoryState = state),
   addPopstateListener: vi.fn(),
-  getState: () => currentHistoryState!,
+  getState: () => currentHistoryState! as HistoryState,
 };
 const routerConfig = [
   {

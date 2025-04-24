@@ -3,7 +3,6 @@ import type {
   QueryParamsMode,
   QueryParamsOptions,
   RouteNode,
-  RouteNodeState,
   URLParamsEncodingType,
 } from "route-node";
 import type {
@@ -15,7 +14,9 @@ import type {
   Unsubscribe,
   CancelFn,
   StateMeta,
+  RouteNodeState,
 } from "./base";
+import type { RouterError } from "../RouterError";
 
 export interface Route<
   Dependencies extends DefaultDependencies = DefaultDependencies,
@@ -55,13 +56,13 @@ export type ActivationFnFactory<
   Dependencies extends DefaultDependencies = DefaultDependencies,
 > = (router: Router<Dependencies>, dependencies: Dependencies) => ActivationFn;
 
-export type DefaultDependencies = Partial<Record<string, any>>;
+export type DefaultDependencies = Partial<Record<string, unknown>>;
 
 export interface Config {
-  decoders: Record<string, any>;
-  encoders: Record<string, any>;
-  defaultParams: Record<string, any>;
-  forwardMap: Record<string, any>;
+  decoders: Record<string, (params: Params) => Params>;
+  encoders: Record<string, (params: Params) => Params>;
+  defaultParams: Record<string, Params>;
+  forwardMap: Record<string, string>;
 }
 
 export interface Router<
@@ -95,7 +96,10 @@ export interface Router<
   setRootPath: (rootPath: string) => void;
 
   getOptions: () => Options;
-  setOption: (option: keyof Options, value: any) => Router<Dependencies>;
+  setOption: (
+    option: keyof Options,
+    value: Options[keyof Options],
+  ) => Router<Dependencies>;
 
   makeState: <P extends Params = Params, MP extends Params = Params>(
     name: string,
@@ -229,7 +233,12 @@ export interface Plugin {
   onStop?: () => void;
   onTransitionStart?: (toState: State, fromState?: State) => void;
   onTransitionCancel?: (toState: State, fromState?: State) => void;
-  onTransitionError?: (toState: State, fromState?: State, err?: any) => void;
+  onTransitionError?: (
+    toState: State,
+    fromState?: State,
+    // ToDo: err is required
+    err?: RouterError,
+  ) => void;
   onTransitionSuccess?: (
     toState: State,
     fromState?: State,
@@ -257,8 +266,8 @@ export interface SubscribeState {
 export type SubscribeFn = (state: SubscribeState) => void;
 
 export interface Listener {
-  next: (val: any) => object;
-  [key: string]: any;
+  next: (val: unknown) => object;
+  [key: string]: unknown;
 }
 
 export interface Subscription {
