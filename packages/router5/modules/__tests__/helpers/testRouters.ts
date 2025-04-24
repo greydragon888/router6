@@ -73,6 +73,7 @@ export default function createTestRouter(options?: any) {
     .addNode(
       "auth-protected",
       "/auth-protected",
+      // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
       () => () => Promise.reject({ redirect: { name: "sign-in" } }),
     );
 }

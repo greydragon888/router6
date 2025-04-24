@@ -6,10 +6,8 @@ import type {
   Router,
 } from "../types/router";
 
-function toFunction<T extends Function>(val: T): T;
-function toFunction<T>(val: T): () => () => T;
-function toFunction(val: unknown): unknown {
-  return typeof val === "function" ? val : () => () => val;
+function toFunction<T>(val: T): () => () => T {
+  return () => () => val;
 }
 
 export default function withRouteLifecycle<
@@ -38,19 +36,16 @@ export default function withRouteLifecycle<
   };
 
   router.canDeactivate = (name, canDeactivateHandler): Router<Dependencies> => {
-    // Yes!!! These blocks are duplicated. It needs for type safety.
     if (isBoolean(canDeactivateHandler)) {
-      const boolFactory = toFunction(canDeactivateHandler);
-
-      canDeactivateFactories[name] = boolFactory;
-      canDeactivateFunctions[name] =
-        router.executeFactory<ActivationFn>(boolFactory);
+      canDeactivateFactories[name] = toFunction(canDeactivateHandler);
+      canDeactivateFunctions[name] = router.executeFactory<ActivationFn>(
+        canDeactivateFactories[name],
+      );
     } else {
-      const factory = toFunction(canDeactivateHandler);
-
-      canDeactivateFactories[name] = factory;
-      canDeactivateFunctions[name] =
-        router.executeFactory<ActivationFn>(factory);
+      canDeactivateFactories[name] = canDeactivateHandler;
+      canDeactivateFunctions[name] = router.executeFactory<ActivationFn>(
+        canDeactivateFactories[name],
+      );
     }
 
     return router;
@@ -78,18 +73,16 @@ export default function withRouteLifecycle<
   };
 
   router.canActivate = (name, canActivateHandler): Router<Dependencies> => {
-    // Yes!!! These blocks are duplicated. It needs for type safety.
     if (isBoolean(canActivateHandler)) {
-      const boolFactory = toFunction(canActivateHandler);
-
-      canActivateFactories[name] = boolFactory;
-      canActivateFunctions[name] =
-        router.executeFactory<ActivationFn>(boolFactory);
+      canActivateFactories[name] = toFunction(canActivateHandler);
+      canActivateFunctions[name] = router.executeFactory<ActivationFn>(
+        canActivateFactories[name],
+      );
     } else {
-      const factory = toFunction(canActivateHandler);
-
-      canActivateFactories[name] = factory;
-      canActivateFunctions[name] = router.executeFactory<ActivationFn>(factory);
+      canActivateFactories[name] = canActivateHandler;
+      canActivateFunctions[name] = router.executeFactory<ActivationFn>(
+        canActivateFactories[name],
+      );
     }
 
     return router;
