@@ -22,23 +22,11 @@ export default tsEslint.config(
     },
     rules: {
       "prefer-template": "error",
-
       "@typescript-eslint/method-signature-style": "error",
-
-      "@typescript-eslint/no-unsafe-assignment": "off",
-      "@typescript-eslint/no-unsafe-member-access": "off",
-      "@typescript-eslint/no-unsafe-return": "off",
-      "@typescript-eslint/no-unsafe-argument": "off",
-      "@typescript-eslint/no-unsafe-function-type": "off",
-      "@typescript-eslint/no-non-null-assertion": "off",
-      "@typescript-eslint/no-redundant-type-constituents": "off",
-      "@typescript-eslint/no-invalid-void-type": "off",
       "@typescript-eslint/consistent-type-assertions": [
         "error",
         { assertionStyle: "angle-bracket" },
       ],
-
-      "@typescript-eslint/unified-signatures": "off",
       /*"@typescript-eslint/member-ordering": [
         "warn",
         {

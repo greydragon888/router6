@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions */
 import $$observable from "symbol-observable";
 import { events } from "../constants";
+import { RouterError } from "../RouterError";
 import type { EventsKeys } from "../constants";
 import type {
   DefaultDependencies,
@@ -12,7 +13,6 @@ import type {
   Subscription,
 } from "../types/router";
 import type { NavigationOptions, State, Unsubscribe } from "../types/base";
-import { RouterError } from "../RouterError";
 
 export default function withObservability<
   Dependencies extends DefaultDependencies,

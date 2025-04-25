@@ -113,6 +113,8 @@ export function resolve(
             done(undefined, resVal);
           }
         },
+        // Посмотреть по тестам, когда актуален unknown
+        // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
         (err: Error | object | unknown) => {
           if (err instanceof Error) {
             console.error(err.stack ?? err);

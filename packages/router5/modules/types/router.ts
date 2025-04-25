@@ -52,6 +52,7 @@ export type ActivationFn = (
   toState: State,
   fromState: State | undefined,
   done: DoneFn,
+  // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
 ) => boolean | Promise<boolean | object | Error | void> | State | void;
 
 export type ActivationFnFactory<

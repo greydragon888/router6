@@ -57,4 +57,5 @@ describe("ConnectedLink component", () => {
 
     expect(a.getAttribute("class")).toContain("active");
   });
+  // add test for the state packages/router5-plugin-browser/modules/browser.ts:87
 });

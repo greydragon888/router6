@@ -30,12 +30,12 @@ export default function withRoutes<Dependencies extends DefaultDependencies>(
 
       if (route.decodeParams) {
         router.config.decoders[route.name] = (params: Params): Params =>
-          route.decodeParams!(params);
+          route.decodeParams?.(params) ?? params;
       }
 
       if (route.encodeParams) {
         router.config.encoders[route.name] = (params: Params): Params =>
-          route.encodeParams!(params);
+          route.encodeParams?.(params) ?? params;
       }
 
       if (route.defaultParams) {

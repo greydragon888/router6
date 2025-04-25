@@ -44,7 +44,7 @@ const listenersPluginFactory = (
 
       if (normalizedName && !/^\$/.test(name)) {
         //@ts-expect-error: used private method
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
         const segments = router.rootNode.getSegmentsByName(normalizedName);
         if (!segments) {
           console.warn(

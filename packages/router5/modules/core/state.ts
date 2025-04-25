@@ -85,11 +85,13 @@ export default function withState<Dependencies extends DefaultDependencies>(
     }
 
     const getUrlParams = (name: string): string[] =>
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
       router.rootNode
         // @ts-expect-error use private method
         .getSegmentsByName(name)
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-non-null-assertion
         .map((segment: RouteNode) => segment.parser!.urlParams)
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         .reduce(
           (params: string[], param: string[]) => params.concat(param),
           [],

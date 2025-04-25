@@ -1,5 +1,6 @@
 import safeBrowser from "./browser";
 import { errorCodes, events } from "router5";
+import { isState } from "./typeGuards";
 import type { Params } from "router5";
 import type { BrowserPluginOptions, HistoryState } from "./types";
 import type {
@@ -157,7 +158,7 @@ function browserPluginFactory(
             params: state.params,
             path: state.path,
           }
-        : state!;
+        : state;
       const finalState: HistoryState =
         options.mergeState === true
           ? { ...(browser.getState() ?? {}), ...(<HistoryState>trimmedState) }
@@ -173,15 +174,27 @@ function browserPluginFactory(
     function onPopState(evt: PopStateEvent) {
       const routerState = router.getState();
       // Do nothing if no state or if last know state is poped state (it should never happen)
-      const newState = !evt.state?.name;
-      const state = newState
+
+      if (!isState(evt.state)) {
+        return;
+      }
+
+      const isNewState = !evt.state.name;
+      const state = isNewState
         ? router.matchPath(browser.getLocation(options), source)
         : router.makeState(
             evt.state.name,
             evt.state.params,
             evt.state.path,
-            { ...evt.state.meta, source },
-            evt.state.meta.id,
+            {
+              ...(evt.state.meta ?? {}),
+              id: evt.state.meta?.id ?? 1,
+              params: evt.state.meta?.params ?? {},
+              options: evt.state.meta?.options ?? {},
+              redirected: !!evt.state.meta?.redirected,
+              source,
+            },
+            evt.state.meta?.id,
           );
       const { defaultRoute, defaultParams } = routerOptions;
 
@@ -219,7 +232,7 @@ function browserPluginFactory(
             routerState
           ) {
             const url = router.buildUrl(routerState.name, routerState.params);
-            if (!newState) {
+            if (!isNewState) {
               // Keep history state unchanged but use current URL
               updateBrowserState(state, url, true);
             }
