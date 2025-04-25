@@ -1,3 +1,4 @@
+import { events } from "../constants";
 import type {
   TrailingSlashMode,
   QueryParamsMode,
@@ -17,6 +18,7 @@ import type {
   RouteNodeState,
 } from "./base";
 import type { RouterError } from "../RouterError";
+import type { EventsKeys } from "../constants";
 
 export interface Route<
   Dependencies extends DefaultDependencies = DefaultDependencies,
@@ -181,20 +183,18 @@ export interface Router<
   ) => Return;
 
   invokeEventListeners: (
-    eventName: string,
+    eventName: (typeof events)[EventsKeys],
     toState?: State,
     fromState?: State,
-    // opts,
-    // err
-    ...args: unknown[]
+    arg?: RouterError | NavigationOptions,
   ) => void;
   removeEventListener: (
-    eventName: string,
-    cb: (toState: State, fromState?: State) => void,
+    eventName: (typeof events)[EventsKeys],
+    cb: Plugin[keyof Plugin],
   ) => void;
   addEventListener: (
-    eventName: string,
-    cb: (toState: State, fromState?: State) => void,
+    eventName: (typeof events)[EventsKeys],
+    cb: Plugin[keyof Plugin],
   ) => Unsubscribe;
 
   cancel: () => Router<Dependencies>;
@@ -235,14 +235,13 @@ export interface Plugin {
   onTransitionCancel?: (toState: State, fromState?: State) => void;
   onTransitionError?: (
     toState: State,
-    fromState?: State,
-    // ToDo: err is required
-    err?: RouterError,
+    fromState: State | undefined,
+    err: RouterError,
   ) => void;
   onTransitionSuccess?: (
     toState: State,
-    fromState?: State,
-    opts?: NavigationOptions,
+    fromState: State | undefined,
+    opts: NavigationOptions,
   ) => void;
   teardown?: () => void;
 }

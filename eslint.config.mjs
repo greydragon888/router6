@@ -25,7 +25,6 @@ export default tsEslint.config(
 
       "@typescript-eslint/method-signature-style": "error",
 
-      "@typescript-eslint/no-unsafe-call": "off",
       "@typescript-eslint/no-unsafe-assignment": "off",
       "@typescript-eslint/no-unsafe-member-access": "off",
       "@typescript-eslint/no-unsafe-return": "off",

@@ -1,5 +1,5 @@
 import safeBrowser from "./browser";
-import { errorCodes, constants } from "router5";
+import { errorCodes, events } from "router5";
 import type { Params } from "router5";
 import type { BrowserPluginOptions, HistoryState } from "./types";
 import type {
@@ -234,7 +234,7 @@ function browserPluginFactory(
             });
           } else {
             router.invokeEventListeners(
-              constants.TRANSITION_SUCCESS,
+              events.TRANSITION_SUCCESS,
               toState,
               routerState,
               { replace: true },

@@ -1,4 +1,4 @@
-import { constants, errorCodes } from "../constants";
+import { events, errorCodes } from "../constants";
 import { RouterError } from "../RouterError";
 import type { DefaultDependencies, Router } from "../types/router";
 import type { DoneFn, State } from "../types/base";
@@ -49,13 +49,13 @@ export default function withRouterLifecycle<
       startState;
 
     started = true;
-    router.invokeEventListeners(constants.ROUTER_START);
+    router.invokeEventListeners(events.ROUTER_START);
 
     // callback
     const cb = (err?: RouterError, state?: State, invokeErrCb = true) => {
       if (!err) {
         router.invokeEventListeners(
-          constants.TRANSITION_SUCCESS,
+          events.TRANSITION_SUCCESS,
           state,
           undefined,
           {
@@ -65,7 +65,7 @@ export default function withRouterLifecycle<
       }
       if (err && invokeErrCb) {
         router.invokeEventListeners(
-          constants.TRANSITION_ERROR,
+          events.TRANSITION_ERROR,
           state,
           undefined,
           err,
@@ -140,7 +140,7 @@ export default function withRouterLifecycle<
     if (started) {
       router.setState(undefined);
       started = false;
-      router.invokeEventListeners(constants.ROUTER_STOP);
+      router.invokeEventListeners(events.ROUTER_STOP);
     }
 
     return router;

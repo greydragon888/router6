@@ -85,6 +85,7 @@ export default function withState<Dependencies extends DefaultDependencies>(
     }
 
     const getUrlParams = (name: string): string[] =>
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       router.rootNode
         // @ts-expect-error use private method
         .getSegmentsByName(name)

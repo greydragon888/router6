@@ -1,4 +1,4 @@
-import { constants, errorCodes } from "../constants";
+import { events, errorCodes } from "../constants";
 import { transition } from "../transition";
 import { RouterError } from "../RouterError";
 import type { DefaultDependencies, Router } from "../types/router";
@@ -90,7 +90,7 @@ export default function withNavigation<
 
       done(err);
       router.invokeEventListeners(
-        constants.TRANSITION_ERROR,
+        events.TRANSITION_ERROR,
         undefined,
         router.getState(),
         err,
@@ -117,7 +117,7 @@ export default function withNavigation<
 
       done(err);
       router.invokeEventListeners(
-        constants.TRANSITION_ERROR,
+        events.TRANSITION_ERROR,
         toState,
         router.getState(),
         err,
@@ -138,7 +138,7 @@ export default function withNavigation<
     return router.transitionToState(toState, fromState, opts, (err, state) => {
       if (!err) {
         router.invokeEventListeners(
-          constants.TRANSITION_SUCCESS,
+          events.TRANSITION_SUCCESS,
           state,
           fromState,
           opts,
@@ -199,7 +199,7 @@ export default function withNavigation<
     done: DoneFn = noop,
   ): CancelFn => {
     router.cancel();
-    router.invokeEventListeners(constants.TRANSITION_START, toState, fromState);
+    router.invokeEventListeners(events.TRANSITION_START, toState, fromState);
 
     const callback: DoneFn = (err, state) => {
       cancelCurrentTransition = null;
@@ -212,13 +212,13 @@ export default function withNavigation<
           err.code === errorCodes.TRANSITION_CANCELLED
         ) {
           router.invokeEventListeners(
-            constants.TRANSITION_CANCEL,
+            events.TRANSITION_CANCEL,
             toState,
             fromState,
           );
         } else {
           router.invokeEventListeners(
-            constants.TRANSITION_ERROR,
+            events.TRANSITION_ERROR,
             toState,
             fromState,
             err,

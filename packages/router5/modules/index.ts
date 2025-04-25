@@ -1,6 +1,6 @@
 import createRouter from "./createRouter";
 import transitionPath from "router5-transition-path";
-import { constants, errorCodes } from "./constants";
+import { events, errorCodes, constants } from "./constants";
 import cloneRouter from "./clone";
 import { RouterError } from "./RouterError";
 import type { RouteNode } from "route-node";
@@ -34,6 +34,7 @@ export {
   cloneRouter,
   transitionPath,
   constants,
+  events,
   errorCodes,
   RouterError,
 };

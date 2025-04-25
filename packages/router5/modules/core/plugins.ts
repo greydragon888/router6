@@ -1,4 +1,4 @@
-import { constants } from "../constants";
+import { events } from "../constants";
 import { isObjKey } from "../typeGuards";
 import type {
   Router,
@@ -9,12 +9,12 @@ import type {
 import type { Unsubscribe } from "../types/base";
 
 const eventsMap = {
-  onStart: constants.ROUTER_START,
-  onStop: constants.ROUTER_STOP,
-  onTransitionSuccess: constants.TRANSITION_SUCCESS,
-  onTransitionStart: constants.TRANSITION_START,
-  onTransitionError: constants.TRANSITION_ERROR,
-  onTransitionCancel: constants.TRANSITION_CANCEL,
+  onStart: events.ROUTER_START,
+  onStop: events.ROUTER_STOP,
+  onTransitionSuccess: events.TRANSITION_SUCCESS,
+  onTransitionStart: events.TRANSITION_START,
+  onTransitionError: events.TRANSITION_ERROR,
+  onTransitionCancel: events.TRANSITION_CANCEL,
 };
 
 export default function withPlugins<

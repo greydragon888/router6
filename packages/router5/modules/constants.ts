@@ -11,14 +11,7 @@ type ErrorCodesKeys =
 
 export type ErrorCodes = Record<ErrorCodesKeys, string>;
 
-type ConstantsKeys =
-  | "UNKNOWN_ROUTE"
-  | "ROUTER_START"
-  | "ROUTER_STOP"
-  | "TRANSITION_START"
-  | "TRANSITION_CANCEL"
-  | "TRANSITION_SUCCESS"
-  | "TRANSITION_ERROR";
+export type ConstantsKeys = "UNKNOWN_ROUTE";
 
 export type Constants = Record<ConstantsKeys, string>;
 
@@ -36,6 +29,20 @@ export const errorCodes: ErrorCodes = {
 
 export const constants: Constants = {
   UNKNOWN_ROUTE: "@@router5/UNKNOWN_ROUTE",
+};
+
+export const plugins = <const>{
+  ROUTER_START: "onStart",
+  ROUTER_STOP: "onStop",
+  TRANSITION_START: "onTransitionStart",
+  TRANSITION_CANCEL: "onTransitionCancel",
+  TRANSITION_SUCCESS: "onTransitionSuccess",
+  TRANSITION_ERROR: "onTransitionError",
+};
+
+export type EventsKeys = keyof typeof plugins;
+
+export const events = <const>{
   ROUTER_START: "$start",
   ROUTER_STOP: "$stop",
   TRANSITION_START: "$$start",
