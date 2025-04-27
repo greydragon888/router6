@@ -38,9 +38,8 @@ export const plugins = <const>{
   TRANSITION_CANCEL: "onTransitionCancel",
   TRANSITION_SUCCESS: "onTransitionSuccess",
   TRANSITION_ERROR: "onTransitionError",
+  TEARDOWN: "teardown",
 };
-
-export type EventsKeys = keyof typeof plugins;
 
 export const events = <const>{
   ROUTER_START: "$start",
@@ -49,4 +48,8 @@ export const events = <const>{
   TRANSITION_CANCEL: "$$cancel",
   TRANSITION_SUCCESS: "$$success",
   TRANSITION_ERROR: "$$error",
+  TEARDOWN: "$$teardown",
 };
+
+export type EventsKeys = keyof typeof plugins;
+export type EventName = (typeof events)[EventsKeys];

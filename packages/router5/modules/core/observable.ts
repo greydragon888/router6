@@ -1,9 +1,6 @@
-// ToDo: remove eslint-disable
-/* eslint-disable @typescript-eslint/consistent-type-assertions */
 import $$observable from "symbol-observable";
-import { events } from "../constants";
+import { events, plugins } from "../constants";
 import { RouterError } from "../RouterError";
-import type { EventsKeys } from "../constants";
 import type {
   DefaultDependencies,
   Listener,
@@ -13,13 +10,61 @@ import type {
   Subscription,
 } from "../types/router";
 import type { NavigationOptions, State, Unsubscribe } from "../types/base";
+import type { EventName, EventsKeys } from "../constants";
+
+type EventMethodMap = {
+  [K in EventsKeys as (typeof events)[K]]: (typeof plugins)[K];
+};
+type EventListenerMap = {
+  [E in keyof EventMethodMap]: Plugin[EventMethodMap[E]][];
+};
+
+/**
+ * Invoke all listeners for a given event.
+ *
+ * @template E  Event literal type.
+ * @param eventName  The event being dispatched (used only for logging).
+ * @param arr        Array of callbacks (or undefined).
+ * @param args       Arguments to pass to each callback.
+ */
+function invokeFor<E extends EventName>(
+  eventName: E,
+  arr: Plugin[EventMethodMap[E]][] | undefined,
+  ...args: Parameters<NonNullable<Plugin[EventMethodMap[E]]>>
+): void {
+  if (!arr) {
+    return;
+  }
+
+  // Clone the listeners array so that removals/additions
+  // during iteration won't affect this loop.
+  const listeners = arr.slice();
+
+  for (const cb of listeners) {
+    if (!cb) {
+      continue;
+    }
+    try {
+      // Use Reflect.apply to pass the args array directly
+      Reflect.apply(cb, undefined, args);
+    } catch (err) {
+      console.error(`Error in listener for ${eventName}:`, err);
+    }
+  }
+}
 
 export default function withObservability<
   Dependencies extends DefaultDependencies,
 >(router: Router<Dependencies>): Router<Dependencies> {
-  const callbacks: Partial<
-    Record<(typeof events)[EventsKeys], Plugin[keyof Plugin][]>
-  > = {};
+  const callbacks: EventListenerMap = {
+    [events.ROUTER_START]: [],
+    [events.TRANSITION_START]: [],
+    [events.TRANSITION_SUCCESS]: [],
+    [events.TRANSITION_ERROR]: [],
+    [events.TRANSITION_CANCEL]: [],
+    [events.TEARDOWN]: [],
+    [events.ROUTER_STOP]: [],
+  };
 
   router.invokeEventListeners = (
     eventName: (typeof events)[EventsKeys],
@@ -27,12 +72,6 @@ export default function withObservability<
     fromState?: State,
     arg?: RouterError | NavigationOptions,
   ) => {
-    const pluginsArr = callbacks[eventName];
-
-    if (!pluginsArr) {
-      return;
-    }
-
     switch (eventName) {
       case events.TRANSITION_START:
       case events.TRANSITION_CANCEL:
@@ -42,27 +81,16 @@ export default function withObservability<
           );
         }
 
-        (pluginsArr as Plugin["onTransitionCancel"][]).forEach((cb) => {
-          if (!cb) {
-            return;
-          }
-
-          cb(toState, fromState);
-        });
+        invokeFor(eventName, callbacks[eventName], toState, fromState);
         break;
       case events.TRANSITION_ERROR:
-        if (!toState || !arg || !(arg instanceof RouterError)) {
+        if (!arg || !(arg instanceof RouterError)) {
           throw new TypeError(
             `Expected toState and error to be defined for event ${eventName}`,
           );
         }
-        (pluginsArr as Plugin["onTransitionError"][]).forEach((cb) => {
-          if (!cb) {
-            return;
-          }
 
-          cb(toState, fromState, arg);
-        });
+        invokeFor(eventName, callbacks[eventName], toState, fromState, arg);
         break;
       case events.TRANSITION_SUCCESS:
         if (
@@ -75,46 +103,36 @@ export default function withObservability<
             `Expected toState and options to be defined for event ${eventName}`,
           );
         }
-        (pluginsArr as Plugin["onTransitionSuccess"][]).forEach((cb) => {
-          if (!cb) {
-            return;
-          }
 
-          cb(toState, fromState, arg);
-        });
+        invokeFor(eventName, callbacks[eventName], toState, fromState, arg);
         break;
       default:
-        (pluginsArr as Plugin["teardown"][]).forEach((cb) => {
-          if (!cb) {
-            return;
-          }
-
-          cb();
-        });
+        invokeFor(eventName, callbacks[eventName]);
         break;
     }
   };
 
-  router.removeEventListener = (
-    eventName: (typeof events)[EventsKeys],
-    cb: Plugin[keyof Plugin],
+  router.removeEventListener = <E extends EventName>(
+    eventName: E,
+    cb: Plugin[EventMethodMap[E]],
   ) => {
-    const pluginsArr = callbacks[eventName];
+    const idx = callbacks[eventName].indexOf(cb);
 
-    if (!pluginsArr) {
-      return;
+    if (idx === -1) {
+      throw new Error(
+        `Passed callback for event ${eventName} was not registered`,
+      );
     }
 
-    callbacks[eventName] = pluginsArr.filter((_cb) => _cb !== cb);
+    // Remove passed event listener
+    callbacks[eventName].splice(idx, 1);
   };
 
-  router.addEventListener = (
-    eventName: (typeof events)[EventsKeys],
-    cb: Plugin[keyof Plugin],
+  router.addEventListener = <E extends EventName>(
+    eventName: E,
+    cb: Plugin[EventMethodMap[E]],
   ): Unsubscribe => {
-    const pluginsArr = eventName in callbacks ? callbacks[eventName] : [];
-
-    callbacks[eventName] = pluginsArr?.concat(cb) ?? [cb];
+    callbacks[eventName].push(cb);
 
     return () => {
       router.removeEventListener(eventName, cb);

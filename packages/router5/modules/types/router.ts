@@ -235,7 +235,8 @@ export interface Plugin {
   onTransitionStart?: (toState: State, fromState?: State) => void;
   onTransitionCancel?: (toState: State, fromState?: State) => void;
   onTransitionError?: (
-    toState: State,
+    // ToDo: check cases when toState, fromState is not undefined
+    toState: State | undefined,
     fromState: State | undefined,
     err: RouterError,
   ) => void;
