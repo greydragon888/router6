@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/consistent-type-assertions */
+import { isHistoryState } from "./typeGuards";
 import type { Browser, HistoryState } from "./types";
 import type { State } from "router5";
 
@@ -74,7 +76,16 @@ const safelyEncodePath = (path: string) => {
   }
 };
 
-const getState = () => window.history.state;
+const getState = () => {
+  if (!window.history.state) {
+    return undefined;
+  }
+  if (!isHistoryState(window.history.state)) {
+    throw new Error("History state is not a valid state object");
+  }
+
+  return window.history.state;
+};
 
 const getHash = () => window.location.hash;
 

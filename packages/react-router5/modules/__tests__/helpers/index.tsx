@@ -5,7 +5,7 @@ import browserPlugin from "router5-plugin-browser";
 import type { FC, ComponentType } from "react";
 import type { Router } from "router5";
 
-export const FnChild: FC<Record<string, any>> = () => <div />;
+export const FnChild: FC = () => <div />;
 
 export const createTestRouter = (): Router => {
   const router = createRouter([]);

@@ -31,4 +31,4 @@ export interface Browser {
   getHash: () => string;
 }
 
-export type HistoryState = State & Record<string, any>;
+export type HistoryState = State & Record<string, unknown>;

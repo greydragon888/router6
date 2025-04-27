@@ -28,11 +28,12 @@ describe("useRouteNode hook", () => {
 
     expect(ChildSpy).toHaveBeenCalledWith({
       router,
-      route: null,
-      previousRoute: null,
+      route: undefined,
+      previousRoute: undefined,
     });
   });
 
+  // add test for the state packages/router5-plugin-browser/modules/browser.ts:87
   it("should not return a null route with a default route and the router started", () => {
     const ChildSpy = vi.fn(FnChild);
 
@@ -42,6 +43,7 @@ describe("useRouteNode hook", () => {
       renderWithRouter(routerWithADefaultRoute)(BaseComponent);
 
       /* first call, first argument */
+      // @ts-expect-error: rewriting tests for hooks
       expect(ChildSpy.mock.calls[0][0].route.name).toStrictEqual("test");
     });
   });

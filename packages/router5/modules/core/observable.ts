@@ -1,40 +1,138 @@
 import $$observable from "symbol-observable";
-import { constants } from "../constants";
+import { events, plugins } from "../constants";
+import { RouterError } from "../RouterError";
 import type {
   DefaultDependencies,
   Listener,
+  Plugin,
   Router,
   SubscribeFn,
   Subscription,
 } from "../types/router";
-import type { State, Unsubscribe } from "../types/base";
+import type { NavigationOptions, State, Unsubscribe } from "../types/base";
+import type { EventName, EventsKeys } from "../constants";
+
+type EventMethodMap = {
+  [K in EventsKeys as (typeof events)[K]]: (typeof plugins)[K];
+};
+type EventListenerMap = {
+  [E in keyof EventMethodMap]: Plugin[EventMethodMap[E]][];
+};
+
+/**
+ * Invoke all listeners for a given event.
+ *
+ * @template E  Event literal type.
+ * @param eventName  The event being dispatched (used only for logging).
+ * @param arr        Array of callbacks (or undefined).
+ * @param args       Arguments to pass to each callback.
+ */
+function invokeFor<E extends EventName>(
+  eventName: E,
+  arr: Plugin[EventMethodMap[E]][] | undefined,
+  ...args: Parameters<NonNullable<Plugin[EventMethodMap[E]]>>
+): void {
+  if (!arr) {
+    return;
+  }
+
+  // Clone the listeners array so that removals/additions
+  // during iteration won't affect this loop.
+  const listeners = arr.slice();
+
+  for (const cb of listeners) {
+    if (!cb) {
+      continue;
+    }
+    try {
+      // Use Reflect.apply to pass the args array directly
+      Reflect.apply(cb, undefined, args);
+    } catch (err) {
+      console.error(`Error in listener for ${eventName}:`, err);
+    }
+  }
+}
 
 export default function withObservability<
   Dependencies extends DefaultDependencies,
 >(router: Router<Dependencies>): Router<Dependencies> {
-  const callbacks: Record<string, Function[]> = {};
-
-  router.invokeEventListeners = (eventName: string, ...args: unknown[]) => {
-    (eventName in callbacks ? callbacks[eventName] : []).forEach((cb) =>
-      cb(...args),
-    );
+  const callbacks: EventListenerMap = {
+    [events.ROUTER_START]: [],
+    [events.TRANSITION_START]: [],
+    [events.TRANSITION_SUCCESS]: [],
+    [events.TRANSITION_ERROR]: [],
+    [events.TRANSITION_CANCEL]: [],
+    [events.TEARDOWN]: [],
+    [events.ROUTER_STOP]: [],
   };
 
-  router.removeEventListener = (
-    eventName: string,
-    cb: (toState: State, fromState?: State) => void,
+  router.invokeEventListeners = (
+    eventName: (typeof events)[EventsKeys],
+    toState?: State,
+    fromState?: State,
+    arg?: RouterError | NavigationOptions,
   ) => {
-    callbacks[eventName] = callbacks[eventName].filter((_cb) => _cb !== cb);
+    switch (eventName) {
+      case events.TRANSITION_START:
+      case events.TRANSITION_CANCEL:
+        if (!toState) {
+          throw new TypeError(
+            `Expected toState to be defined for event ${eventName}`,
+          );
+        }
+
+        invokeFor(eventName, callbacks[eventName], toState, fromState);
+        break;
+      case events.TRANSITION_ERROR:
+        if (!arg || !(arg instanceof RouterError)) {
+          throw new TypeError(
+            `Expected toState and error to be defined for event ${eventName}`,
+          );
+        }
+
+        invokeFor(eventName, callbacks[eventName], toState, fromState, arg);
+        break;
+      case events.TRANSITION_SUCCESS:
+        if (
+          !toState ||
+          !arg ||
+          typeof arg !== "object" ||
+          arg instanceof RouterError
+        ) {
+          throw new TypeError(
+            `Expected toState and options to be defined for event ${eventName}`,
+          );
+        }
+
+        invokeFor(eventName, callbacks[eventName], toState, fromState, arg);
+        break;
+      default:
+        invokeFor(eventName, callbacks[eventName]);
+        break;
+    }
   };
 
-  router.addEventListener = (
-    eventName: string,
-    cb: (toState: State, fromState?: State) => void,
+  router.removeEventListener = <E extends EventName>(
+    eventName: E,
+    cb: Plugin[EventMethodMap[E]],
+  ) => {
+    const idx = callbacks[eventName].indexOf(cb);
+
+    if (idx === -1) {
+      throw new Error(
+        `Passed callback for event ${eventName} was not registered`,
+      );
+    }
+
+    // Remove passed event listener
+    callbacks[eventName].splice(idx, 1);
+  };
+
+  router.addEventListener = <E extends EventName>(
+    eventName: E,
+    cb: Plugin[EventMethodMap[E]],
   ): Unsubscribe => {
-    callbacks[eventName] = [
-      ...(eventName in callbacks ? callbacks[eventName] : []),
-      cb,
-    ];
+    callbacks[eventName].push(cb);
 
     return () => {
       router.removeEventListener(eventName, cb);
@@ -49,11 +147,11 @@ export default function withObservability<
 
     // Automatically listens to the TRANSITION_SUCCESS event
     const unsubscribeHandler = router.addEventListener(
-      constants.TRANSITION_SUCCESS,
-      (toState, fromState) => {
+      events.TRANSITION_SUCCESS,
+      (toState: State, fromState?: State) => {
         finalListener({
           route: toState,
-          previousRoute: fromState ?? null,
+          previousRoute: fromState,
         });
       },
     );
@@ -77,9 +175,7 @@ export default function withObservability<
   }
 
   router.subscribe = subscribe;
-  //@ts-expect-error: TypeScript does not allow indexing with a symbol, but this is required for observable interop
   router[$$observable] = observable;
-  //@ts-expect-error: TypeScript does not allow indexing with a symbol, but this is required for observable interop
   router["@@observable"] = observable;
 
   return router;

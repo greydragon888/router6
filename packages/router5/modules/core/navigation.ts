@@ -1,5 +1,6 @@
-import { constants, errorCodes } from "../constants";
+import { events, errorCodes } from "../constants";
 import { transition } from "../transition";
+import { RouterError } from "../RouterError";
 import type { DefaultDependencies, Router } from "../types/router";
 import type {
   CancelFn,
@@ -77,21 +78,24 @@ export default function withNavigation<
       getNavigationArguments(args);
 
     if (!router.isStarted()) {
-      done({ code: errorCodes.ROUTER_NOT_STARTED });
+      done(new RouterError(errorCodes.ROUTER_NOT_STARTED));
+
       return noop;
     }
 
     const route = router.buildState(name, params);
 
     if (!route) {
-      const err = { code: errorCodes.ROUTE_NOT_FOUND };
+      const err = new RouterError(errorCodes.ROUTE_NOT_FOUND);
+
       done(err);
       router.invokeEventListeners(
-        constants.TRANSITION_ERROR,
-        null,
+        events.TRANSITION_ERROR,
+        undefined,
         router.getState(),
         err,
       );
+
       return noop;
     }
 
@@ -99,7 +103,7 @@ export default function withNavigation<
       route.name,
       route.params,
       router.buildPath(route.name, route.params),
-      { params: route.meta, options: opts },
+      { id: 1, params: route.meta, options: opts, redirected: false },
     );
 
     const sameStates = router.getState()
@@ -109,47 +113,49 @@ export default function withNavigation<
     // Do not proceed further if states are the same and no reload
     // (no deactivation and no callbacks)
     if (sameStates && !opts.reload && !opts.force) {
-      const err = { code: errorCodes.SAME_STATES };
+      const err = new RouterError(errorCodes.SAME_STATES);
+
       done(err);
       router.invokeEventListeners(
-        constants.TRANSITION_ERROR,
+        events.TRANSITION_ERROR,
         toState,
         router.getState(),
         err,
       );
+
       return noop;
     }
 
     const fromState = router.getState();
 
     if (opts.skipTransition) {
-      done(null, toState);
+      done(undefined, toState);
+
       return noop;
     }
 
     // Transition
     return router.transitionToState(toState, fromState, opts, (err, state) => {
-      if (err) {
-        if (typeof err === "object" && "redirect" in err) {
-          const { name, params } = err.redirect;
-
-          navigate(
-            name,
-            params,
-            { ...opts, force: true, redirected: true },
-            done,
-          );
-        } else {
-          done(err);
-        }
-      } else {
+      if (!err) {
         router.invokeEventListeners(
-          constants.TRANSITION_SUCCESS,
+          events.TRANSITION_SUCCESS,
           state,
           fromState,
           opts,
         );
-        done(null, state);
+
+        done(undefined, state);
+      } else if (err.redirect) {
+        const { name, params } = err.redirect;
+
+        navigate(
+          name,
+          params,
+          { ...opts, force: true, redirected: true },
+          done,
+        );
+      } else {
+        done(err);
       }
     });
   };
@@ -188,12 +194,12 @@ export default function withNavigation<
 
   router.transitionToState = (
     toState: State,
-    fromState: State | null,
+    fromState?: State,
     options: NavigationOptions = {},
     done: DoneFn = noop,
   ): CancelFn => {
     router.cancel();
-    router.invokeEventListeners(constants.TRANSITION_START, toState, fromState);
+    router.invokeEventListeners(events.TRANSITION_START, toState, fromState);
 
     const callback: DoneFn = (err, state) => {
       cancelCurrentTransition = null;
@@ -206,13 +212,13 @@ export default function withNavigation<
           err.code === errorCodes.TRANSITION_CANCELLED
         ) {
           router.invokeEventListeners(
-            constants.TRANSITION_CANCEL,
+            events.TRANSITION_CANCEL,
             toState,
             fromState,
           );
         } else {
           router.invokeEventListeners(
-            constants.TRANSITION_ERROR,
+            events.TRANSITION_ERROR,
             toState,
             fromState,
             err,
@@ -221,12 +227,12 @@ export default function withNavigation<
         done(err);
       } else {
         router.setState(state);
-        done(null, state);
+        done(undefined, state);
       }
     };
 
     cancelCurrentTransition = transition(
-      router as Router,
+      router,
       toState,
       fromState,
       options,

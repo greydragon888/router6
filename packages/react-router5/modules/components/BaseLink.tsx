@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, useMemo } from "react";
 import type { FC, MouseEvent } from "react";
 import type { BaseLinkProps } from "./interfaces";
 import type { State } from "router5";
+import type { RouterError } from "router5";
 
 export const BaseLink: FC<BaseLinkProps> = ({
   routeName,
@@ -29,7 +30,7 @@ export const BaseLink: FC<BaseLinkProps> = ({
   const [active, setActive] = useState<boolean>(getActiveState());
 
   // Callback to handle successful or erroneous navigation
-  const callback: (err?: any, state?: State) => void = useCallback(
+  const callback: (err?: RouterError, state?: State) => void = useCallback(
     (err, state) => {
       if (!err && successCallback) {
         successCallback(state);

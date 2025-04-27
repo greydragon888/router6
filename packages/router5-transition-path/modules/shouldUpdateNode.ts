@@ -1,8 +1,8 @@
 import transitionPath from "./transitionPath";
-import { State } from "./transitionPath";
+import type { State } from "./transitionPath";
 
 export default function shouldUpdateNode(nodeName: string) {
-  return (toState: State, fromSate: State | null): boolean => {
+  return (toState: State, fromSate?: State): boolean => {
     const {
       intersection,
       toActivate,
@@ -11,7 +11,7 @@ export default function shouldUpdateNode(nodeName: string) {
 
     const toDeactivate = [...toDeactivateReversed].reverse();
 
-    if (toState.meta?.options?.reload) {
+    if (toState.meta?.options.reload) {
       return true;
     }
 

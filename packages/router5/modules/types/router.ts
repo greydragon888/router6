@@ -1,9 +1,9 @@
+import { events } from "../constants";
 import type {
   TrailingSlashMode,
   QueryParamsMode,
   QueryParamsOptions,
   RouteNode,
-  RouteNodeState,
   URLParamsEncodingType,
 } from "route-node";
 import type {
@@ -15,7 +15,10 @@ import type {
   Unsubscribe,
   CancelFn,
   StateMeta,
+  RouteNodeState,
 } from "./base";
+import type { RouterError } from "../RouterError";
+import type { EventsKeys } from "../constants";
 
 export interface Route<
   Dependencies extends DefaultDependencies = DefaultDependencies,
@@ -47,26 +50,29 @@ export interface Options {
 
 export type ActivationFn = (
   toState: State,
-  fromState: State,
+  fromState: State | undefined,
   done: DoneFn,
-) => boolean | Promise<boolean | Error | void> | void;
+  // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+) => boolean | Promise<boolean | object | Error | void> | State | void;
 
 export type ActivationFnFactory<
   Dependencies extends DefaultDependencies = DefaultDependencies,
-> = (router: Router<Dependencies>, dependencies?: Dependencies) => ActivationFn;
+> = (router: Router<Dependencies>, dependencies: Dependencies) => ActivationFn;
 
-export type DefaultDependencies = Record<string, any>;
+export type DefaultDependencies = Partial<Record<string, unknown>>;
 
 export interface Config {
-  decoders: Record<string, any>;
-  encoders: Record<string, any>;
-  defaultParams: Record<string, any>;
-  forwardMap: Record<string, any>;
+  decoders: Record<string, (params: Params) => Params>;
+  encoders: Record<string, (params: Params) => Params>;
+  defaultParams: Record<string, Params>;
+  forwardMap: Record<string, string>;
 }
 
 export interface Router<
   Dependencies extends DefaultDependencies = DefaultDependencies,
 > {
+  [key: symbol]: unknown;
+  [key: string]: unknown;
   config: Config;
 
   rootNode: RouteNode;
@@ -86,30 +92,46 @@ export interface Router<
     ignoreQueryParams?: boolean,
   ) => boolean;
   buildPath: (route: string, params?: Params) => string;
-  matchPath: (path: string, source?: string) => State | null;
+  matchPath: <P extends Params = Params, MP extends Params = Params>(
+    path: string,
+    source?: string,
+  ) => State<P, MP> | undefined;
   setRootPath: (rootPath: string) => void;
 
   getOptions: () => Options;
-  setOption: (option: keyof Options, value: any) => Router<Dependencies>;
+  setOption: (
+    option: keyof Options,
+    value: Options[keyof Options],
+  ) => Router<Dependencies>;
 
-  makeState: (
+  makeState: <P extends Params = Params, MP extends Params = Params>(
     name: string,
-    params?: Params,
+    params?: P,
     path?: string,
-    meta?: Partial<StateMeta>,
+    meta?: StateMeta<MP>,
     forceId?: number,
-  ) => State;
+  ) => State<P, MP>;
   makeNotFoundState: (path: string, options?: NavigationOptions) => State;
-  getState: () => State | null;
-  setState: (state: State | null) => void;
+  getState: <P extends Params = Params, MP extends Params = Params>() =>
+    | State<P, MP>
+    | undefined;
+  setState: <P extends Params = Params, MP extends Params = Params>(
+    state?: State<P, MP>,
+  ) => void;
   areStatesEqual: (
-    state1: State | null | undefined,
-    state2: State | null | undefined,
+    state1: State | undefined,
+    state2: State | undefined,
     ignoreQueryParams?: boolean,
   ) => boolean;
   areStatesDescendants: (parentState: State, childState: State) => boolean;
-  forwardState: (routeName: string, routeParams: Params) => SimpleState;
-  buildState: (routeName: string, routeParams: Params) => RouteNodeState | null;
+  forwardState: <P extends Params = Params>(
+    routeName: string,
+    routeParams: P,
+  ) => SimpleState<P>;
+  buildState: (
+    routeName: string,
+    routeParams: Params,
+  ) => RouteNodeState | undefined;
 
   isStarted: () => boolean;
   start: (() => Router<Dependencies>) &
@@ -161,15 +183,19 @@ export interface Router<
     ) => Return,
   ) => Return;
 
-  // ToDo: improve arguments types
-  invokeEventListeners: (eventName: string, ...args: unknown[]) => void;
+  invokeEventListeners: (
+    eventName: (typeof events)[EventsKeys],
+    toState?: State,
+    fromState?: State,
+    arg?: RouterError | NavigationOptions,
+  ) => void;
   removeEventListener: (
-    eventName: string,
-    cb: (toState: State, fromState?: State) => void,
+    eventName: (typeof events)[EventsKeys],
+    cb: Plugin[keyof Plugin],
   ) => void;
   addEventListener: (
-    eventName: string,
-    cb: (toState: State, fromState?: State) => void,
+    eventName: (typeof events)[EventsKeys],
+    cb: Plugin[keyof Plugin],
   ) => Unsubscribe;
 
   cancel: () => Router<Dependencies>;
@@ -195,7 +221,7 @@ export interface Router<
     ((opts: NavigationOptions, done: DoneFn) => CancelFn);
   transitionToState: (
     toState: State,
-    fromState: State | null,
+    fromState: State | undefined,
     opts: NavigationOptions,
     done?: DoneFn,
   ) => CancelFn;
@@ -208,20 +234,22 @@ export interface Plugin {
   onStop?: () => void;
   onTransitionStart?: (toState: State, fromState?: State) => void;
   onTransitionCancel?: (toState: State, fromState?: State) => void;
-  onTransitionError?: (toState: State, fromState?: State, err?: any) => void;
+  onTransitionError?: (
+    // ToDo: check cases when toState, fromState is not undefined
+    toState: State | undefined,
+    fromState: State | undefined,
+    err: RouterError,
+  ) => void;
   onTransitionSuccess?: (
     toState: State,
-    fromState?: State,
-    opts?: NavigationOptions,
+    fromState: State | undefined,
+    opts: NavigationOptions,
   ) => void;
   teardown?: () => void;
 }
 
-export type Middleware = (
-  toState: State,
-  fromState: State,
-  done: DoneFn,
-) => boolean | Promise<any> | void;
+// eslint-disable-next-line sonarjs/redundant-type-aliases
+export type Middleware = ActivationFn;
 
 export type MiddlewareFactory<
   Dependencies extends DefaultDependencies = DefaultDependencies,
@@ -229,18 +257,18 @@ export type MiddlewareFactory<
 
 export type PluginFactory<
   Dependencies extends DefaultDependencies = DefaultDependencies,
-> = (router: Router<Dependencies>, dependencies?: Dependencies) => Plugin;
+> = (router: Router<Dependencies>, dependencies: Dependencies) => Plugin;
 
 export interface SubscribeState {
   route: State;
-  previousRoute: State | null;
+  previousRoute?: State | undefined;
 }
 
 export type SubscribeFn = (state: SubscribeState) => void;
 
 export interface Listener {
-  next: (val: any) => object;
-  [key: string]: any;
+  next: (val: unknown) => object;
+  [key: string]: unknown;
 }
 
 export interface Subscription {

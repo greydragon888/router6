@@ -53,7 +53,11 @@ describe("core/utils", () => {
     });
 
     it("should decode path params on match", () => {
-      expect(omitMeta(router.matchPath("/encoded/hello/123")!)).toStrictEqual({
+      expect(
+        omitMeta(
+          router.matchPath<{ one: string; two: string }>("/encoded/hello/123")!,
+        ),
+      ).toStrictEqual({
         name: "withEncoder",
         params: {
           one: "hello",
@@ -135,7 +139,9 @@ describe("core/utils", () => {
     });
 
     it("should match paths", () => {
-      const match = router.matchPath("/query?param1=✓&param2=✗");
+      const match = router.matchPath<{ param1: boolean; param: boolean }>(
+        "/query?param1=✓&param2=✗",
+      );
 
       expect(match?.params).toStrictEqual({
         param1: true,

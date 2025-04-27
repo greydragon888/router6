@@ -22,22 +22,11 @@ export default tsEslint.config(
     },
     rules: {
       "prefer-template": "error",
-
       "@typescript-eslint/method-signature-style": "error",
-
-      "@typescript-eslint/no-unsafe-call": "off",
-      "@typescript-eslint/no-unsafe-assignment": "off",
-      "@typescript-eslint/no-unsafe-member-access": "off",
-      "@typescript-eslint/no-unsafe-return": "off",
-      "@typescript-eslint/no-unsafe-argument": "off",
-      "@typescript-eslint/no-unsafe-function-type": "off",
-      "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/no-non-null-assertion": "off",
-      "@typescript-eslint/prefer-promise-reject-errors": "off",
-      "@typescript-eslint/no-redundant-type-constituents": "off",
-      "@typescript-eslint/no-invalid-void-type": "off",
-
-      "@typescript-eslint/unified-signatures": "off",
+      "@typescript-eslint/consistent-type-assertions": [
+        "error",
+        { assertionStyle: "angle-bracket" },
+      ],
       /*"@typescript-eslint/member-ordering": [
         "warn",
         {
@@ -218,6 +207,28 @@ export default tsEslint.config(
           next: "export",
         },
       ],*/
+    },
+  },
+  {
+    files: ["**/__tests__/*.ts?(x)"],
+    languageOptions: {
+      parserOptions: {
+        project: "./tsconfig.json",
+      },
+    },
+    rules: {
+      "@typescript-eslint/consistent-type-assertions": "off",
+      "@typescript-eslint/prefer-promise-reject-errors": "off",
+      "@typescript-eslint/no-unsafe-call": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-return": "off",
+      "@typescript-eslint/no-unsafe-argument": "off",
+      "@typescript-eslint/no-unsafe-function-type": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-non-null-assertion": "off",
+      "@typescript-eslint/no-redundant-type-constituents": "off",
+      "@typescript-eslint/no-invalid-void-type": "off",
     },
   },
   {

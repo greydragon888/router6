@@ -31,12 +31,10 @@ describe("core/navigation", () => {
   it("should navigate to same state if reload is set to true", () => {
     router.navigate("orders.pending", () => {
       router.navigate("orders.pending", (err) => {
-        expect((err as { code: string }).code).toStrictEqual(
-          errorCodes.SAME_STATES,
-        );
+        expect(err?.code).toStrictEqual(errorCodes.SAME_STATES);
 
         router.navigate("orders.pending", {}, { reload: true }, (err) => {
-          expect(err).toStrictEqual(null);
+          expect(err).toStrictEqual(undefined);
         });
       });
     });
@@ -45,9 +43,7 @@ describe("core/navigation", () => {
   it("should be able to cancel a transition", () => {
     router.canActivate("admin", () => () => Promise.resolve());
     const cancel = router.navigate("admin", (err) => {
-      expect((err as { code: string }).code).toStrictEqual(
-        errorCodes.TRANSITION_CANCELLED,
-      );
+      expect(err?.code).toStrictEqual(errorCodes.TRANSITION_CANCELLED);
     });
     cancel();
   });
@@ -57,19 +53,13 @@ describe("core/navigation", () => {
       setTimeout(done, 20);
     });
     router.navigate("users", (err) => {
-      expect((err as { code: string }).code).toStrictEqual(
-        errorCodes.TRANSITION_CANCELLED,
-      );
+      expect(err?.code).toStrictEqual(errorCodes.TRANSITION_CANCELLED);
     });
     router.navigate("users", (err) => {
-      expect((err as { code: string }).code).toStrictEqual(
-        errorCodes.TRANSITION_CANCELLED,
-      );
+      expect(err?.code).toStrictEqual(errorCodes.TRANSITION_CANCELLED);
     });
     router.navigate("users", (err) => {
-      expect((err as { code: string }).code).toStrictEqual(
-        errorCodes.TRANSITION_CANCELLED,
-      );
+      expect(err?.code).toStrictEqual(errorCodes.TRANSITION_CANCELLED);
     });
     router.navigate("users", () => {
       router.clearMiddleware();
@@ -105,13 +95,9 @@ describe("core/navigation", () => {
 
     router.start("", () => {
       router.navigate("admin", (err) => {
-        expect((err as { code: string; error: Error }).code).toStrictEqual(
-          errorCodes.CANNOT_ACTIVATE,
-        );
+        expect(err?.code).toStrictEqual(errorCodes.CANNOT_ACTIVATE);
 
-        expect(
-          (err as { code: string; error: Error }).error.message,
-        ).toStrictEqual("error message");
+        expect(err?.message).toStrictEqual("error message");
       });
     });
   });
@@ -128,9 +114,7 @@ describe("core/navigation", () => {
     );
     router.start("", () => {
       router.navigate("admin", (err) => {
-        expect((err as { code: string }).code).toStrictEqual(
-          errorCodes.CANNOT_ACTIVATE,
-        );
+        expect(err?.code).toStrictEqual(errorCodes.CANNOT_ACTIVATE);
         expect(console.error).toHaveBeenCalled();
       });
     });
@@ -147,9 +131,7 @@ describe("core/navigation", () => {
     );
     router.start("", () => {
       const cancel = router.navigate("admin", (err) => {
-        expect((err as { code: string }).code).toStrictEqual(
-          errorCodes.TRANSITION_CANCELLED,
-        );
+        expect(err?.code).toStrictEqual(errorCodes.TRANSITION_CANCELLED);
       });
       setTimeout(cancel, 10);
     });

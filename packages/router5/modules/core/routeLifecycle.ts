@@ -1,3 +1,4 @@
+import { isBoolean } from "../typeGuards";
 import type {
   ActivationFn,
   ActivationFnFactory,
@@ -5,10 +6,8 @@ import type {
   Router,
 } from "../types/router";
 
-function toFunction<T extends Function>(val: T): T;
-function toFunction<T>(val: T): () => () => T;
-function toFunction(val: unknown): unknown {
-  return typeof val === "function" ? val : () => () => val;
+function toFunction<T>(val: T): () => () => T {
+  return () => () => val;
 }
 
 export default function withRouteLifecycle<
@@ -37,12 +36,17 @@ export default function withRouteLifecycle<
   };
 
   router.canDeactivate = (name, canDeactivateHandler): Router<Dependencies> => {
-    const factory = toFunction(
-      canDeactivateHandler,
-    ) as ActivationFnFactory<Dependencies>;
-
-    canDeactivateFactories[name] = factory;
-    canDeactivateFunctions[name] = router.executeFactory<ActivationFn>(factory);
+    if (isBoolean(canDeactivateHandler)) {
+      canDeactivateFactories[name] = toFunction(canDeactivateHandler);
+      canDeactivateFunctions[name] = router.executeFactory<ActivationFn>(
+        canDeactivateFactories[name],
+      );
+    } else {
+      canDeactivateFactories[name] = canDeactivateHandler;
+      canDeactivateFunctions[name] = router.executeFactory<ActivationFn>(
+        canDeactivateFactories[name],
+      );
+    }
 
     return router;
   };
@@ -69,12 +73,17 @@ export default function withRouteLifecycle<
   };
 
   router.canActivate = (name, canActivateHandler): Router<Dependencies> => {
-    const factory = toFunction(
-      canActivateHandler,
-    ) as ActivationFnFactory<Dependencies>;
-
-    canActivateFactories[name] = factory;
-    canActivateFunctions[name] = router.executeFactory<ActivationFn>(factory);
+    if (isBoolean(canActivateHandler)) {
+      canActivateFactories[name] = toFunction(canActivateHandler);
+      canActivateFunctions[name] = router.executeFactory<ActivationFn>(
+        canActivateFactories[name],
+      );
+    } else {
+      canActivateFactories[name] = canActivateHandler;
+      canActivateFunctions[name] = router.executeFactory<ActivationFn>(
+        canActivateFactories[name],
+      );
+    }
 
     return router;
   };

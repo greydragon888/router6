@@ -1,12 +1,16 @@
+import { RouterError } from "router5";
 import type { HTMLAttributes, MouseEventHandler } from "react";
-import type { NavigationOptions, Router, State } from "router5";
+import type { NavigationOptions, Params, Router, State } from "router5";
 
-export interface BaseLinkProps extends HTMLAttributes<HTMLAnchorElement> {
+export interface BaseLinkProps<
+  P extends Params = Params,
+  MP extends Params = Params,
+> extends HTMLAttributes<HTMLAnchorElement> {
   router: Router;
   routeName: string;
-  route?: State | null;
-  previousRoute?: State | null;
-  routeParams?: Record<string, any>;
+  route?: State<P, MP> | undefined;
+  previousRoute?: State | undefined;
+  routeParams?: P;
   routeOptions?: NavigationOptions;
   className?: string;
   activeClassName?: string;
@@ -15,6 +19,6 @@ export interface BaseLinkProps extends HTMLAttributes<HTMLAnchorElement> {
   target?: string;
   onClick?: MouseEventHandler<HTMLAnchorElement>;
   onMouseOver?: MouseEventHandler<HTMLAnchorElement>;
-  successCallback?: (state?: State) => void;
-  errorCallback?: (error?: any) => void;
+  successCallback?: (state?: State<P, MP>) => void;
+  errorCallback?: (error?: RouterError) => void;
 }

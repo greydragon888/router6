@@ -1,5 +1,7 @@
 import safeBrowser from "./browser";
-import { errorCodes, constants } from "router5";
+import { errorCodes, events } from "router5";
+import { isState } from "./typeGuards";
+import type { Params } from "router5";
 import type { BrowserPluginOptions, HistoryState } from "./types";
 import type {
   PluginFactory,
@@ -11,11 +13,11 @@ import type {
 
 declare module "router5" {
   interface Router {
-    buildUrl: (name: string, params?: Record<string, any>) => string;
-    matchUrl: (url: string) => State | null;
+    buildUrl: (name: string, params?: Params) => string;
+    matchUrl: (url: string) => State | undefined;
     replaceHistoryState: (
       name: string,
-      params?: Record<string, any>,
+      params?: Params,
       title?: string,
     ) => void;
     lastKnownState: State;
@@ -132,11 +134,16 @@ function browserPluginFactory(
         route.name,
         route.params,
         router.buildPath(route.name, route.params),
-        { params: route.meta },
+        {
+          params: route.meta,
+          id: 1,
+          options: {},
+          redirected: false,
+        },
       );
       const url = router.buildUrl(name, params);
       router.lastKnownState = state;
-      browser.replaceState(state, title, url);
+      browser.replaceState(<HistoryState>state, title, url);
     };
 
     function updateBrowserState(
@@ -145,17 +152,17 @@ function browserPluginFactory(
       replace?: boolean,
     ) {
       const trimmedState = state
-        ? ({
+        ? {
             meta: state.meta,
             name: state.name,
             params: state.params,
             path: state.path,
-          } as State)
-        : state!;
+          }
+        : state;
       const finalState: HistoryState =
         options.mergeState === true
-          ? { ...browser.getState(), ...trimmedState }
-          : trimmedState;
+          ? { ...(browser.getState() ?? {}), ...(<HistoryState>trimmedState) }
+          : <HistoryState>trimmedState;
 
       if (replace) {
         browser.replaceState(finalState, "", url);
@@ -167,15 +174,27 @@ function browserPluginFactory(
     function onPopState(evt: PopStateEvent) {
       const routerState = router.getState();
       // Do nothing if no state or if last know state is poped state (it should never happen)
-      const newState = !evt.state?.name;
-      const state = newState
+
+      if (!isState(evt.state)) {
+        return;
+      }
+
+      const isNewState = !evt.state.name;
+      const state = isNewState
         ? router.matchPath(browser.getLocation(options), source)
         : router.makeState(
             evt.state.name,
             evt.state.params,
             evt.state.path,
-            { ...evt.state.meta, source },
-            evt.state.meta.id,
+            {
+              ...(evt.state.meta ?? {}),
+              id: evt.state.meta?.id ?? 1,
+              params: evt.state.meta?.params ?? {},
+              options: evt.state.meta?.options ?? {},
+              redirected: !!evt.state.meta?.redirected,
+              source,
+            },
+            evt.state.meta?.id,
           );
       const { defaultRoute, defaultParams } = routerOptions;
 
@@ -199,39 +218,36 @@ function browserPluginFactory(
         routerState,
         transitionOptions,
         (err, toState) => {
-          if (err && typeof err === "object") {
-            if ("redirect" in err) {
-              const { name, params } = err.redirect;
+          if (err?.redirect) {
+            const { name, params } = err.redirect;
 
-              router.navigate(name, params, {
-                ...transitionOptions,
-                replace: true,
-                force: true,
-                redirected: true,
-              });
-            } else if (
-              "code" in err &&
-              err.code === errorCodes.CANNOT_DEACTIVATE &&
-              routerState
-            ) {
-              const url = router.buildUrl(routerState.name, routerState.params);
-              if (!newState) {
-                // Keep history state unchanged but use current URL
-                updateBrowserState(state, url, true);
-              }
-              // else do nothing or history will be messed up
-              // TODO: history.back()?
-            } else if (defaultRoute) {
-              // Force navigation to default state
-              router.navigate(defaultRoute, defaultParams ?? {}, {
-                ...transitionOptions,
-                reload: true,
-                replace: true,
-              });
+            router.navigate(name, params, {
+              ...transitionOptions,
+              replace: true,
+              force: true,
+              redirected: true,
+            });
+          } else if (
+            err?.code === errorCodes.CANNOT_DEACTIVATE &&
+            routerState
+          ) {
+            const url = router.buildUrl(routerState.name, routerState.params);
+            if (!isNewState) {
+              // Keep history state unchanged but use current URL
+              updateBrowserState(state, url, true);
             }
+            // else do nothing or history will be messed up
+            // TODO: history.back()?
+          } else if (defaultRoute) {
+            // Force navigation to default state
+            router.navigate(defaultRoute, defaultParams ?? {}, {
+              ...transitionOptions,
+              reload: true,
+              replace: true,
+            });
           } else {
             router.invokeEventListeners(
-              constants.TRANSITION_SUCCESS,
+              events.TRANSITION_SUCCESS,
               toState,
               routerState,
               { replace: true },

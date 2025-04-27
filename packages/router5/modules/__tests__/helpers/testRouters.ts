@@ -1,4 +1,4 @@
-import createRouter, { Route } from "../../";
+import createRouter, { type Options, Route } from "../../";
 
 const routes: Route[] = [
   {
@@ -61,10 +61,10 @@ const routes: Route[] = [
   },
 ];
 
-export default function createTestRouter(options?: any) {
+export default function createTestRouter(options?: Partial<Options>) {
   return createRouter(routes, {
     defaultRoute: "home",
-    ...options,
+    ...(options ?? {}),
   })
     .addNode("index", "/")
     .addNode("home", "/home")
@@ -73,6 +73,7 @@ export default function createTestRouter(options?: any) {
     .addNode(
       "auth-protected",
       "/auth-protected",
+      // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
       () => () => Promise.reject({ redirect: { name: "sign-in" } }),
     );
 }

@@ -1,6 +1,7 @@
 import { constants } from "../constants";
 import { RouteNode } from "route-node";
-import type { Params } from "../types/base";
+import { isString } from "../typeGuards";
+import type { Params, RouteNodeState, State } from "../types/base";
 import type { Router, Route, DefaultDependencies } from "../types/router";
 
 export default function withRoutes<Dependencies extends DefaultDependencies>(
@@ -29,12 +30,12 @@ export default function withRoutes<Dependencies extends DefaultDependencies>(
 
       if (route.decodeParams) {
         router.config.decoders[route.name] = (params: Params): Params =>
-          route.decodeParams!(params);
+          route.decodeParams?.(params) ?? params;
       }
 
       if (route.encodeParams) {
         router.config.encoders[route.name] = (params: Params): Params =>
-          route.encodeParams!(params);
+          route.encodeParams?.(params) ?? params;
       }
 
       if (route.defaultParams) {
@@ -88,7 +89,7 @@ export default function withRoutes<Dependencies extends DefaultDependencies>(
 
     router.buildPath = (route: string, params?: Params): string => {
       if (route === constants.UNKNOWN_ROUTE) {
-        return (params?.path ?? "") as string;
+        return isString(params?.path) ? params.path : "";
       }
 
       const paramsWithDefault = {
@@ -98,9 +99,10 @@ export default function withRoutes<Dependencies extends DefaultDependencies>(
 
       const { trailingSlashMode, queryParamsMode, queryParams } =
         router.getOptions();
-      const encodedParams = router.config.encoders[route]
-        ? router.config.encoders[route](paramsWithDefault)
-        : paramsWithDefault;
+      const encodedParams =
+        typeof router.config.encoders[route] === "function"
+          ? router.config.encoders[route](paramsWithDefault)
+          : paramsWithDefault;
 
       // @ts-expect-error TS2379. Should make fixes to route-node
       return router.rootNode.buildPath(route, encodedParams, {
@@ -111,30 +113,40 @@ export default function withRoutes<Dependencies extends DefaultDependencies>(
       });
     };
 
-    router.matchPath = (path, source) => {
+    router.matchPath = <P extends Params = Params, MP extends Params = Params>(
+      path: string,
+      source?: string,
+    ): State<P, MP> | undefined => {
       const options = router.getOptions();
-      const match = router.rootNode.matchPath(path, options);
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      const match = router.rootNode.matchPath(path, options) as
+        | RouteNodeState<P>
+        | undefined;
 
       if (match) {
         const { name, params, meta } = match;
-        const decodedParams = router.config.decoders[name]
-          ? router.config.decoders[name](params)
-          : params;
-        const { name: routeName, params: routeParams } = router.forwardState(
+        const decodedParams =
+          typeof router.config.decoders[name] === "function"
+            ? router.config.decoders[name](params)
+            : params;
+        const { name: routeName, params: routeParams } = router.forwardState<P>(
           name,
-          decodedParams,
+          <P>decodedParams,
         );
         const builtPath = !options.rewritePathOnMatch
           ? path
           : router.buildPath(routeName, routeParams);
 
-        return router.makeState(routeName, routeParams, builtPath, {
-          params: meta,
+        return router.makeState<P, MP>(routeName, routeParams, builtPath, {
+          id: 1,
+          params: <MP>meta,
+          options: {},
           source,
+          redirected: false,
         });
       }
 
-      return null;
+      return undefined;
     };
 
     router.setRootPath = (rootPath) => {

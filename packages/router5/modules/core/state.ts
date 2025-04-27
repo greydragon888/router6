@@ -1,46 +1,54 @@
 import { constants } from "../constants";
+import { isRouteNodeState, isState } from "../typeGuards";
 import type {
   NavigationOptions,
   Params,
+  RouteNodeState,
   SimpleState,
   State,
   StateMeta,
 } from "../types/base";
 import type { DefaultDependencies, Router } from "../types/router";
-import type { RouteNode, RouteNodeState } from "route-node";
+import type { RouteNode } from "route-node";
 
 export default function withState<Dependencies extends DefaultDependencies>(
   router: Router<Dependencies>,
 ): Router<Dependencies> {
   let stateId = 0;
-  let routerState: State | null = null;
+  let routerState: State | undefined = undefined;
 
-  router.getState = () => routerState;
+  router.getState = <
+    P extends Params = Params,
+    MP extends Params = Params,
+  >() => (isState<P, MP>(routerState) ? routerState : undefined);
 
-  router.setState = (state: State | null) => {
+  router.setState = (state: State | undefined) => {
     routerState = state;
   };
 
-  router.makeState = (
+  router.makeState = <P extends Params = Params, MP extends Params = Params>(
     name: string,
-    params?: Params,
+    params?: P,
     path?: string,
-    meta?: Partial<StateMeta>,
+    meta?: StateMeta<MP>,
     forceId?: number,
-  ): State => ({
+  ): State<P, MP> => ({
     name,
-    params: {
+    // Important! It is not true!!! Idk what is defaultParams type
+    // Надо подумать, как привести router.config.defaultParams к P
+    params: <P>{
       ...router.config.defaultParams[name],
-      ...params,
+      ...(params ?? {}),
     },
-    path: path ?? router.buildPath(name, params ?? {}),
+    path: path ?? router.buildPath(name, params),
+    // write guard is meta
     meta: meta
       ? {
           ...meta,
           id: forceId ?? ++stateId,
-          params: meta.params ?? {},
-          options: meta.options ?? {},
-          redirected: meta.redirected ?? false,
+          params: meta.params,
+          options: meta.options,
+          redirected: meta.redirected,
         }
       : undefined,
   });
@@ -49,13 +57,16 @@ export default function withState<Dependencies extends DefaultDependencies>(
     path: string,
     options?: NavigationOptions,
   ): State =>
-    router.makeState(
+    router.makeState<{ path: string }>(
       constants.UNKNOWN_ROUTE,
       { path },
       path,
       options
         ? {
-            options: options,
+            id: ++stateId,
+            options,
+            params: {},
+            redirected: false,
           }
         : undefined,
     );
@@ -74,10 +85,13 @@ export default function withState<Dependencies extends DefaultDependencies>(
     }
 
     const getUrlParams = (name: string): string[] =>
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
       router.rootNode
         // @ts-expect-error use private method
         .getSegmentsByName(name)
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-non-null-assertion
         .map((segment: RouteNode) => segment.parser!.urlParams)
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         .reduce(
           (params: string[], param: string[]) => params.concat(param),
           [],
@@ -113,10 +127,11 @@ export default function withState<Dependencies extends DefaultDependencies>(
     );
   };
 
-  router.forwardState = (
+  router.forwardState = <P extends Params = Params>(
     routeName: string,
-    routeParams: Params,
-  ): SimpleState => {
+    routeParams: P,
+    // ToDo: it is not shure if this is correct
+  ): SimpleState<P> => {
     const name = router.config.forwardMap[routeName] ?? routeName;
     const params = {
       ...router.config.defaultParams[routeName],
@@ -130,13 +145,15 @@ export default function withState<Dependencies extends DefaultDependencies>(
     };
   };
 
-  router.buildState = (
+  router.buildState = <P extends Params = Params>(
     routeName: string,
-    routeParams: Params,
-  ): RouteNodeState | null => {
+    routeParams: P,
+  ): RouteNodeState<P> | undefined => {
     const { name, params } = router.forwardState(routeName, routeParams);
 
-    return router.rootNode.buildState(name, params);
+    const state = router.rootNode.buildState(name, params);
+
+    return isRouteNodeState<P>(state) ? state : undefined;
   };
 
   return router;

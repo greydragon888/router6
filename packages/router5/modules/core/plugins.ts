@@ -1,4 +1,5 @@
-import { constants } from "../constants";
+import { events } from "../constants";
+import { isObjKey } from "../typeGuards";
 import type {
   Router,
   Plugin,
@@ -8,12 +9,12 @@ import type {
 import type { Unsubscribe } from "../types/base";
 
 const eventsMap = {
-  onStart: constants.ROUTER_START,
-  onStop: constants.ROUTER_STOP,
-  onTransitionSuccess: constants.TRANSITION_SUCCESS,
-  onTransitionStart: constants.TRANSITION_START,
-  onTransitionError: constants.TRANSITION_ERROR,
-  onTransitionCancel: constants.TRANSITION_CANCEL,
+  onStart: events.ROUTER_START,
+  onStop: events.ROUTER_STOP,
+  onTransitionSuccess: events.TRANSITION_SUCCESS,
+  onTransitionStart: events.TRANSITION_START,
+  onTransitionError: events.TRANSITION_ERROR,
+  onTransitionCancel: events.TRANSITION_CANCEL,
 };
 
 export default function withPlugins<
@@ -47,9 +48,10 @@ export default function withPlugins<
   ): Unsubscribe {
     const appliedPlugin = router.executeFactory<Plugin>(pluginFactory);
 
-    const removeEventListeners = (
-      Object.keys(eventsMap) as (keyof typeof eventsMap)[]
-    )
+    const removeEventListeners = Object.keys(eventsMap)
+      .filter((eventName): eventName is keyof typeof eventsMap =>
+        isObjKey<typeof eventsMap>(eventName, eventsMap),
+      )
       .map((methodName) => {
         if (appliedPlugin[methodName]) {
           return router.addEventListener(
@@ -60,7 +62,7 @@ export default function withPlugins<
           return;
         }
       })
-      .filter(Boolean) as Unsubscribe[];
+      .filter((listener): listener is Unsubscribe => Boolean(listener));
 
     return () => {
       removeEventListeners.forEach((removeListener) => {

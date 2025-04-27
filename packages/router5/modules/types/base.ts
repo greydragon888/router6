@@ -1,38 +1,33 @@
+import type { RouteNodeStateMeta } from "route-node/dist/RouteNode";
+import type { RouterError } from "../RouterError";
+
 export type Unsubscribe = () => void;
 
-export type DoneFnError =
-  | {
-      code?: string;
-      error?: State | Error;
-      segment?: string;
-      reason?: string;
-      redirect?: State;
-      [key: string]: unknown;
-    } // Errors with a code and additional properties
-  | { promiseError: Error; redirect?: State; [key: string]: unknown } // Errors from promises
-  | Error // Standard errors
-  | string // String errors
-  | null;
-
-export type DoneFn = (err?: DoneFnError, state?: State) => void;
+export type DoneFn = (err?: RouterError, state?: State) => void;
 
 export type CancelFn = () => void;
 
-export interface SimpleState {
+export interface RouteNodeState<P extends Params = Params> {
   name: string;
-  params: Params;
+  params: P;
+  meta: RouteNodeStateMeta;
 }
 
-export interface State {
+export interface SimpleState<P extends Params = Params> {
   name: string;
-  params: Params;
+  params: P;
+}
+
+export interface State<P extends Params = Params, MP extends Params = Params> {
+  name: string;
+  params: P;
   path: string;
-  meta?: StateMeta | undefined;
+  meta?: StateMeta<MP> | undefined;
 }
 
-export interface StateMeta {
+export interface StateMeta<P extends Params = Params> {
   id: number;
-  params: Params;
+  params: P;
   options: NavigationOptions;
   redirected: boolean;
   source?: string | undefined;
@@ -57,6 +52,6 @@ export interface Params {
     | number
     | boolean
     | Params
-    | Record<string, string>
+    | Record<string, string | number | boolean>
     | undefined;
 }
