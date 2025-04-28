@@ -39,6 +39,7 @@ export function transition<Dependencies extends DefaultDependencies>(
 
     if (!err && options.autoCleanUp) {
       const activeSegments = nameToIDs(toState.name);
+
       Object.keys(canDeactivateFunctions).forEach((name) => {
         if (!activeSegments.includes(name)) {
           router.clearCanDeactivate(name);

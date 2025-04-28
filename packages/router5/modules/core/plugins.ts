@@ -29,6 +29,7 @@ export default function withPlugins<
   ): Unsubscribe => {
     const removePluginFns = plugins.map((plugin) => {
       routerPlugins.push(plugin);
+
       return startPlugin(plugin);
     });
 

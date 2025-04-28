@@ -35,6 +35,7 @@ function persistentParamsPluginFactory(
         ...getDefinedParams(persistentParams),
         ...params,
       };
+
       return originalBuildPath(route, routeParams);
     };
 
@@ -43,6 +44,7 @@ function persistentParamsPluginFactory(
         ...getDefinedParams(persistentParams),
         ...params,
       };
+
       return originalBuildState(route, routeParams);
     };
 

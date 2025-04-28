@@ -21,6 +21,7 @@ const getStartRouterArguments = (
       if (typeof args[0] === "function") {
         return [undefined, args[0]];
       }
+
       return [args[0], noop];
     case 2:
       return [args[0], args[1]];
@@ -42,6 +43,7 @@ export default function withRouterLifecycle<
 
     if (started) {
       done(new RouterError(errorCodes.ROUTER_ALREADY_STARTED));
+
       return router;
     }
 
@@ -71,11 +73,13 @@ export default function withRouterLifecycle<
           err,
         );
       }
+
       done(err, state);
     };
 
     if (startPathOrState === undefined && !options.defaultRoute) {
       cb(new RouterError(errorCodes.NO_START_PATH_OR_STATE));
+
       return router;
     }
     if (typeof startPathOrState === "string") {
@@ -113,6 +117,7 @@ export default function withRouterLifecycle<
           }
         });
       };
+
       // If matched start path
       if (startState) {
         transitionToState(startState);

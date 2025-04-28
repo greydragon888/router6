@@ -38,6 +38,7 @@ const getNavigationArguments = (
       if (typeof args[2] === "function") {
         return [args[0], args[1], {}, args[2]];
       }
+
       return [args[0], args[1], args[2], noop];
     case 4:
       return [args[0], args[1], args[2], args[3]];
@@ -62,6 +63,7 @@ const getNavigationToDefaultArguments = (
       if (typeof args[0] === "function") {
         return [{}, args[0]];
       }
+
       return [args[0], noop];
     case 2:
       return [args[0], args[1]];
@@ -224,6 +226,7 @@ export default function withNavigation<
             err,
           );
         }
+
         done(err);
       } else {
         router.setState(state);

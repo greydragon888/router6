@@ -117,9 +117,11 @@ export default function withState<Dependencies extends DefaultDependencies>(
     childState: State,
   ): boolean => {
     const regex = new RegExp(`^${parentState.name}\\.(.*)$`);
+
     if (!regex.test(childState.name)) {
       return false;
     }
+
     // If child state name extends parent state name, and all parent state params
     // are in child state params.
     return Object.keys(parentState.params).every(

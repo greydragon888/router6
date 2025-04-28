@@ -44,6 +44,7 @@ function invokeFor<E extends EventName>(
     if (!cb) {
       continue;
     }
+
     try {
       // Use Reflect.apply to pass the args array directly
       Reflect.apply(cb, undefined, args);
@@ -82,6 +83,7 @@ export default function withObservability<
         }
 
         invokeFor(eventName, callbacks[eventName], toState, fromState);
+
         break;
       case events.TRANSITION_ERROR:
         if (!arg || !(arg instanceof RouterError)) {
@@ -91,6 +93,7 @@ export default function withObservability<
         }
 
         invokeFor(eventName, callbacks[eventName], toState, fromState, arg);
+
         break;
       case events.TRANSITION_SUCCESS:
         if (
@@ -105,9 +108,11 @@ export default function withObservability<
         }
 
         invokeFor(eventName, callbacks[eventName], toState, fromState, arg);
+
         break;
       default:
         invokeFor(eventName, callbacks[eventName]);
+
         break;
     }
   };
@@ -165,6 +170,7 @@ export default function withObservability<
         if (typeof observer !== "object") {
           throw new TypeError("Expected the observer to be an object.");
         }
+
         return subscribe(observer);
       },
 

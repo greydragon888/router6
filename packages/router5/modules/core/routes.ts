@@ -50,6 +50,7 @@ export default function withRoutes<Dependencies extends DefaultDependencies>(
       if (finalSort) {
         rootNode.sortDescendants();
       }
+
       return router;
     };
 
@@ -58,6 +59,7 @@ export default function withRoutes<Dependencies extends DefaultDependencies>(
       if (canActivateHandler) {
         router.canActivate(name, canActivateHandler);
       }
+
       return router;
     };
 

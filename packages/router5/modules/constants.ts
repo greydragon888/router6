@@ -52,4 +52,5 @@ export const events = <const>{
 };
 
 export type EventsKeys = keyof typeof plugins;
+
 export type EventName = (typeof events)[EventsKeys];

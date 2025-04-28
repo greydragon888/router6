@@ -28,6 +28,7 @@ export default function withDependencies<
             router.setDependency(name, deps[name]);
           }
         });
+
       return router;
     };
 

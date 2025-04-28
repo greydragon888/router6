@@ -3,6 +3,7 @@
 /** @type {import("eslint").Linter.FlatConfig[]} */
 
 import eslint from "@eslint/js";
+import stylisticTs from "@stylistic/eslint-plugin-ts";
 import tsEslint from "typescript-eslint";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 import sonarjsPlugin from "eslint-plugin-sonarjs";
@@ -11,6 +12,89 @@ import turboConfig from "eslint-config-turbo/flat";
 
 export default tsEslint.config(
   eslint.configs.recommended,
+  {
+    plugins: {
+      "@stylistic/ts": stylisticTs,
+    },
+    languageOptions: {
+      parser: tsEslint.parser,
+    },
+    rules: {
+      "@stylistic/ts/padding-line-between-statements": [
+        "warn",
+        {
+          blankLine: "always",
+          prev: "*",
+          next: ["interface", "type"],
+        },
+        {
+          blankLine: "any",
+          prev: ["interface", "type"],
+          next: "*",
+        },
+        {
+          blankLine: "always",
+          prev: "*",
+          next: "return",
+        },
+        {
+          blankLine: "always",
+          prev: ["const", "let"],
+          next: "block-like",
+        },
+        {
+          blankLine: "always",
+          prev: ["const", "let"],
+          next: "*",
+        },
+        {
+          blankLine: "any",
+          prev: ["const", "let"],
+          next: ["const", "let"],
+        },
+        {
+          blankLine: "always",
+          prev: ["if", "for", "while", "switch"],
+          next: "*",
+        },
+        {
+          blankLine: "any",
+          prev: ["if", "for", "while", "switch"],
+          next: ["if", "for", "while", "switch"],
+        },
+        {
+          blankLine: "always",
+          prev: "*",
+          next: "break",
+        },
+        {
+          blankLine: "never",
+          prev: "*",
+          next: ["case", "default"],
+        },
+        {
+          blankLine: "always",
+          prev: "*",
+          next: "throw",
+        },
+        {
+          blankLine: "always",
+          prev: "import",
+          next: "*",
+        },
+        {
+          blankLine: "any",
+          prev: "import",
+          next: "import",
+        },
+        {
+          blankLine: "always",
+          prev: "*",
+          next: "export",
+        },
+      ],
+    },
+  },
   tsEslint.configs.strictTypeChecked,
   tsEslint.configs.stylisticTypeChecked,
   {
@@ -27,7 +111,9 @@ export default tsEslint.config(
         "error",
         { assertionStyle: "angle-bracket" },
       ],
-      /*"@typescript-eslint/member-ordering": [
+
+      "@typescript-eslint/unified-signatures": "off",
+      "@typescript-eslint/member-ordering": [
         "warn",
         {
           default: [
@@ -133,80 +219,7 @@ export default tsEslint.config(
             "#private-method",
           ],
         },
-      ],*/
-      /*"@typescript-eslint/padding-line-between-statements": [
-        "warn",
-        {
-          blankLine: "always",
-          prev: "*",
-          next: ["interface", "type"],
-        },
-        {
-          blankLine: "any",
-          prev: ["interface", "type"],
-          next: "*",
-        },
-        {
-          blankLine: "always",
-          prev: "*",
-          next: "return",
-        },
-        {
-          blankLine: "always",
-          prev: ["const", "let"],
-          next: "block-like",
-        },
-        {
-          blankLine: "always",
-          prev: ["const", "let"],
-          next: "*",
-        },
-        {
-          blankLine: "any",
-          prev: ["const", "let"],
-          next: ["const", "let"],
-        },
-        {
-          blankLine: "always",
-          prev: ["if", "for", "while", "switch"],
-          next: "*",
-        },
-        {
-          blankLine: "any",
-          prev: ["if", "for", "while", "switch"],
-          next: ["if", "for", "while", "switch"],
-        },
-        {
-          blankLine: "always",
-          prev: "*",
-          next: "break",
-        },
-        {
-          blankLine: "never",
-          prev: "*",
-          next: ["case", "default"],
-        },
-        {
-          blankLine: "always",
-          prev: "*",
-          next: "throw",
-        },
-        {
-          blankLine: "always",
-          prev: "import",
-          next: "*",
-        },
-        {
-          blankLine: "any",
-          prev: "import",
-          next: "import",
-        },
-        {
-          blankLine: "always",
-          prev: "*",
-          next: "export",
-        },
-      ],*/
+      ],
     },
   },
   {

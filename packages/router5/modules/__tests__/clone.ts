@@ -18,6 +18,7 @@ describe("core/clone", () => {
     const myPlugin = () => ({
       onTransitionSuccess: () => true,
     });
+
     router.usePlugin(myPlugin);
 
     const clonedRouter = cloneRouter(router);

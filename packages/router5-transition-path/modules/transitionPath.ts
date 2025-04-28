@@ -82,6 +82,7 @@ export default function transitionPath(
 
   function pointOfDifference() {
     let i;
+
     for (i = 0; i < maxI; i += 1) {
       const left = fromStateIds[i];
       const right = toStateIds[i];
@@ -105,6 +106,7 @@ export default function transitionPath(
       const different = Object.keys(leftParams).some(
         (p) => rightParams[p] !== leftParams[p],
       );
+
       if (different) {
         return i;
       }
@@ -114,6 +116,7 @@ export default function transitionPath(
   }
 
   let i;
+
   if (!fromState || toStateOptions.reload) {
     i = 0;
   } else if (!hasMetaParams(fromState) && !hasMetaParams(toState)) {

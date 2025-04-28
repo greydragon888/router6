@@ -103,6 +103,7 @@ function browserPluginFactory(
           if (typeof args[0] === "function") {
             return [browser.getLocation(options), args[0]];
           }
+
           return [args[0], noop];
         case 2:
           return [args[0], args[1]];
@@ -142,6 +143,7 @@ function browserPluginFactory(
         },
       );
       const url = router.buildUrl(name, params);
+
       router.lastKnownState = state;
       browser.replaceState(<HistoryState>state, title, url);
     };
@@ -207,6 +209,7 @@ function browserPluginFactory(
           reload: true,
           replace: true,
         });
+
         return;
       }
       if (routerState && router.areStatesEqual(state, routerState, false)) {
@@ -232,6 +235,7 @@ function browserPluginFactory(
             routerState
           ) {
             const url = router.buildUrl(routerState.name, routerState.params);
+
             if (!isNewState) {
               // Keep history state unchanged but use current URL
               updateBrowserState(state, url, true);
@@ -288,6 +292,7 @@ function browserPluginFactory(
         fromState && router.areStatesEqual(fromState, toState, false);
       const replace = Boolean((opts?.replace ?? !hasState) || statesAreEqual);
       let url = router.buildUrl(toState.name, toState.params);
+
       if (
         fromState === undefined &&
         options.useHash === false &&
@@ -295,6 +300,7 @@ function browserPluginFactory(
       ) {
         url += browser.getHash();
       }
+
       updateBrowserState(toState, url, replace);
     }
 

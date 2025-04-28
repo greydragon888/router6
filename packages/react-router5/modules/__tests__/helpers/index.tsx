@@ -25,11 +25,13 @@ export const createTestRouterWithADefaultRoute = (): Router => {
     ],
     { defaultRoute: "test" },
   );
+
   router.usePlugin(
     browserPlugin({
       useHash: true,
     }),
   );
+
   return router;
 };
 

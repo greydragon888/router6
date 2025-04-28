@@ -41,10 +41,12 @@ export const startsWithSegment: SegmentTestFunction = testRouteWithSegment(
   "^",
   dotOrEnd,
 );
+
 export const endsWithSegment: SegmentTestFunction = testRouteWithSegment(
   dotOrStart,
   "$",
 );
+
 export const includesSegment: SegmentTestFunction = testRouteWithSegment(
   dotOrStart,
   dotOrEnd,

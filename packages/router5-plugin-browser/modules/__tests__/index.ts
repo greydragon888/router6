@@ -40,6 +40,7 @@ const withoutMeta = (state: State) => {
   if (!state.meta?.id) {
     throw new Error("No state id");
   }
+
   return {
     name: state.name,
     params: state.params,

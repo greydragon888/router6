@@ -14,6 +14,7 @@ declare module "router5" {
     removeRouteListener: (name: string, callback: Listener) => void;
   }
 }
+
 export interface ListenersPluginOptions {
   autoCleanUp?: boolean;
 }
@@ -36,6 +37,7 @@ const listenersPluginFactory = (
       } else {
         listeners[name] = [];
       }
+
       return router;
     }
 
@@ -46,6 +48,7 @@ const listenersPluginFactory = (
         //@ts-expect-error: used private method
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
         const segments = router.rootNode.getSegmentsByName(normalizedName);
+
         if (!segments) {
           console.warn(
             `No route found for ${normalizedName}, listener might never be called!`,
@@ -56,6 +59,7 @@ const listenersPluginFactory = (
       if (!(name in listeners)) {
         listeners[name] = [];
       }
+
       listeners[name] = [...(replace ? [] : listeners[name]), cb];
 
       return router;

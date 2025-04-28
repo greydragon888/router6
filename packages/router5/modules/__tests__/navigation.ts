@@ -45,6 +45,7 @@ describe("core/navigation", () => {
     const cancel = router.navigate("admin", (err) => {
       expect(err?.code).toStrictEqual(errorCodes.TRANSITION_CANCELLED);
     });
+
     cancel();
   });
 
@@ -133,6 +134,7 @@ describe("core/navigation", () => {
       const cancel = router.navigate("admin", (err) => {
         expect(err?.code).toStrictEqual(errorCodes.TRANSITION_CANCELLED);
       });
+
       setTimeout(cancel, 10);
     });
   });
@@ -200,6 +202,7 @@ describe("core/navigation", () => {
 
   it("should add navitation options to meta", () => {
     const options = { reload: true, replace: true, customOption: "abc" };
+
     router.navigate("profile", {}, options, (_err, state) => {
       expect(state?.meta?.options).toStrictEqual(options);
     });

@@ -12,6 +12,7 @@ const listeners: Record<string, Middleware> = {
       path: toState.path,
       hitMware: true,
     };
+
     done(undefined, newState);
   },
   transitionMutate: (toState, _fromState, done) => {
@@ -21,6 +22,7 @@ const listeners: Record<string, Middleware> = {
       path: toState.path,
       hitMware: true,
     };
+
     done(undefined, newState);
   },
   transitionErr: (_toState, _fromState, done) => {
@@ -112,6 +114,7 @@ describe("core/middleware", () => {
         m3: (toState as State & { m2: boolean }).m2,
       } as State & { m2: boolean; m3: boolean });
     };
+
     router.clearMiddleware();
     router.useMiddleware(m1, m2, m3);
 
