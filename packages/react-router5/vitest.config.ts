@@ -6,7 +6,7 @@ export default mergeConfig(
   defineProject({
     test: {
       environment: "happy-dom",
-      exclude: ["**/__tests__/helpers/**"],
+      include: ["**/__tests__/*.test.ts?(x)"],
       setupFiles: "./modules/setup.ts",
     },
   }),

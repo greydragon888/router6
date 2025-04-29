@@ -15,12 +15,26 @@ export const createTestRouter = (): Router => {
   return router;
 };
 
-export const createTestRouterWithADefaultRoute = (): Router => {
+export const createTestRouterWithADefaultRouter = (): Router => {
   const router = createRouter(
     [
       {
         name: "test",
         path: "/",
+      },
+      {
+        name: "one-more-test",
+        path: "/test",
+      },
+      {
+        name: "items",
+        path: "/items",
+        children: [
+          {
+            name: "item",
+            path: "/items/:id",
+          },
+        ],
       },
     ],
     { defaultRoute: "test" },
@@ -28,7 +42,7 @@ export const createTestRouterWithADefaultRoute = (): Router => {
 
   router.usePlugin(
     browserPlugin({
-      useHash: true,
+      useHash: false,
     }),
   );
 
