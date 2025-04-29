@@ -75,18 +75,17 @@ export default function withRoutes<Dependencies extends DefaultDependencies>(
         return false;
       }
 
+      const targetState = router.makeState(name, params);
+
       if (strictEquality || activeState.name === name) {
         return router.areStatesEqual(
-          router.makeState(name, params),
+          targetState,
           activeState,
           ignoreQueryParams,
         );
       }
 
-      return router.areStatesDescendants(
-        router.makeState(name, params),
-        activeState,
-      );
+      return router.areStatesDescendants(targetState, activeState);
     };
 
     router.buildPath = (route: string, params?: Params): string => {

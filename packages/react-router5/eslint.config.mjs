@@ -10,6 +10,12 @@ export default tsEslint.config(
   ...eslintConfig,
   reactPlugin.configs.flat.recommended,
   reactPlugin.configs.flat["jsx-runtime"],
+  {
+    files: ["**/__tests__/*.test.tsx"],
+    rules: {
+      "react/display-name": "off",
+    },
+  },
   reactHooksPlugin.configs["recommended-latest"],
   {
     files: ["**/__tests__/*.test.tsx"],

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, useMemo } from "react";
+import { useCallback, useMemo, useSyncExternalStore } from "react";
 import type { FC, MouseEvent } from "react";
 import type { BaseLinkProps } from "./interfaces";
 import type { State } from "router5";
@@ -20,14 +20,31 @@ export const BaseLink: FC<BaseLinkProps> = ({
   children,
   ...linkProps
 }) => {
-  const getActiveState = useCallback(
+  const getSnapshot = useCallback(
     () =>
       router.isActive(routeName, routeParams, activeStrict, ignoreQueryParams),
-    [activeStrict, ignoreQueryParams, routeName, routeParams, router],
+    [router, routeName, routeParams, activeStrict, ignoreQueryParams],
   );
 
-  // State to track if the link is active or not
-  const [active, setActive] = useState<boolean>(getActiveState());
+  const subscribe = useCallback(
+    (callback: () => void) => {
+      const unsubscribe = router.subscribe(() => {
+        callback();
+      });
+
+      return () => {
+        /* c8 ignore next 3 */
+        if (typeof unsubscribe !== "function") {
+          throw new Error("Router unsubscribe is not a function");
+        }
+
+        unsubscribe(); // Unsubscribe from router updates
+      };
+    },
+    [router],
+  );
+
+  const active = useSyncExternalStore(subscribe, getSnapshot);
 
   // Callback to handle successful or erroneous navigation
   const callback: (err?: RouterError, state?: State) => void = useCallback(
@@ -47,11 +64,6 @@ export const BaseLink: FC<BaseLinkProps> = ({
   const buildUrl = useMemo(() => {
     return router.buildUrl(routeName, routeParams);
   }, [routeName, routeParams, router]);
-
-  // Update the active state based on the isActive result
-  useEffect(() => {
-    setActive(getActiveState());
-  }, [routeName, routeParams, activeStrict, ignoreQueryParams, getActiveState]);
 
   // Handler for click events, handles navigation
   const clickHandler = useCallback(

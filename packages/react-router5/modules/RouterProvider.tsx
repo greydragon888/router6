@@ -31,6 +31,7 @@ export const RouterProvider: FC<RouteProviderProps> = ({
       });
 
       return () => {
+        /* c8 ignore next 3 */
         if (typeof unsubscribe !== "function") {
           throw new Error("Router unsubscribe is not a function");
         }

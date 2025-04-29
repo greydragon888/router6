@@ -23,6 +23,7 @@ export default defineConfig({
         "**/contexts.ts",
         "**/enums.ts",
         "**/interfaces.ts",
+        "**/__tests__/helpers/**.ts?(x)",
       ],
       extension: ["ts", "tsx"],
       thresholds: {
