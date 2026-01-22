@@ -109,7 +109,7 @@ describe("RouterProvider component", () => {
     const unsubscribeSpy = vi.fn();
 
     vi.spyOn(router, "subscribe").mockImplementation((cb) => {
-      // сразу возвращаем фейковый unsubscribe
+      // return fake unsubscribe immediatly
       cb({
         route: router.getState()!,
         previousRoute: undefined,

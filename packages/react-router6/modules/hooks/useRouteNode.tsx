@@ -30,9 +30,9 @@ export function useRouteNode(nodeName: string): RouteContext {
     (sub?: SubscribeState): RouteState => {
       const currentRoute = sub?.route ?? router.getState();
 
-      // Проверяем, активен ли узел
+      // Checking if the node is active
       if (currentRoute && nodeName !== "") {
-        // Корневой узел всегда активен
+        // Root node always active
         const isNodeActive =
           currentRoute.name === nodeName ||
           currentRoute.name.startsWith(`${nodeName}.`);

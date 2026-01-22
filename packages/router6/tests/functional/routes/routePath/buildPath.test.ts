@@ -1,5 +1,9 @@
+import { getSegmentsByName } from "route-tree";
 import { describe, beforeEach, afterEach, it, expect } from "vitest";
 
+import { constants } from "router6";
+
+import { getRouteTree } from "../../../../modules/internals";
 import { createTestRouter } from "../../../helpers";
 
 import type { Route, Router } from "router6";
@@ -903,6 +907,141 @@ describe("core/routes/routePath/buildPath", () => {
           expect(toStringCalled).toBe(false);
           expect(valueOfCalled).toBe(false);
         });
+      });
+    });
+  });
+
+  describe("buildPathWithSegments (internal)", () => {
+    describe("route validation (line 186)", () => {
+      it("should throw TypeError for empty string route", () => {
+        expect(() => router.buildPathWithSegments("", {}, [])).toThrowError(
+          TypeError,
+        );
+        expect(() => router.buildPathWithSegments("", {}, [])).toThrowError(
+          'route must be a non-empty string, got ""',
+        );
+      });
+
+      it("should throw TypeError for non-string route", () => {
+        expect(() =>
+          router.buildPathWithSegments(123 as unknown as string, {}, []),
+        ).toThrowError(TypeError);
+        expect(() =>
+          router.buildPathWithSegments(123 as unknown as string, {}, []),
+        ).toThrowError("route must be a non-empty string, got number");
+      });
+
+      it("should throw TypeError for undefined route", () => {
+        expect(() =>
+          router.buildPathWithSegments(undefined as unknown as string, {}, []),
+        ).toThrowError(TypeError);
+        expect(() =>
+          router.buildPathWithSegments(undefined as unknown as string, {}, []),
+        ).toThrowError("route must be a non-empty string, got undefined");
+      });
+    });
+
+    describe("UNKNOWN_ROUTE handling (line 192)", () => {
+      it("should return params.path for UNKNOWN_ROUTE when path is string", () => {
+        const path = router.buildPathWithSegments(
+          constants.UNKNOWN_ROUTE,
+          { path: "/custom-not-found" },
+          [],
+        );
+
+        expect(path).toBe("/custom-not-found");
+      });
+
+      it("should return empty string for UNKNOWN_ROUTE when path is not a string", () => {
+        const path = router.buildPathWithSegments(
+          constants.UNKNOWN_ROUTE,
+          { path: 404 },
+          [],
+        );
+
+        expect(path).toBe("");
+      });
+
+      it("should return empty string for UNKNOWN_ROUTE when path is undefined", () => {
+        const path = router.buildPathWithSegments(
+          constants.UNKNOWN_ROUTE,
+          {},
+          [],
+        );
+
+        expect(path).toBe("");
+      });
+    });
+
+    describe("params fallback when no defaultParams (line 200)", () => {
+      it("should use empty object when params is undefined and no defaultParams", () => {
+        // Route without defaultParams
+        router.addRoute({ name: "simple", path: "/simple" });
+
+        // Get real segments for buildPathWithSegments
+        const tree = getRouteTree(router);
+        const segments = getSegmentsByName(tree, "simple");
+
+        // Pass undefined params - should use empty object fallback (line 200)
+        const path = router.buildPathWithSegments(
+          "simple",
+          undefined,
+          segments!,
+        );
+
+        expect(path).toBe("/simple");
+      });
+
+      it("should use empty object when params is null and no defaultParams", () => {
+        router.addRoute({ name: "nullable", path: "/nullable" });
+
+        const tree = getRouteTree(router);
+        const segments = getSegmentsByName(tree, "nullable");
+
+        // Pass null params - should use empty object fallback (line 200)
+        const path = router.buildPathWithSegments(
+          "nullable",
+          null as unknown as undefined,
+          segments!,
+        );
+
+        expect(path).toBe("/nullable");
+      });
+    });
+
+    describe("buildOptions cache miss fallback (line 210)", () => {
+      it("should work before router.start() using fallback buildOptions", () => {
+        // Create router but don't start it - no buildOptions cache
+        const coldRouter = createTestRouter();
+
+        // Get real segments from route tree (tree exists even without start)
+        const tree = getRouteTree(coldRouter);
+        const segments = getSegmentsByName(tree, "home");
+
+        // buildPathWithSegments should use fallback on line 210
+        const path = coldRouter.buildPathWithSegments("home", {}, segments!);
+
+        expect(path).toBe("/home");
+      });
+
+      it("should use fallback buildOptions when cache not initialized", () => {
+        // Create router but don't start it
+        const coldRouter = createTestRouter();
+
+        // Adding route to ensure it's defined
+        coldRouter.addRoute({ name: "cacheless", path: "/cacheless" });
+
+        const tree = getRouteTree(coldRouter);
+        const segments = getSegmentsByName(tree, "cacheless");
+
+        // buildPathWithSegments should use fallback (line 210)
+        const path = coldRouter.buildPathWithSegments(
+          "cacheless",
+          {},
+          segments!,
+        );
+
+        expect(path).toBe("/cacheless");
       });
     });
   });

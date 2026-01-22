@@ -477,6 +477,48 @@ describe("core/observable/addEventListener", () => {
     });
   });
 
+  // 🟡 IMPORTANT: hasListeners
+  describe("hasListeners", () => {
+    it("should return false for invalid event name", () => {
+      // Test line 378-379 in observable.ts
+      const result = router.hasListeners("INVALID_EVENT" as any);
+
+      expect(result).toBe(false);
+    });
+
+    it("should return false when no listeners registered", () => {
+      const result = router.hasListeners(events.ROUTER_START);
+
+      expect(result).toBe(false);
+    });
+
+    it("should return true when listener is registered", () => {
+      router.addEventListener(events.ROUTER_START, () => {});
+
+      const result = router.hasListeners(events.ROUTER_START);
+
+      expect(result).toBe(true);
+    });
+
+    it("should return false after listener is unsubscribed", () => {
+      const unsub = router.addEventListener(events.ROUTER_START, () => {});
+
+      expect(router.hasListeners(events.ROUTER_START)).toBe(true);
+
+      unsub();
+
+      expect(router.hasListeners(events.ROUTER_START)).toBe(false);
+    });
+
+    it("should track listeners per event type independently", () => {
+      router.addEventListener(events.ROUTER_START, () => {});
+
+      expect(router.hasListeners(events.ROUTER_START)).toBe(true);
+      expect(router.hasListeners(events.ROUTER_STOP)).toBe(false);
+      expect(router.hasListeners(events.TRANSITION_START)).toBe(false);
+    });
+  });
+
   // 🟢 DESIRABLE: Edge cases
   describe("edge cases", () => {
     it("should handle listener that removes itself during execution", () => {

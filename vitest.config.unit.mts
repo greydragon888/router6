@@ -34,8 +34,8 @@ export default mergeConfig(
         reportsDirectory: "./coverage",
         clean: true,
         include: [
-          "packages/*/modules/tests/**/*.test.ts",
-          "packages/*/modules/tests/**/*.test.tsx",
+          "packages/*/modules/**/*.ts",
+          "packages/*/modules/**/*.tsx",
         ],
         exclude: [
           "**/node_modules/**",

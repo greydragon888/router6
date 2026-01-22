@@ -6,12 +6,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 /**
- * Vitest конфигурация для Stryker mutation testing
- * Router6-plugin-logger зависит от logger, router6, router6-types
+ * Vitest configuration for Stryker mutation testing
+ * Router6-plugin-logger depends on logger, router6, router6-types
  *
- * КРИТИЧНО: относительный путь для ЭТОГО пакета, absolute для dependencies!
- * - router6-plugin-logger: ./modules (мутированный код в sandbox)
- * - workspace deps: абсолютные пути к ОРИГИНАЛЬНОМУ коду
+ * CRITICAL: relative path for THIS package, absolute for dependencies!
+ * - router6-plugin-logger: ./modules (mutated code in sandbox)
+ * - workspace deps: absolute paths to ORIGINAL code
  */
 export default defineConfig({
   cacheDir: "./.vitest-stryker",
@@ -38,7 +38,7 @@ export default defineConfig({
     reporters: ["dot"], // Minimal reporter for speed
     watch: false,
 
-    // Оптимизированные таймауты
+    // Optimized timeouts
     testTimeout: 5000, // 5s per test
     hookTimeout: 5000, // 5s per hook
 

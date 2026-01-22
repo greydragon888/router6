@@ -4,6 +4,8 @@
 
 import { describe, it, expect } from "vitest";
 
+import { getSegmentsByName } from "route-tree";
+
 import { createRouteTree } from "../../../modules/builder/createRouteTree";
 import { buildPath } from "../../../modules/operations/build";
 
@@ -90,5 +92,66 @@ describe("New API - buildPath", () => {
     const path = buildPath(tree, "route", {}, { trailingSlashMode: "never" });
 
     expect(path).toBe("/route");
+  });
+
+  describe("with pre-computed segments", () => {
+    it("should build path using provided segments", () => {
+      const tree = createRouteTree("", "", [
+        {
+          name: "users",
+          path: "/users",
+          children: [{ name: "profile", path: "/:id" }],
+        },
+      ]);
+
+      const segments = getSegmentsByName(tree, "users.profile")!;
+      const path = buildPath(
+        tree,
+        "users.profile",
+        { id: "456" },
+        {},
+        segments,
+      );
+
+      expect(path).toBe("/users/456");
+    });
+
+    it("should build nested path with segments and query params", () => {
+      const tree = createRouteTree("", "", [
+        {
+          name: "users",
+          path: "/users",
+          children: [{ name: "profile", path: "/:id?tab" }],
+        },
+      ]);
+
+      const segments = getSegmentsByName(tree, "users.profile")!;
+      const path = buildPath(
+        tree,
+        "users.profile",
+        { id: "789", tab: "settings" },
+        {},
+        segments,
+      );
+
+      expect(path).toBe("/users/789?tab=settings");
+    });
+
+    it("should build path with segments and options", () => {
+      const tree = createRouteTree("", "", [
+        { name: "route", path: "/route/:param" },
+      ]);
+
+      const segments = getSegmentsByName(tree, "route")!;
+      const path = buildPath(
+        tree,
+        "route",
+        { param: "test" },
+        { trailingSlashMode: "always" },
+        segments,
+      );
+
+      expect(path).toBe("/route/test/");
+    });
   });
 });

@@ -33,4 +33,48 @@ describe("New API - meta functions", () => {
 
     expect(result).toStrictEqual({});
   });
+
+  it("buildParamTypeMap should map url params correctly", () => {
+    const tree = createRouteTree("", "", [
+      { name: "users", path: "/users/:id/:action" },
+    ]);
+
+    const userRoute = tree.childrenByName.get("users")!;
+    const result = buildParamTypeMap(userRoute.parser);
+
+    expect(result).toStrictEqual({
+      id: "url",
+      action: "url",
+    });
+  });
+
+  it("buildParamTypeMap should map query params correctly", () => {
+    const tree = createRouteTree("", "", [
+      { name: "search", path: "/search?q&page&sort" },
+    ]);
+
+    const searchRoute = tree.childrenByName.get("search")!;
+    const result = buildParamTypeMap(searchRoute.parser);
+
+    expect(result).toStrictEqual({
+      q: "query",
+      page: "query",
+      sort: "query",
+    });
+  });
+
+  it("buildParamTypeMap should map mixed url and query params", () => {
+    const tree = createRouteTree("", "", [
+      { name: "users", path: "/users/:id?tab&view" },
+    ]);
+
+    const userRoute = tree.childrenByName.get("users")!;
+    const result = buildParamTypeMap(userRoute.parser);
+
+    expect(result).toStrictEqual({
+      id: "url",
+      tab: "query",
+      view: "query",
+    });
+  });
 });

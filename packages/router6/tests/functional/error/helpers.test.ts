@@ -694,6 +694,27 @@ describe("freezeStateInPlace", () => {
       expect(Object.isFrozen(frozen.params)).toBe(true);
     });
 
+    it("should return early when called twice on the same state (frozenRoots fast path)", () => {
+      const state: State = {
+        name: "test",
+        path: "/test",
+        params: { id: "123" },
+      };
+
+      // First call - freezes the state and adds to frozenRoots
+      const frozen1 = freezeStateInPlace(state);
+
+      expect(frozen1).toBe(state);
+      expect(Object.isFrozen(frozen1)).toBe(true);
+
+      // Second call - should return early via frozenRoots.has(state) check (line 155)
+      const frozen2 = freezeStateInPlace(state);
+
+      expect(frozen2).toBe(state);
+      expect(frozen2).toBe(frozen1);
+      expect(Object.isFrozen(frozen2)).toBe(true);
+    });
+
     it("should handle partially frozen nested objects", () => {
       const state: State = {
         name: "test",

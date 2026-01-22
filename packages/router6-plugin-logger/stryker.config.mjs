@@ -1,11 +1,11 @@
 /**
- * ✨ Конфигурация мутационного тестирования для Router6 Plugin Logger
+ * ✨ Mutation testing configuration for Plugin Logger
  *
- * Основана на успешном опыте router-error:
+ * Based on successful experience from router-error:
  * ✅ Vitest runner + perTest coverage
- * ✅ Absolute paths для workspace dependencies (logger, router6, router6-types)
- * ✅ Incremental mode для кеширования
- * ✅ Без "tests slash-star-star" в ignorePatterns
+ * ✅ Absolute paths for workspace dependencies (logger, router6, router6-types)
+ * ✅ Incremental mode for caching
+ * ✅ Without "tests slash-star-star" in ignorePatterns
  *
  * @type {import('@stryker-mutator/api/core').PartialStrykerOptions}
  */
@@ -14,7 +14,7 @@ export default {
   testRunner: "vitest",
   checkers: ["typescript"],
 
-  // Мутируем все исходники кроме barrel exports, types и constants
+  // Mutate all source code except barrel exports, types and constants
   mutate: [
     "modules/**/*.ts",
     "!modules/index.ts", // Barrel export - skip
@@ -22,14 +22,14 @@ export default {
     "!modules/constants.ts", // Constants - skip
   ],
 
-  // Vitest runner с оптимизированной конфигурацией
+  // Vitest runner with optimized configuration
   vitest: {
     configFile: "vitest.stryker.config.mts",
     related: false, // Disable related test detection (barrel export issue)
   },
 
-  // ✨ КРИТИЧНО: "perTest" для Vitest игнорируется, но оставляем для совместимости
-  // Workspace dependencies работают через absolute paths в vitest.stryker.config.mts
+  // ✨ CRITICAL: "perTest" is ignored for Vitest, but kept for compatibility
+  // Workspace dependencies work through absolute paths in vitest.stryker.config.mts
   coverageAnalysis: "perTest",
 
   // Local tsconfig
@@ -37,14 +37,14 @@ export default {
 
   // Mutation score thresholds
   thresholds: {
-    high: 85, // Plugin сложнее - средняя планка
+    high: 85, // Plugin is more complex - medium threshold
     low: 70,
     break: 60,
   },
 
   // Performance settings
-  concurrency: 2, // 2 параллельных процесса
-  timeoutMS: 10000, // 10s (тесты быстрые)
+  concurrency: 2, // 2 parallel processes
+  timeoutMS: 10000, // 10s (tests are fast)
   timeoutFactor: 3, // 3x safety margin
 
   // Reporters
@@ -53,7 +53,7 @@ export default {
     fileName: "reports/mutation-report.html",
   },
 
-  // ⚠️ КРИТИЧНО: НЕ исключаем tests/ - они нужны в sandbox!
+  // ⚠️ CRITICAL: DO NOT exclude tests/ - they are needed in sandbox!
   ignorePatterns: [
     "dist",
     "coverage",
@@ -61,7 +61,7 @@ export default {
     ".turbo",
     ".vitest",
     ".bench",
-    // ❌ НЕ ДОБАВЛЯТЬ "tests/**" - тесты ДОЛЖНЫ быть в sandbox!
+    // ❌ DO NOT ADD "tests/**" - tests MUST be in sandbox!
   ],
 
   // Incremental mode (cache results)

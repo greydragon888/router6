@@ -117,7 +117,6 @@ describe("useRouteNode", () => {
       router.navigate("users.list");
     });
 
-    // ИСПРАВИТЬ: узел "users" теперь обновляется при первом входе
     expect(result.current.route?.name).toBe("users.list");
 
     act(() => {
@@ -130,7 +129,6 @@ describe("useRouteNode", () => {
       router.navigate("home");
     });
 
-    // ИСПРАВИТЬ: узел "users" теперь обновляется при выходе
     expect(result.current.route).toBeUndefined();
   });
 

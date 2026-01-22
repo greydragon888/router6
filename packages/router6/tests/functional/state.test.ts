@@ -162,6 +162,16 @@ describe("core/state", () => {
       expect(state.params).toStrictEqual({ lang: "en", id: 123 });
     });
 
+    it("uses empty params when no params and no defaultParams (line 328)", () => {
+      // Delete any defaultParams for home route
+      delete getConfig(router).defaultParams.home;
+
+      // Call makeState with undefined params (no params, no defaults)
+      const state = router.makeState("home", undefined as never, "/home");
+
+      expect(state.params).toStrictEqual({});
+    });
+
     it("uses forced ID if provided", () => {
       const state = router.makeState(
         "home",
@@ -309,6 +319,20 @@ describe("core/state", () => {
 
     it("should return true when both states are undefined", () => {
       expect(router.areStatesEqual(undefined, undefined)).toBe(true);
+    });
+
+    it("should use cached urlParams on second call (line 118 cache hit)", () => {
+      // First call computes and caches urlParams for "home"
+      const s1 = router.makeState("home", { id: 1 }, "/home");
+      const s2 = router.makeState("home", { id: 1 }, "/home");
+
+      expect(router.areStatesEqual(s1, s2, true)).toBe(true);
+
+      // Second call uses cached urlParams (line 118 returns early)
+      const s3 = router.makeState("home", { id: 2 }, "/home");
+      const s4 = router.makeState("home", { id: 2 }, "/home");
+
+      expect(router.areStatesEqual(s3, s4, true)).toBe(true);
     });
 
     it("should return false when one state is undefined", () => {
@@ -619,6 +643,28 @@ describe("core/state", () => {
 
       expect(state.name).toBe("admin");
       expect(state.params).toStrictEqual({ a: 1, b: 2, c: 3 });
+    });
+
+    it("forwards with only source route defaults (line 595)", () => {
+      router.forward("home", "admin");
+      getConfig(router).defaultParams.home = { a: 1 };
+      // No defaults for admin
+
+      const state = router.forwardState("home", { c: 3 });
+
+      expect(state.name).toBe("admin");
+      expect(state.params).toStrictEqual({ a: 1, c: 3 });
+    });
+
+    it("forwards with only target route defaults (line 598)", () => {
+      router.forward("sign-in", "admin");
+      // No defaults for sign-in
+      getConfig(router).defaultParams.admin = { b: 2 };
+
+      const state = router.forwardState("sign-in", { c: 3 });
+
+      expect(state.name).toBe("admin");
+      expect(state.params).toStrictEqual({ b: 2, c: 3 });
     });
 
     describe("argument validation", () => {

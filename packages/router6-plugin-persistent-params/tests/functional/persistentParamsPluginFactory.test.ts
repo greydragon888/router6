@@ -1,9 +1,10 @@
 import { createRouter, events } from "router6";
-import { describe, beforeEach, afterEach, it, expect } from "vitest";
+import { describe, beforeEach, afterEach, it, expect, vi } from "vitest";
 
 import { persistentParamsPluginFactory as persistentParamsPlugin } from "router6-plugin-persistent-params";
 
 import { parseQueryString } from "../../modules/utils";
+import * as utils from "../../modules/utils";
 
 import type { Router, State } from "router6";
 
@@ -1056,6 +1057,45 @@ describe("Persistent params plugin", () => {
       expect(() => {
         router.navigate("route1", maliciousParams);
       }).toThrowError(/String error thrown/);
+    });
+
+    it("should wrap non-TypeError errors from mergeParams (line 206)", () => {
+      router.usePlugin(persistentParamsPlugin(["mode"]));
+      router.start();
+
+      // Mock mergeParams to throw a generic Error (not TypeError)
+      const mergeParamsSpy = vi
+        .spyOn(utils, "mergeParams")
+        .mockImplementation(() => {
+          throw new Error("Unexpected internal error");
+        });
+
+      expect(() => {
+        router.navigate("route1", { id: "1", mode: "dev" });
+      }).toThrowError(/Error merging parameters.*Unexpected internal error/);
+
+      mergeParamsSpy.mockRestore();
+    });
+
+    it("should wrap non-Error thrown values from mergeParams (line 206 String branch)", () => {
+      router.usePlugin(persistentParamsPlugin(["mode"]));
+      router.start();
+
+      // Mock mergeParams to throw a non-Error value
+      const mergeParamsSpy = vi
+        .spyOn(utils, "mergeParams")
+        .mockImplementation(() => {
+          // eslint-disable-next-line @typescript-eslint/only-throw-error
+          throw "String thrown from mergeParams";
+        });
+
+      expect(() => {
+        router.navigate("route1", { id: "1", mode: "dev" });
+      }).toThrowError(
+        /Error merging parameters.*String thrown from mergeParams/,
+      );
+
+      mergeParamsSpy.mockRestore();
     });
 
     it("should log error when onTransitionSuccess encounters invalid state (line 356)", () => {
