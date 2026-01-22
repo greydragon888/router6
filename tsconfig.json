@@ -18,7 +18,7 @@
       "router6-plugin-persistent-params": [
         "packages/router6-plugin-persistent-params/modules/index.ts"
       ],
-      "react-router6": ["packages/react-router6/modules/index.ts"],
+      "router6-react": ["packages/router6-react/modules/index.ts"],
       "type-guards": ["packages/type-guards/modules/index.ts"],
       "route-tree": ["packages/route-tree/modules/index.ts"],
       "search-params": ["packages/search-params/modules/index.ts"]

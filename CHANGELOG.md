@@ -28,14 +28,14 @@ router6 was a complete rewrite of router5, delivering:
 
 ### Packages in 1.0.0
 
-| Package | Version | Description |
-|---------|---------|-------------|
-| router6 | 1.0.0 | Core router implementation |
-| react-router6 | 1.0.0 | React integration |
-| router6-plugin-browser | 1.0.0 | Browser history plugin |
-| router6-plugin-logger | 1.0.0 | Debug logging plugin |
+| Package                          | Version | Description |
+|----------------------------------|---------|-------------|
+| router6                          | 1.0.0 | Core router implementation |
+| router6-react                    | 1.0.0 | React integration |
+| router6-plugin-browser           | 1.0.0 | Browser history plugin |
+| router6-plugin-logger            | 1.0.0 | Debug logging plugin |
 | router6-plugin-persistent-params | 1.0.0 | Persistent params plugin |
-| router6-helpers | 1.0.0 | Utility functions |
+| router6-helpers                  | 1.0.0 | Utility functions |
 
 ---
 

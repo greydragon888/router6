@@ -496,7 +496,7 @@ Full documentation available on the [Router6 Wiki](https://github.com/greydragon
 
 ## Related Packages
 
-- [react-router6](https://www.npmjs.com/package/react-router6) — React integration
+- [router6-react](https://www.npmjs.com/package/router6-react) — React integration
 
 ---
 

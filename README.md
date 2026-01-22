@@ -73,7 +73,7 @@ router.navigate("users.profile", { id: "123" });
 ### With React
 
 ```tsx
-import { RouterProvider, useRoute, Link } from "react-router6";
+import { RouterProvider, useRoute, Link } from "router6-react";
 
 function App() {
   const { route } = useRoute();
@@ -110,7 +110,7 @@ from(router).subscribe(({ route, previousRoute }) => {
 | Package | Description |
 |---------|-------------|
 | [router6](./packages/router6) | Core router implementation |
-| [react-router6](./packages/react-router6) | React integration (Provider, hooks, components) |
+| [router6-react](packages/router6-react) | React integration (Provider, hooks, components) |
 | [router6-plugin-browser](./packages/router6-plugin-browser) | Browser history and URL synchronization |
 | [router6-plugin-logger](./packages/router6-plugin-logger) | Debug logging for transitions |
 | [router6-plugin-persistent-params](./packages/router6-plugin-persistent-params) | Parameter persistence across navigations |

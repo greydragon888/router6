@@ -39,7 +39,7 @@ This package has **minimal external dependencies** by design:
 Packages that depend on `router6-types`:
 - `router6` - main consumer
 - `type-guards` - for type guard return types
-- `react-router6` - for hook return types
+- `router6-react` - for hook return types
 - `router6-helpers` - for State type
 - All plugin packages
 
@@ -54,7 +54,7 @@ router6-types (depends on route-tree for RouteNode types)
         ↓
         └── plugins (depend on router6-types + router6)
             ↓
-            └── react-router6 (depends on router6 + plugins)
+            └── router6-react (depends on router6 + plugins)
 ```
 
 ## Key Design Decisions
@@ -323,7 +323,7 @@ Full documentation available on the [Router6 Wiki](https://github.com/greydragon
 ## Related Packages
 
 - [router6](https://www.npmjs.com/package/router6) — main router implementation
-- [react-router6](https://www.npmjs.com/package/react-router6) — React integration
+- [router6-react](https://www.npmjs.com/package/router6-react) — React integration
 - [type-guards](https://www.npmjs.com/package/type-guards) — runtime type validation
 - [route-tree](https://www.npmjs.com/package/route-tree) — route tree parsing
 
