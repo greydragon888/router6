@@ -35,29 +35,29 @@ router.start();
 router.navigate("users.profile", { id: "123" });
 ```
 
-## API Reference
+---
+
+## Essential API
 
 ### `createRouter(routes?, options?, dependencies?)`
 
-Creates a new router instance.
+Creates a new router instance. [Wiki](https://github.com/greydragon888/router6/wiki/createRouter)
 
 ```typescript
 const router = createRouter(
   routes,       // Route[] - route definitions
   options,      // Partial<Options> - router options
-  dependencies  // object - dependency injection
+  dependencies, // object - dependency injection
 );
 ```
 
 ---
 
-## Router Methods
-
 ### Lifecycle
 
-#### `router.start(startPath?)`
+#### `router.start(startPath?, done?)`
 
-Starts the router. Optionally accepts an initial path.
+Starts the router. [Wiki](https://github.com/greydragon888/router6/wiki/start)
 
 ```typescript
 router.start();
@@ -69,21 +69,11 @@ router.start("/users/123", (err, state) => {
 
 #### `router.stop()`
 
-Stops the router.
-
-```typescript
-router.stop();
-```
+Stops the router. [Wiki](https://github.com/greydragon888/router6/wiki/stop)
 
 #### `router.isStarted()`
 
-Returns whether the router is started.
-
-```typescript
-if (router.isStarted()) {
-  router.navigate("home");
-}
-```
+Returns whether the router is started. [Wiki](https://github.com/greydragon888/router6/wiki/isStarted)
 
 ---
 
@@ -91,161 +81,46 @@ if (router.isStarted()) {
 
 #### `router.navigate(name, params?, options?, done?)`
 
-Navigates to a route by name.
+Navigates to a route by name. Returns a cancel function. [Wiki](https://github.com/greydragon888/router6/wiki/navigate)
 
 ```typescript
 router.navigate("users");
 router.navigate("users.profile", { id: "123" });
 router.navigate("users.profile", { id: "123" }, { replace: true });
-router.navigate("users.profile", { id: "123" }, { replace: true }, (err, state) => {
+
+// With callback
+router.navigate("users", {}, {}, (err, state) => {
   if (err) console.error(err);
 });
+
+// Cancellation
+const cancel = router.navigate("users.profile", { id: "123" });
+cancel(); // abort navigation
 ```
-
-#### `router.navigateToDefault(options?, done?)`
-
-Navigates to the default route.
-
-```typescript
-router.navigateToDefault();
-```
-
-#### `router.isNavigating()`
-
-Returns whether a navigation is in progress.
-
-```typescript
-if (!router.isNavigating()) {
-  router.navigate("home");
-}
-```
-
-#### `router.cancel()`
-
-Cancels the current navigation.
-
-```typescript
-router.cancel();
-```
-
----
-
-### State
 
 #### `router.getState()`
 
-Returns the current router state.
+Returns the current router state. [Wiki](https://github.com/greydragon888/router6/wiki/getState)
 
 ```typescript
 const state = router.getState();
 // { name: "users.profile", params: { id: "123" }, path: "/users/123" }
 ```
 
-#### `router.getPreviousState()`
+#### `router.navigateToDefault(options?, done?)`
 
-Returns the previous router state.
-
-```typescript
-const prev = router.getPreviousState();
-```
-
-#### `router.setState(state)`
-
-Sets the router state directly (without navigation).
-
-```typescript
-router.setState({ name: "home", params: {}, path: "/" });
-```
-
-#### `router.areStatesEqual(state1, state2, ignoreQueryParams?)`
-
-Compares two states for equality.
-
-```typescript
-router.areStatesEqual(stateA, stateB);
-router.areStatesEqual(stateA, stateB, true); // ignore query params
-```
-
----
-
-### Routes
-
-#### `router.addRoute(route)`
-
-Adds a route definition.
-
-```typescript
-router.addRoute({ name: "settings", path: "/settings" });
-router.addRoute({ name: "settings.profile", path: "/profile" });
-```
-
-#### `router.removeRoute(name)`
-
-Removes a route by name.
-
-```typescript
-router.removeRoute("settings");
-```
-
-#### `router.getRoute(name)`
-
-Gets a route definition by name.
-
-```typescript
-const route = router.getRoute("users");
-```
-
-#### `router.hasRoute(name)`
-
-Checks if a route exists.
-
-```typescript
-if (router.hasRoute("users")) {
-  router.navigate("users");
-}
-```
-
----
-
-### Path Building & Matching
-
-#### `router.buildPath(name, params?)`
-
-Builds a URL path from route name and params.
-
-```typescript
-const path = router.buildPath("users.profile", { id: "123" });
-// "/users/123"
-```
-
-#### `router.buildState(name, params?)`
-
-Builds a state object from route name and params.
-
-```typescript
-const state = router.buildState("users.profile", { id: "123" });
-// { name: "users.profile", params: { id: "123" }, path: "/users/123", meta: {...} }
-```
-
-#### `router.matchPath(path)`
-
-Matches a URL path to a state.
-
-```typescript
-const state = router.matchPath("/users/123");
-// { name: "users.profile", params: { id: "123" }, ... }
-```
+Navigates to the default route. [Wiki](https://github.com/greydragon888/router6/wiki/navigateToDefault)
 
 ---
 
 ### Guards
 
-#### `router.canActivate(name, canActivateFn)`
+#### `router.canActivate(name, guardFactory)`
 
-Registers a guard for route activation.
+Registers a guard for route activation. [Wiki](https://github.com/greydragon888/router6/wiki/canActivate)
 
 ```typescript
-router.canActivate("admin", (toState, fromState, done) => {
+router.canActivate("admin", () => (toState, fromState, done) => {
   if (!isAuthenticated()) {
     done({ redirect: { name: "login" } });
   } else {
@@ -254,12 +129,12 @@ router.canActivate("admin", (toState, fromState, done) => {
 });
 ```
 
-#### `router.canDeactivate(name, canDeactivateFn)`
+#### `router.canDeactivate(name, guardFactory)`
 
-Registers a guard for route deactivation.
+Registers a guard for route deactivation. [Wiki](https://github.com/greydragon888/router6/wiki/canDeactivate)
 
 ```typescript
-router.canDeactivate("editor", (toState, fromState, done) => {
+router.canDeactivate("editor", () => (toState, fromState, done) => {
   if (hasUnsavedChanges()) {
     done({ error: new Error("Unsaved changes") });
   } else {
@@ -268,73 +143,57 @@ router.canDeactivate("editor", (toState, fromState, done) => {
 });
 ```
 
-#### `router.clearCanActivate(name)`
-
-Clears activation guard for a route.
-
-#### `router.clearCanDeactivate(name)`
-
-Clears deactivation guard for a route.
-
 ---
 
-### Events & Subscriptions
+### Events
 
 #### `router.subscribe(listener)`
 
-Subscribes to state changes.
+Subscribes to successful transitions. [Wiki](https://github.com/greydragon888/router6/wiki/subscribe)
 
 ```typescript
 const unsubscribe = router.subscribe(({ route, previousRoute }) => {
   console.log("Navigation:", previousRoute?.name, "→", route.name);
 });
-
-// Later: unsubscribe()
 ```
 
 #### `router.addEventListener(event, listener)`
 
-Adds an event listener.
+Adds an event listener. Returns an unsubscribe function. [Wiki](https://github.com/greydragon888/router6/wiki/addEventListener)
 
 ```typescript
-router.addEventListener("TRANSITION_START", (toState, fromState) => {
+import { events } from "router6";
+
+router.addEventListener(events.TRANSITION_START, (toState, fromState) => {
   console.log("Starting:", toState.name);
 });
 
-router.addEventListener("TRANSITION_SUCCESS", (toState, fromState) => {
-  console.log("Success:", toState.name);
-});
-
-router.addEventListener("TRANSITION_ERROR", (toState, fromState, error) => {
-  console.error("Error:", error);
-});
+// Available events:
+// ROUTER_START, ROUTER_STOP
+// TRANSITION_START, TRANSITION_SUCCESS, TRANSITION_ERROR, TRANSITION_CANCEL
 ```
-
-#### `router.removeEventListener(event, listener)`
-
-Removes an event listener.
 
 ---
 
 ### Plugins
 
-#### `router.usePlugin(plugin)`
+#### `router.usePlugin(pluginFactory)`
 
-Registers a plugin.
+Registers a plugin. Returns an unsubscribe function. [Wiki](https://github.com/greydragon888/router6/wiki/usePlugin)
 
 ```typescript
 import { browserPlugin } from "router6-plugin-browser";
 
-router.usePlugin(browserPlugin());
+const unsubscribe = router.usePlugin(browserPlugin());
 ```
 
 ---
 
 ### Middleware
 
-#### `router.useMiddleware(middleware)`
+#### `router.useMiddleware(middlewareFactory)`
 
-Registers middleware.
+Registers middleware for the navigation pipeline. [Wiki](https://github.com/greydragon888/router6/wiki/useMiddleware)
 
 ```typescript
 router.useMiddleware((router) => (toState, fromState, done) => {
@@ -343,70 +202,161 @@ router.useMiddleware((router) => (toState, fromState, done) => {
 });
 ```
 
-#### `router.clearMiddleware()`
+---
 
-Clears all middleware.
+## Advanced API
+
+### Routes
+
+#### `router.addRoute(route: Route): void`
+Add a route definition at runtime.\
+[Wiki](https://github.com/greydragon888/router6/wiki/addRoute)
+
+#### `router.removeRoute(name: string): void`
+Remove a route by name.\
+[Wiki](https://github.com/greydragon888/router6/wiki/removeRoute)
+
+#### `router.getRoute(name: string): Route | undefined`
+Get route definition by name.\
+[Wiki](https://github.com/greydragon888/router6/wiki/getRoute)
+
+#### `router.hasRoute(name: string): boolean`
+Check if a route exists.\
+[Wiki](https://github.com/greydragon888/router6/wiki/hasRoute)
+
+#### `router.clearRoutes(): void`
+Remove all routes.\
+[Wiki](https://github.com/greydragon888/router6/wiki/clearRoutes)
+
+#### `router.forward(fromRoute: string, toRoute: string): void`
+Set up route forwarding (redirect).\
+[Wiki](https://github.com/greydragon888/router6/wiki/forward)
 
 ---
 
-### Options
+### State Utilities
 
-#### `router.getOptions()`
+#### `router.getPreviousState(): State | undefined`
+Get previous router state.\
+[Wiki](https://github.com/greydragon888/router6/wiki/getPreviousState)
 
-Returns router options.
+#### `router.setState(state: State): void`
+Set state directly without navigation.\
+[Wiki](https://github.com/greydragon888/router6/wiki/setState)
 
-```typescript
-const options = router.getOptions();
-```
+#### `router.makeState(name: string, params?, path?, meta?): State`
+Create a state object.\
+[Wiki](https://github.com/greydragon888/router6/wiki/makeState)
 
-#### `router.setOption(name, value)`
+#### `router.buildState(name: string, params?): State | undefined`
+Build state from route name.\
+[Wiki](https://github.com/greydragon888/router6/wiki/buildState)
 
-Sets a router option.
+#### `router.areStatesEqual(state1, state2, ignoreQueryParams?): boolean`
+Compare two states for equality.\
+[Wiki](https://github.com/greydragon888/router6/wiki/areStatesEqual)
 
-```typescript
-router.setOption("defaultRoute", "home");
-router.setOption("strictTrailingSlash", true);
-```
+#### `router.areStatesDescendants(parentState, childState): boolean`
+Check if child state is descendant of parent.\
+[Wiki](https://github.com/greydragon888/router6/wiki/areStatesDescendants)
+
+---
+
+### Path Operations
+
+#### `router.buildPath(name: string, params?): string`
+Build URL path from route name.\
+[Wiki](https://github.com/greydragon888/router6/wiki/buildPath)
+
+#### `router.matchPath(path: string): State | undefined`
+Match URL path to state.\
+[Wiki](https://github.com/greydragon888/router6/wiki/matchPath)
+
+#### `router.isActiveRoute(name, params?, strictEquality?, ignoreQueryParams?): boolean`
+Check if route is currently active.\
+[Wiki](https://github.com/greydragon888/router6/wiki/isActiveRoute)
+
+#### `router.setRootPath(rootPath: string): void`
+Set root path prefix for all routes.\
+[Wiki](https://github.com/greydragon888/router6/wiki/setRootPath)
 
 ---
 
 ### Dependencies
 
-#### `router.getDependencies()`
+#### `router.getDependencies(): Dependencies`
+Get all dependencies.\
+[Wiki](https://github.com/greydragon888/router6/wiki/getDependencies)
 
-Returns injected dependencies.
+#### `router.setDependency(name: string, value: unknown): void`
+Set a dependency.\
+[Wiki](https://github.com/greydragon888/router6/wiki/setDependency)
 
-```typescript
-const deps = router.getDependencies();
-```
-
-#### `router.setDependency(name, value)`
-
-Sets a dependency.
-
-```typescript
-router.setDependency("api", apiClient);
-```
+#### `router.getDependency(name: string): unknown`
+Get a dependency by name.\
+[Wiki](https://github.com/greydragon888/router6/wiki/getDependency)
 
 ---
 
-## Options
+### Options
+
+#### `router.getOptions(): Options`
+Get router options.\
+[Wiki](https://github.com/greydragon888/router6/wiki/getOptions)
+
+#### `router.setOption(name: string, value: unknown): void`
+Set a router option. Must be called before `start()`.\
+[Wiki](https://github.com/greydragon888/router6/wiki/setOption)
+
+---
+
+### Other
+
+#### `router.clone(dependencies?): Router`
+Clone router for SSR.\
+[Wiki](https://github.com/greydragon888/router6/wiki/clone)
+
+#### `router.isNavigating(): boolean`
+Check if navigation is in progress.\
+[Wiki](https://github.com/greydragon888/router6/wiki/isNavigating)
+
+#### `router.clearMiddleware(): void`
+Clear all middleware.\
+[Wiki](https://github.com/greydragon888/router6/wiki/clearMiddleware)
+
+#### `router.clearCanActivate(name: string): void`
+Clear activation guard for a route.\
+[Wiki](https://github.com/greydragon888/router6/wiki/clearCanActivate)
+
+#### `router.clearCanDeactivate(name: string): void`
+Clear deactivation guard for a route.\
+[Wiki](https://github.com/greydragon888/router6/wiki/clearCanDeactivate)
+
+---
+
+## Configuration
 
 ```typescript
 interface Options {
-  defaultRoute?: string;           // Default route name
-  defaultParams?: Params;          // Default route params
-  strictTrailingSlash?: boolean;   // Strict trailing slash matching
-  queryParamsMode?: "default" | "strict" | "loose";
-  caseSensitive?: boolean;         // Case-sensitive matching
-  allowNotFound?: boolean;         // Allow navigation to unknown routes
-  autoCleanUp?: boolean;           // Auto cleanup on stop
+  defaultRoute: string;            // Default route name (default: "")
+  defaultParams: Params;           // Default route params (default: {})
+  trailingSlash: "strict" | "never" | "always" | "preserve";  // (default: "preserve")
+  caseSensitive: boolean;          // Case-sensitive matching (default: false)
+  urlParamsEncoding: "default" | "uri" | "uriComponent" | "none";  // (default: "default")
+  queryParamsMode: "default" | "strict" | "loose";  // (default: "loose")
+  queryParams?: QueryParamsOptions; // Query parameter parsing options
+  allowNotFound: boolean;          // Allow navigation to unknown routes (default: true)
+  rewritePathOnMatch: boolean;     // Rewrite path on successful match (default: false)
 }
 ```
 
+See [RouterOptions](https://github.com/greydragon888/router6/wiki/RouterOptions) for detailed documentation.
+
+---
+
 ## Observable Support
 
-The router implements the Observable interface:
+The router implements the [TC39 Observable](https://github.com/tc39/proposal-observable) interface:
 
 ```typescript
 import { from } from "rxjs";
@@ -416,9 +366,41 @@ from(router).subscribe(({ route, previousRoute }) => {
 });
 ```
 
+See [Symbol.observable](https://github.com/greydragon888/router6/wiki/observable) for details.
+
+---
+
+## Error Handling
+
+Navigation errors are instances of `RouterError`:
+
+```typescript
+import { RouterError, errorCodes } from "router6";
+
+router.navigate("users", {}, {}, (err, state) => {
+  if (err instanceof RouterError) {
+    console.log(err.code, err.message);
+  }
+});
+```
+
+| Code                | Description                    |
+| ------------------- | ------------------------------ |
+| `ROUTE_NOT_FOUND`   | Route doesn't exist            |
+| `CANNOT_ACTIVATE`   | Blocked by canActivate guard   |
+| `CANNOT_DEACTIVATE` | Blocked by canDeactivate guard |
+| `CANCELLED`         | Navigation was cancelled       |
+| `SAME_STATES`       | Already at target route        |
+| `NOT_STARTED`       | Router not started             |
+| `ALREADY_STARTED`   | Router already started         |
+
+See [RouterError](https://github.com/greydragon888/router6/wiki/RouterError) and [Error Codes](https://github.com/greydragon888/router6/wiki/error-codes) for details.
+
+---
+
 ## Documentation
 
-Full documentation available on the [Router6 Wiki](https://github.com/greydragon888/router6/wiki):
+Full documentation on [Wiki](https://github.com/greydragon888/router6/wiki):
 
 - [createRouter](https://github.com/greydragon888/router6/wiki/createRouter) — factory function
 - [start](https://github.com/greydragon888/router6/wiki/start) · [stop](https://github.com/greydragon888/router6/wiki/stop) — lifecycle
@@ -428,13 +410,15 @@ Full documentation available on the [Router6 Wiki](https://github.com/greydragon
 - [Plugins](https://github.com/greydragon888/router6/wiki/Plugins) — plugin system
 - [Middleware](https://github.com/greydragon888/router6/wiki/Middleware) — middleware system
 
+---
+
 ## Related Packages
 
 - [router6-react](https://www.npmjs.com/package/router6-react) — React integration
-- [router6-plugin-browser](https://www.npmjs.com/package/router6-plugin-browser) — browser history
-- [router6-plugin-logger](https://www.npmjs.com/package/router6-plugin-logger) — debug logging
-- [router6-plugin-persistent-params](https://www.npmjs.com/package/router6-plugin-persistent-params) — persistent params
-- [router6-helpers](https://www.npmjs.com/package/router6-helpers) — utilities
+- [router6-plugin-browser](https://www.npmjs.com/package/router6-plugin-browser) — Browser history
+- [router6-plugin-logger](https://www.npmjs.com/package/router6-plugin-logger) — Debug logging
+- [router6-plugin-persistent-params](https://www.npmjs.com/package/router6-plugin-persistent-params) — Persistent params
+- [router6-helpers](https://www.npmjs.com/package/router6-helpers) — Utilities
 
 ## License
 

@@ -46,6 +46,8 @@ npm install router6
 pnpm add router6
 # or
 yarn add router6
+# or
+bun add router6
 ```
 
 ## Quick Start
@@ -96,7 +98,7 @@ createRoot(document.getElementById("root")).render(
 ### With Observables
 
 ```typescript
-import { from } from "rxjs";
+import { from } from "rxjs";  
 
 from(router).subscribe(({ route, previousRoute }) => {
   console.log("Navigation:", previousRoute?.name, "→", route.name);
@@ -185,6 +187,12 @@ pnpm build
 
 # Run tests
 pnpm test
+
+# Type checking
+pnpm type-check
+
+# Linting
+pnpm lint
 ```
 
 ## Contributing
