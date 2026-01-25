@@ -4,6 +4,3 @@
 
 // Main plugin factory and instance
 export { loggerPluginFactory, loggerPlugin } from "./plugin";
-
-// Types
-export type { LoggerPluginConfig, LogLevel } from "./types";

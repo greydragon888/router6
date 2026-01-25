@@ -44,7 +44,7 @@ export interface LoggerPluginConfig {
    * Only applies when navigating within the same route.
    * Helps identify which parameters changed during navigation.
    *
-   * @default false
+   * @default true
    */
   showParamsDiff?: boolean;
 

@@ -26,8 +26,8 @@ on:
 #
 # Documentation: https://docs.npmjs.com/trusted-publishers/
 #
-# NOTE: pnpm does not support OIDC Trusted Publishing (see https://github.com/pnpm/pnpm/issues/9812)
-# We use pnpm for install/build but npm for publish.
+# NOTE: pnpm publish uses npm publish internally, so OIDC Trusted Publishing works.
+# See https://github.com/pnpm/pnpm/issues/9812
 
 permissions:
   contents: write
@@ -40,17 +40,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10
+        # version is read from package.json packageManager field
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 24
           cache: pnpm
@@ -66,6 +65,44 @@ jobs:
 
       - name: Run tests
         run: pnpm run test
+
+      - name: Remove private dependencies from package.json
+        run: |
+          PRIVATE_PACKAGES="route-tree search-params type-guards router6-types"
+          echo "Removing private dependencies from public packages..."
+
+          for dir in packages/*/; do
+            if [ -f "$dir/package.json" ]; then
+              private=$(node -p "require('./${dir}package.json').private || false")
+              if [ "$private" = "true" ]; then
+                continue
+              fi
+
+              name=$(node -p "require('./${dir}package.json').name")
+              modified=false
+
+              for pkg in $PRIVATE_PACKAGES; do
+                # Check and remove from dependencies
+                has_dep=$(node -p "require('./${dir}package.json').dependencies?.['$pkg'] || ''")
+                if [ -n "$has_dep" ]; then
+                  node -e "
+                    const fs = require('fs');
+                    const path = './${dir}package.json';
+                    const pkg = JSON.parse(fs.readFileSync(path, 'utf8'));
+                    delete pkg.dependencies['$pkg'];
+                    if (Object.keys(pkg.dependencies).length === 0) delete pkg.dependencies;
+                    fs.writeFileSync(path, JSON.stringify(pkg, null, 2) + '\n');
+                  "
+                  echo "  Removed $pkg from $name dependencies"
+                  modified=true
+                fi
+              done
+
+              if [ "$modified" = "true" ]; then
+                echo "✅ Updated $name"
+              fi
+            fi
+          done
 
       - name: Determine version
         id: version
@@ -123,14 +160,18 @@ jobs:
           for dir in packages/*/; do
             if [ -f "$dir/package.json" ]; then
               name=$(node -p "require('./${dir}package.json').name")
+              version=$(node -p "require('./${dir}package.json').version")
               private=$(node -p "require('./${dir}package.json').private || false")
 
               if [ "$private" = "true" ]; then
                 echo "⏭️ Skipping $name (private package)"
+              elif npm view "${name}@${version}" version >/dev/null 2>&1; then
+                echo "⏭️ Skipping $name@${version} (already published)"
               else
-                echo "📦 Publishing $name..."
+                echo "📦 Publishing $name@${version}..."
                 cd "$dir"
-                npm publish --provenance --access public --registry https://registry.npmjs.org
+                # pnpm publish converts workspace:^ automatically and uses npm publish internally (OIDC works)
+                pnpm publish --provenance --access public --no-git-checks
                 cd ../..
               fi
             fi
