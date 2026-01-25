@@ -57,8 +57,3 @@ stryker*.config.mjs.map
 # ESLint cache
 .eslintcache
 packages/**/.eslintcache
-
-# Local scripts and tools
-scripts/
-!scripts/generate-dts.mjs
-tools/
