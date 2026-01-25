@@ -33,6 +33,7 @@ export default tsEslint.config(
     "**/*.min.js",
     "**/*.d.ts",
     "**/generated/**",
+    "**/scripts/**", // Build scripts
     "**/.DS_Store", // macOS system files
     "**/*.bak*", // Backup files
   ]),
