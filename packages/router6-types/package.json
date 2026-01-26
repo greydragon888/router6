@@ -1,7 +1,6 @@
 {
   "name": "router6-types",
-  "version": "1.0.0",
-  "private": true,
+  "version": "1.0.1",
   "description": "Shared TypeScript types for Router6 ecosystem",
   "types": "./dist/esm/index.d.mts",
   "exports": {

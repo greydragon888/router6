@@ -149,9 +149,11 @@ export const createConfig = (opts: CreateConfigOptions = {}): Options[] => {
     ...commonConfig,
     format,
 
-    // Type definitions generated separately via dts-bundle-generator
-    // (tsup's dts doesn't properly bundle workspace dependencies)
-    dts: false,
+    // Generate type definitions with imports preserved
+    // (types are imported from router6-types, not inlined)
+    dts: {
+      resolve: true,
+    },
 
     // Output directory for each format
     outDir: `${OUT_DIR}/${format}`,

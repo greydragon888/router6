@@ -68,7 +68,7 @@ jobs:
 
       - name: Remove private dependencies from package.json
         run: |
-          PRIVATE_PACKAGES="route-tree search-params type-guards router6-types"
+          PRIVATE_PACKAGES="route-tree search-params type-guards"
           echo "Removing private dependencies from public packages..."
 
           for dir in packages/*/; do
