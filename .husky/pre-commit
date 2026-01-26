@@ -1,5 +1,12 @@
-scripts/add-package-paths.sh
+#!/bin/sh
 
-time pnpm build
+# Exit on any error
+set -e
 
-node scripts/analyze-bundle.mjs
+echo "🔍 Running pre-commit checks..."
+
+# Run type checking, linting, and tests via turbo pipeline
+echo "🧪 Running tests (includes type-check and lint via turbo)..."
+pnpm test
+
+echo "✅ Pre-commit checks passed!"

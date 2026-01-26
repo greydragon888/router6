@@ -3,6 +3,7 @@
   "type": "module",
   "description": "A real router. Just routing, nothing else.",
   "scripts": {
+    "prepare": "husky",
     "build": "turbo run build",
     "test": "turbo run test",
     "lint": "turbo run lint",
@@ -10,8 +11,6 @@
     "type-check": "turbo run type-check",
     "publint": "turbo run publint",
     "test:coverage": "turbo run test -- --coverage",
-    "clean:all": "bash ./scripts/clean-all.sh",
-    "clean:deep": "scripts/clean-deep.sh",
     "packages-structure": "find packages/*/modules -type f -name \"*.ts*\" -print | tree --fromfile"
   },
   "private": true,
